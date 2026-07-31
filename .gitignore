@@ -1,0 +1,37 @@
+# LaTeX / latexmk 中间文件
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.blg
+*.bbl
+*.bcf
+*.run.xml
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.dvi
+*.ps
+*.idx
+*.ilg
+*.ind
+*.glo
+*.gls
+*.nlo
+*.nls
+*.xdv
+*.bmt
+*.loa
+*.lol
+
+# 编译输出 PDF（若后续使用 PDF 格式的图片，请改从忽略列表排除）
+*.pdf
+
+# 编辑器临时文件
+*.swp
+*.bak

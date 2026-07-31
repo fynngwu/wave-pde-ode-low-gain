@@ -1,0 +1,27 @@
+{
+  // LaTeX Workshop 自动编译配置：保存 main.tex 时自动用 latexmk 编译为 PDF
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk",
+      "command": "latexmk",
+      "args": [
+        "-pdf",
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOC%"
+      ],
+      "env": {}
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk (pdf)",
+      "tools": ["latexmk"]
+    }
+  ],
+  // 保存文件时自动触发编译
+  "latex-workshop.latex.autoBuild.run": "onSave",
+  // 编译完成后在编辑器内新标签页打开 PDF 预览
+  "latex-workshop.view.pdf.viewer": "tab"
+}
