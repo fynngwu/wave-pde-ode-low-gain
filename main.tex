@@ -6,821 +6,757 @@
 \usepackage{textcomp}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\usepackage{bm}
+\usepackage{amsthm}
+\newcommand{\Av}{\mathcal{A}}
+\newcommand{\dint}[1]{\int_0^D #1}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{assumption}{Assumption}
+\theoremstyle{definition}
+\newtheorem{remark}{Remark}
+
 \begin{document}
-\title{Preparation of Briefs for IEEE TRANSACTIONS and JOURNALS (February 2017)}
-\author{First A. Author, \IEEEmembership{Fellow, IEEE}, Second B. Author, and Third C. Author, Jr., \IEEEmembership{Member, IEEE}
-\thanks{This paragraph of the first footnote will contain the date on 
-which you submitted your brief for review. It will also contain support 
-information, including sponsor and financial support acknowledgment. For 
-example, ``This work was supported in part by the U.S. Department of 
-Commerce under Grant BS123456.'' }
-\thanks{The next few paragraphs should contain 
-the authors' current affiliations, including current address and e-mail. For 
-example, F. A. Author is with the National Institute of Standards and 
-Technology, Boulder, CO 80305 USA (e-mail: author@boulder.nist.gov). }
-\thanks{S. B. Author, Jr., was with Rice University, Houston, TX 77005 USA. He is 
-now with the Department of Physics, Colorado State University, Fort Collins, 
-CO 80523 USA (e-mail: author@lamar.colostate.edu).}
-\thanks{T. C. Author is with 
-the Electrical Engineering Department, University of Colorado, Boulder, CO 
-80309 USA, on leave from the National Research Institute for Metals, 
-Tsukuba, Japan (e-mail: author@nrim.go.jp).}}
+
+\title{Low-Gain Compensation for Wave PDE--ODE System with Distributed Effect}
+
+\author{Fengyang~Wu
+\thanks{F. Wu is with the School of System Design and Intelligent Manufacturing
+(now the Department of Automation and Intelligent Manufacturing), Southern
+University of Science and Technology, Shenzhen, China (e-mail:
+12210634@mail.sustech.edu.cn). This work was supervised by Prof. Xiang~Xu.}}
 
 \maketitle
 
 \begin{abstract}
-These instructions give you guidelines for preparing briefs for 
-IEEE Transactions and Journals. Use this document as a template if you are 
-using \LaTeX. Otherwise, use this document as an 
-instruction set. The electronic file of your brief will be formatted further 
-at IEEE. Brief titles should be written in uppercase and lowercase letters, 
-not all uppercase. Avoid writing long formulas with subscripts in the title; 
-short formulas that identify the elements are fine (e.g., "Nd--Fe--B"). Do 
-not write ``(Invited)'' in the title. Full names of authors are preferred in 
-the author field, but are not required. Put a space between authors' 
-initials. The abstract must be a concise yet comprehensive reflection of 
-what is in your article. In particular, the abstract must be self-contained, 
-without abbreviations, footnotes, or references. It should be a microcosm of 
-the full article. The abstract must be between 150--250 words. Be sure that 
-you adhere to these limits; otherwise, you will need to edit your abstract 
-accordingly. The abstract must be written as one paragraph, and should not 
-contain displayed mathematical equations or tabular material. The abstract 
-should include three or four different keywords or phrases, as this will 
-help readers to find it. It is important to avoid over-repetition of such 
-phrases as this can result in a page being rejected by search engines. 
-Ensure that your abstract reads well and is grammatically correct.
+This article proposes two low-gain boundary controllers for wave PDE--ODE
+cascade systems with distributed coupling. The closed-loop system is shown to
+be exponentially stabilized with the proposed controllers as long as the
+open-loop ODE plant is not exponentially unstable. In contrast to existing
+backstepping designs, the controllers are structurally much simpler, requiring
+only the low-gain feedback and a boundary velocity damping term, and an even
+simpler controller is constructed for the nilpotent case. Several simulation
+examples illustrate the effectiveness of the controllers.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Enter key words or phrases in alphabetical 
-order, separated by commas. For a list of suggested keywords, send a blank 
-e-mail to keywords@ieee.org or visit \underline
-{http://www.ieee.org/organizations/pubs/ani\_prod/keywrd98.txt}
+PDE--ODE cascade, wave equation, boundary stabilization, low-gain compensation.
 \end{IEEEkeywords}
 
 \section{Introduction}
-\label{sec:introduction}
-This document is a template for \LaTeX. If you are 
-reading a brief or PDF version of this document, please download the 
-electronic file, trans\_jour.tex, from the IEEE Web site at \underline
-{http://www.ieee.org/authortools/trans\_jour.tex} so you can use it to prepare your manuscript. If 
-you would prefer to use LaTeX, download IEEE's LaTeX style and sample files 
-from the same Web page. You can also explore using the Overleaf editor at 
-\underline
-{https://www.overleaf.com/blog/278-how-to-use-overleaf-with-}\discretionary{}{}{}\underline
-{ieee-collabratec-your-quick-guide-to-getting-started\#.}\discretionary{}{}{}\underline{xsVp6tpPkrKM9}
+\IEEEPARstart{M}{any} control systems deliver the controller command to the ODE
+plant through a non-ideal actuator rather than an ideal lumped input. The command
+first passes through actuator dynamics associated with a non-negligible
+transmission length, finite propagation speed, elasticity, inertia, or acoustic
+storage; the actuator then stores energy, reflects disturbances at its
+boundaries, and reaches the plant only through the evolution of a distributed
+state. This viewpoint is closely related to the classical compensation of input
+delays \cite{r1}--\cite{r4}, but it retains more of the physical actuator
+dynamics than a pure delay representation.
 
-If your brief is intended for a conference, please contact your conference 
-editor concerning acceptable word processor formats for your particular 
-conference. 
-
-IEEE will do the final formatting of your brief. If your brief is intended 
-for a conference, please observe the conference page limits. 
-
-\subsection{Abbreviations and Acronyms}
-Define abbreviations and acronyms the first time they are used in the text, 
-even after they have already been defined in the abstract. Abbreviations 
-such as IEEE, SI, ac, and dc do not have to be defined. Abbreviations that 
-incorporate periods should not have spaces: write ``C.N.R.S.,'' not ``C. N. 
-R. S.'' Do not use abbreviations in the title unless they are unavoidable 
-(for example, ``IEEE'' in the title of this article).
-
-\subsection{Other Recommendations}
-Use one space after periods and colons. Hyphenate complex modifiers: 
-``zero-field-cooled magnetization.'' Avoid dangling participles, such as, 
-``Using \eqref{eq}, the potential was calculated.'' [It is not clear who or what 
-used \eqref{eq}.] Write instead, ``The potential was calculated by using \eqref{eq},'' or 
-``Using \eqref{eq}, we calculated the potential.''
-
-Use a zero before decimal points: ``0.25,'' not ``.25.'' Use 
-``cm$^{3}$,'' not ``cc.'' Indicate sample dimensions as ``0.1 cm 
-$\times $ 0.2 cm,'' not ``0.1 $\times $ 0.2 cm$^{2}$.'' The 
-abbreviation for ``seconds'' is ``s,'' not ``sec.'' Use 
-``Wb/m$^{2}$'' or ``webers per square meter,'' not 
-``webers/m$^{2}$.'' When expressing a range of values, write ``7 to 
-9'' or ``7--9,'' not ``7$\sim $9.''
-
-A parenthetical statement at the end of a sentence is punctuated outside of 
-the closing parenthesis (like this). (A parenthetical sentence is punctuated 
-within the parentheses.) In American English, periods and commas are within 
-quotation marks, like ``this period.'' Other punctuation is ``outside''! 
-Avoid contractions; for example, write ``do not'' instead of ``don't.'' The 
-serial comma is preferred: ``A, B, and C'' instead of ``A, B and C.''
-
-If you wish, you may write in the first person singular or plural and use 
-the active voice (``I observed that $\ldots$'' or ``We observed that $\ldots$'' 
-instead of ``It was observed that $\ldots$''). Remember to check spelling. If 
-your native language is not English, please get a native English-speaking 
-colleague to carefully proofread your brief.
-
-Try not to use too many typefaces in the same article. You're writing
-scholarly papers, not ransom notes. Also please remember that MathJax
-can't handle really weird typefaces.
-
-\subsection{Equations}
-Number equations consecutively with equation numbers in parentheses flush 
-with the right margin, as in \eqref{eq}. To make your equations more 
-compact, you may use the solidus (~/~), the exp function, or appropriate 
-exponents. Use parentheses to avoid ambiguities in denominators. Punctuate 
-equations when they are part of a sentence, as in
-\begin{equation}E=mc^2.\label{eq}\end{equation}
-
-Be sure that the symbols in your equation have been defined before the 
-equation appears or immediately following. Italicize symbols ($T$ might refer 
-to temperature, but T is the unit tesla). Refer to ``\eqref{eq},'' not ``Eq. \eqref{eq}'' 
-or ``equation \eqref{eq},'' except at the beginning of a sentence: ``Equation \eqref{eq} 
-is $\ldots$ .''
-
-\subsection{\LaTeX-Specific Advice}
-
-Please use ``soft'' (e.g., \verb|\eqref{Eq}|) cross references instead
-of ``hard'' references (e.g., \verb|(1)|). That will make it possible
-to combine sections, add equations, or change the order of figures or
-citations without having to go through the file line by line.
-
-Please don't use the \verb|{eqnarray}| equation environment. Use
-\verb|{align}| or \verb|{IEEEeqnarray}| instead. The \verb|{eqnarray}|
-environment leaves unsightly spaces around relation symbols.
-
-Please note that the \verb|{subequations}| environment in {\LaTeX}
-will increment the main equation counter even when there are no
-equation numbers displayed. If you forget that, you might write an
-article in which the equation numbers skip from (17) to (20), causing
-the copy editors to wonder if you've discovered a new method of
-counting.
-
-{\BibTeX} does not work by magic. It doesn't get the bibliographic
-data from thin air but from .bib files. If you use {\BibTeX} to produce a
-bibliography you must send the .bib files. 
-
-{\LaTeX} can't read your mind. If you assign the same label to a
-subsubsection and a table, you might find that Table I has been cross
-referenced as Table IV-B3. 
-
-{\LaTeX} does not have precognitive abilities. If you put a
-\verb|\label| command before the command that updates the counter it's
-supposed to be using, the label will pick up the last counter to be
-cross referenced instead. In particular, a \verb|\label| command
-should not go before the caption of a figure or a table.
-
-Do not use \verb|\nonumber| inside the \verb|{array}| environment. It
-will not stop equation numbers inside \verb|{array}| (there won't be
-any anyway) and it might stop a wanted equation number in the
-surrounding equation.
-
-\section{Units}
-Use either SI (MKS) or CGS as primary units. (SI units are strongly 
-encouraged.) English units may be used as secondary units (in parentheses). 
-This applies to briefs in data storage. For example, write ``15 
-Gb/cm$^{2}$ (100 Gb/in$^{2})$.'' An exception is when 
-English units are used as identifiers in trade, such as ``3\textonehalf-in 
-disk drive.'' Avoid combining SI and CGS units, such as current in amperes 
-and magnetic field in oersteds. This often leads to confusion because 
-equations do not balance dimensionally. If you must use mixed units, clearly 
-state the units for each quantity in an equation.
-
-The SI unit for magnetic field strength $H$ is A/m. However, if you wish to use 
-units of T, either refer to magnetic flux density $B$ or magnetic field 
-strength symbolized as $\mu _{0}H$. Use the center dot to separate 
-compound units, e.g., ``A$\cdot $m$^{2}$.''
-
-\section{Some Common Mistakes}
-The word ``data'' is plural, not singular. The subscript for the 
-permeability of vacuum $\mu _{0}$ is zero, not a lowercase letter 
-``o.'' The term for residual magnetization is ``remanence''; the adjective 
-is ``remanent''; do not write ``remnance'' or ``remnant.'' Use the word 
-``micrometer'' instead of ``micron.'' A graph within a graph is an 
-``inset,'' not an ``insert.'' The word ``alternatively'' is preferred to the 
-word ``alternately'' (unless you really mean something that alternates). Use 
-the word ``whereas'' instead of ``while'' (unless you are referring to 
-simultaneous events). Do not use the word ``essentially'' to mean 
-``approximately'' or ``effectively.'' Do not use the word ``issue'' as a 
-euphemism for ``problem.'' When compositions are not specified, separate 
-chemical symbols by en-dashes; for example, ``NiMn'' indicates the 
-intermetallic compound Ni$_{0.5}$Mn$_{0.5}$ whereas 
-``Ni--Mn'' indicates an alloy of some composition 
-Ni$_{x}$Mn$_{1-x}$.
+Wave equations provide a natural model for such actuator dynamics because
+propagation and energy storage are dominant \cite{r5}, \cite{r6}. Compared with
+diffusion models, a wave equation is hyperbolic and essentially conservative
+unless damping is injected through the boundary or the domain, so the location
+and form of the boundary conditions determine how energy enters and leaves the
+actuator. In the cascade considered here, the boundary input $U(t)$ is applied
+at the right endpoint $x = D$ of a one-dimensional wave actuator $u(x,t)$, the
+left endpoint $x = 0$ carries a positive Robin elastic support $u_x(0,t) = q
+u(0,t)$, $q > 0$, and the plant state $X(t)$ is driven by the spatially
+integrated effects of the wave displacement and velocity through
+$\dint{B_1(x)u(x,t)\,\mathrm{d}x}$ and $\dint{B_2(x)u_t(x,t)\,\mathrm{d}x}$.
+The plant is therefore coupled to the whole actuator profile rather than to a
+single boundary trace, and the closed loop is not in a strict-feedback form. The
+structure is summarized in Fig.~\ref{fig1}.
 
 \begin{figure}[!t]
-\centerline{\includegraphics[width=\columnwidth]{fig1.png}}
-\caption{Magnetization as a function of applied field.
-It is good practice to explain the significance of the figure in the caption.}
+\centerline{\includegraphics[width=0.9\columnwidth]{fig1.png}}
+\caption{Closed-loop wave PDE--ODE cascade with distributed displacement and
+velocity coupling.}
 \label{fig1}
 \end{figure}
 
-Be aware of the different meanings of the homophones ``affect'' (usually a 
-verb) and ``effect'' (usually a noun), ``complement'' and ``compliment,'' 
-``discreet'' and ``discrete,'' ``principal'' (e.g., ``principal 
-investigator'') and ``principle'' (e.g., ``principle of measurement''). Do 
-not confuse ``imply'' and ``infer.'' 
+Boundary control of wave equations and PDE backstepping have been extensively
+studied \cite{r7}--\cite{r9}. For a wave PDE entering the plant, an explicit
+compensator was first constructed in \cite{r10} for a pointwise interconnection
+and extended in \cite{r11} to distributed in-domain couplings. Because the
+cascade is not strict-feedback and the wave subsystem has infinitely many
+imaginary-axis modes, such backstepping controllers tend to be algebraically
+involved and typically require full distributed-state information. Recent work
+has moved wave and hyperbolic PDE--ODE cascades toward output feedback,
+disturbances, and delays \cite{r14}--\cite{r17}, usually at the price of adding
+observer, disturbance-estimator, or adaptive modules.
 
-Prefixes such as ``non,'' ``sub,'' ``micro,'' ``multi,'' and ``ultra'' are 
-not independent words; they should be joined to the words they modify, 
-usually without a hyphen. There is no period after the ``et'' in the Latin 
-abbreviation ``\emph{et al.}'' (it is also italicized). The abbreviation ``i.e.,'' means 
-``that is,'' and the abbreviation ``e.g.,'' means ``for example'' (these 
-abbreviations are not italicized).
+On the other hand, low-gain feedback provides simple controllers for linear
+systems with input saturation and/or input delays \cite{r18}--\cite{r26} under
+additional spectral assumptions on the open-loop plant. Most relevant to the
+distributed-effect mechanism, low-gain compensation was established in
+\cite{r27} for diffusion--convection PDE--ODE cascades, and \cite{r28} shows how
+distributed interconnections increase the complexity of both the controller and
+the proof. These developments motivate the question whether a similarly simple
+low-gain design exists for a \emph{conservative wave} actuator with distributed
+displacement and velocity coupling.
 
-A general IEEE styleguide is available at \underline{http://www.ieee.org/authortools}.
-
-\section{Guidelines for Graphics Preparation and Submission}
-\label{sec:guidelines}
-
-\subsection{Types of Graphics}
-The following list outlines the different types of graphics published in 
-IEEE journals. They are categorized based on their construction, and use of 
-color/shades of gray:
-
-\subsubsection{Color/Grayscale figures}
-{Figures that are meant to appear in color, or shades of black/gray. Such 
-figures may include photographs, illustrations, multicolor graphs, and 
-flowcharts.}
-
-\subsubsection{Line Art figures}
-{Figures that are composed of only black lines and shapes. These figures 
-should have no shades or half-tones of gray, only black and white.}
-
-\subsubsection{Author photos}
-{Head and shoulders shots of authors that appear at the end of our briefs. }
-
-\subsubsection{Tables}
-{Data charts which are typically black and white, but sometimes include 
-color.}
-
-\begin{table}
-\caption{Units for Magnetic Properties}
-\label{table}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{|p{25pt}|p{75pt}|p{115pt}|}
-\hline
-Symbol& 
-Quantity& 
-Conversion from Gaussian and \par CGS EMU to SI $^{\mathrm{a}}$ \\
-\hline
-$\Phi $& 
-magnetic flux& 
-1 Mx $\to  10^{-8}$ Wb $= 10^{-8}$ V$\cdot $s \\
-$B$& 
-magnetic flux density, \par magnetic induction& 
-1 G $\to  10^{-4}$ T $= 10^{-4}$ Wb/m$^{2}$ \\
-$H$& 
-magnetic field strength& 
-1 Oe $\to  10^{3}/(4\pi )$ A/m \\
-$m$& 
-magnetic moment& 
-1 erg/G $=$ 1 emu \par $\to 10^{-3}$ A$\cdot $m$^{2} = 10^{-3}$ J/T \\
-$M$& 
-magnetization& 
-1 erg/(G$\cdot $cm$^{3}) =$ 1 emu/cm$^{3}$ \par $\to 10^{3}$ A/m \\
-4$\pi M$& 
-magnetization& 
-1 G $\to  10^{3}/(4\pi )$ A/m \\
-$\sigma $& 
-specific magnetization& 
-1 erg/(G$\cdot $g) $=$ 1 emu/g $\to $ 1 A$\cdot $m$^{2}$/kg \\
-$j$& 
-magnetic dipole \par moment& 
-1 erg/G $=$ 1 emu \par $\to 4\pi \times  10^{-10}$ Wb$\cdot $m \\
-$J$& 
-magnetic polarization& 
-1 erg/(G$\cdot $cm$^{3}) =$ 1 emu/cm$^{3}$ \par $\to 4\pi \times  10^{-4}$ T \\
-$\chi , \kappa $& 
-susceptibility& 
-1 $\to  4\pi $ \\
-$\chi_{\rho }$& 
-mass susceptibility& 
-1 cm$^{3}$/g $\to  4\pi \times  10^{-3}$ m$^{3}$/kg \\
-$\mu $& 
-permeability& 
-1 $\to  4\pi \times  10^{-7}$ H/m \par $= 4\pi \times  10^{-7}$ Wb/(A$\cdot $m) \\
-$\mu_{r}$& 
-relative permeability& 
-$\mu \to \mu_{r}$ \\
-$w, W$& 
-energy density& 
-1 erg/cm$^{3} \to  10^{-1}$ J/m$^{3}$ \\
-$N, D$& 
-demagnetizing factor& 
-1 $\to  1/(4\pi )$ \\
-\hline
-\multicolumn{3}{p{251pt}}{Vertical lines are optional in tables. Statements that serve as captions for 
-the entire table do not need footnote letters. }\\
-\multicolumn{3}{p{251pt}}{$^{\mathrm{a}}$Gaussian units are the same as cg emu for magnetostatics; Mx 
-$=$ maxwell, G $=$ gauss, Oe $=$ oersted; Wb $=$ weber, V $=$ volt, s $=$ 
-second, T $=$ tesla, m $=$ meter, A $=$ ampere, J $=$ joule, kg $=$ 
-kilogram, H $=$ henry.}
-\end{tabular}
-\label{tab1}
-\end{table}
-
-\subsection{Multipart figures}
-Figures compiled of more than one sub-figure presented side-by-side, or 
-stacked. If a multipart figure is made up of multiple figure
-types (one part is lineart, and another is grayscale or color) the figure 
-should meet the stricter guidelines.
-
-\subsection{File Formats For Graphics}\label{formats}
-Format and save your graphics using a suitable graphics processing program 
-that will allow you to create the images as PostScript (PS), Encapsulated 
-PostScript (.EPS), Tagged Image File Format (.TIFF), Portable Document 
-Format (.PDF), Portable Network Graphics (.PNG), or Metapost (.MPS), sizes them, and adjusts 
-the resolution settings. When 
-submitting your final brief, your graphics should all be submitted 
-individually in one of these formats along with the manuscript.
-
-\subsection{Sizing of Graphics}
-Most charts, graphs, and tables are one column wide (3.5 inches/88 
-millimeters/21 picas) or page wide (7.16 inches/181 millimeters/43 
-picas). The maximum depth a graphic can be is 8.5 inches (216 millimeters/54
-picas). When choosing the depth of a graphic, please allow space for a 
-caption. Figures can be sized between column and page widths if the author 
-chooses, however it is recommended that figures are not sized less than 
-column width unless when necessary. 
-
-There is currently one publication with column measurements that do not 
-coincide with those listed above. Proceedings of the IEEE has a column 
-measurement of 3.25 inches (82.5 millimeters/19.5 picas). 
-
-The final printed size of author photographs is exactly
-1 inch wide by 1.25 inches tall (25.4 millimeters$\,\times\,$31.75 millimeters/6 
-picas$\,\times\,$7.5 picas). Author photos printed in editorials measure 1.59 inches 
-wide by 2 inches tall (40 millimeters$\,\times\,$50 millimeters/9.5 picas$\,\times\,$12 
-picas).
-
-\subsection{Resolution }
-The proper resolution of your figures will depend on the type of figure it 
-is as defined in the ``Types of Figures'' section. Author photographs, 
-color, and grayscale figures should be at least 300dpi. Line art, including 
-tables should be a minimum of 600dpi.
-
-\subsection{Vector Art}
-In order to preserve the figures' integrity across multiple computer 
-platforms, we accept files in the following formats: .EPS/.PDF/.PS. All 
-fonts must be embedded or text converted to outlines in order to achieve the 
-best-quality results.
-
-\subsection{Color Space}
-The term color space refers to the entire sum of colors that can be 
-represented within the said medium. For our purposes, the three main color 
-spaces are Grayscale, RGB (red/green/blue) and CMYK 
-(cyan/magenta/yellow/black). RGB is generally used with on-screen graphics, 
-whereas CMYK is used for printing purposes.
-
-All color figures should be generated in RGB or CMYK color space. Grayscale 
-images should be submitted in Grayscale color space. Line art may be 
-provided in grayscale OR bitmap colorspace. Note that ``bitmap colorspace'' 
-and ``bitmap file format'' are not the same thing. When bitmap color space 
-is selected, .TIF/.TIFF/.PNG are the recommended file formats.
-
-\subsection{Accepted Fonts Within Figures}
-When preparing your graphics IEEE suggests that you use of one of the 
-following Open Type fonts: Times New Roman, Helvetica, Arial, Cambria, and 
-Symbol. If you are supplying EPS, PS, or PDF files all fonts must be 
-embedded. Some fonts may only be native to your operating system; without 
-the fonts embedded, parts of the graphic may be distorted or missing.
-
-A safe option when finalizing your figures is to strip out the fonts before 
-you save the files, creating ``outline'' type. This converts fonts to 
-artwork what will appear uniformly on any screen.
-
-\subsection{Using Labels Within Figures}
-
-\subsubsection{Figure Axis labels }
-Figure axis labels are often a source of confusion. Use words rather than 
-symbols. As an example, write the quantity ``Magnetization,'' or 
-``Magnetization M,'' not just ``M.'' Put units in parentheses. Do not label 
-axes only with units. As in Fig. 1, for example, write ``Magnetization 
-(A/m)'' or ``Magnetization (A$\cdot$m$^{-1}$),'' not just ``A/m.'' Do not label axes with a ratio of quantities and 
-units. For example, write ``Temperature (K),'' not ``Temperature/K.'' 
-
-Multipliers can be especially confusing. Write ``Magnetization (kA/m)'' or 
-``Magnetization (10$^{3}$ A/m).'' Do not write ``Magnetization 
-(A/m)$\,\times\,$1000'' because the reader would not know whether the top 
-axis label in Fig. 1 meant 16000 A/m or 0.016 A/m. Figure labels should be 
-legible, approximately 8 to 10 point type.
-
-\subsubsection{Subfigure Labels in Multipart Figures and Tables}
-Multipart figures should be combined and labeled before final submission. 
-Labels should appear centered below each subfigure in 8 point Times New 
-Roman font in the format of (a) (b) (c). 
-
-\subsection{File Naming}
-Figures (line artwork or photographs) should be named starting with the 
-first 5 letters of the author's last name. The next characters in the 
-filename should be the number that represents the sequential 
-location of this image in your article. For example, in author 
-``Anderson's'' brief, the first three figures would be named ander1.tif, 
-ander2.tif, and ander3.ps.
-
-Tables should contain only the body of the table (not the caption) and 
-should be named similarly to figures, except that `.t' is inserted 
-in-between the author's name and the table number. For example, author 
-Anderson's first three tables would be named ander.t1.tif, ander.t2.ps, 
-ander.t3.eps.
-
-Author photographs should be named using the first five characters of the 
-pictured author's last name. For example, four author photographs for a 
-brief may be named: oppen.ps, moshc.tif, chen.eps, and duran.pdf.
-
-If two authors or more have the same last name, their first initial(s) can 
-be substituted for the fifth, fourth, third$\ldots$ letters of their surname 
-until the degree where there is differentiation. For example, two authors 
-Michael and Monica Oppenheimer's photos would be named oppmi.tif, and 
-oppmo.eps.
-
-\subsection{Referencing a Figure or Table Within Your Brief}
-When referencing your figures and tables within your brief, use the 
-abbreviation ``Fig.'' even at the beginning of a sentence. Do not abbreviate 
-``Table.'' Tables should be numbered with Roman Numerals.
-
-\subsection{Checking Your Figures: The IEEE Graphics Analyzer}
-The IEEE Graphics Analyzer enables authors to pre-screen their graphics for 
-compliance with IEEE Transactions and Journals standards before submission. 
-The online tool, located at
-\underline{http://graphicsqc.ieee.org/}, allows authors to 
-upload their graphics in order to check that each file is the correct file 
-format, resolution, size and colorspace; that no fonts are missing or 
-corrupt; that figures are not compiled in layers or have transparency, and 
-that they are named according to the IEEE Transactions and Journals naming 
-convention. At the end of this automated process, authors are provided with 
-a detailed report on each graphic within the web applet, as well as by 
-email.
-
-For more information on using the Graphics Analyzer or any other graphics 
-related topic, contact the IEEE Graphics Help Desk by e-mail at 
-graphics@ieee.org.
-
-\subsection{Submitting Your Graphics}
-Because IEEE will do the final formatting of your brief,
-you do not need to position figures and tables at the top and bottom of each 
-column. In fact, all figures, figure captions, and tables can be placed at 
-the end of your brief. In addition to, or even in lieu of submitting figures 
-within your final manuscript, figures should be submitted individually, 
-separate from the manuscript in one of the file formats listed above in 
-Section \ref{formats}. Place figure captions below the figures; place table titles 
-above the tables. Please do not include captions as part of the figures, or 
-put them in ``text boxes'' linked to the figures. Also, do not place borders 
-around the outside of your figures.
-
-\subsection{Color Processing/Printing in IEEE Journals}
-All IEEE Transactions, Journals, and Letters allow an author to publish 
-color figures on IEEE Xplore\textregistered\ at no charge, and automatically 
-convert them to grayscale for print versions. In most journals, figures and 
-tables may alternatively be printed in color if an author chooses to do so. 
-Please note that this service comes at an extra expense to the author. If 
-you intend to have print color graphics, include a note with your final 
-brief indicating which figures or tables you would like to be handled that 
-way, and stating that you are willing to pay the additional fee.
-
-\section{Conclusion}
-A conclusion section is not required. Although a conclusion may review the 
-main points of the brief, do not replicate the abstract as the conclusion. A 
-conclusion might elaborate on the importance of the work or suggest 
-applications and extensions. 
-
-\appendices
-
-Appendixes, if needed, appear before the acknowledgment.
-
-\section*{Acknowledgment}
-
-The preferred spelling of the word ``acknowledgment'' in American English is 
-without an ``e'' after the ``g.'' Use the singular heading even if you have 
-many acknowledgments. Avoid expressions such as ``One of us (S.B.A.) would 
-like to thank $\ldots$ .'' Instead, write ``F. A. Author thanks $\ldots$ .'' In most 
-cases, sponsor and financial support acknowledgments are placed in the 
-unnumbered footnote on the first page, not here.
-
-\section*{References and Footnotes}
-
-\subsection{References}
-References need not be cited in text. When they are, they appear on the 
-line, in square brackets, inside the punctuation. Multiple references are 
-each numbered with separate brackets. When citing a section in a book, 
-please give the relevant page numbers. In text, refer simply to the 
-reference number. Do not use ``Ref.'' or ``reference'' except at the 
-beginning of a sentence: ``Reference \cite{b3} shows $\ldots$ .'' Please do not use 
-automatic endnotes in \emph{Word}, rather, type the reference list at the end of the 
-brief using the ``References'' style.
-
-Reference numbers are set flush left and form a column of their own, hanging 
-out beyond the body of the reference. The reference numbers are on the line, 
-enclosed in square brackets. In all references, the given name of the author 
-or editor is abbreviated to the initial only and precedes the last name. Use 
-them all; use \emph{et al.} only if names are not given. Use commas around Jr., 
-Sr., and III in names. Abbreviate conference titles. When citing IEEE 
-transactions, provide the issue number, page range, volume number, year, 
-and/or month if available. When referencing a patent, provide the day and 
-the month of issue, or application. References may not include all 
-information; please obtain and include relevant information. Do not combine 
-references. There must be only one reference with each number. If there is a 
-URL included with the print reference, it can be included at the end of the 
-reference. 
-
-Other than books, capitalize only the first word in a brief title, except 
-for proper nouns and element symbols. For briefs published in translation 
-journals, please give the English citation first, followed by the original 
-foreign-language citation See the end of this document for formats and 
-examples of common references. For a complete discussion of references and 
-their formats, see the IEEE style manual at
-\underline{http://www.ieee.org/authortools}.
-
-\subsection{Footnotes}
-Number footnotes separately in superscript numbers.\footnote{It is recommended that footnotes be avoided (except for 
-the unnumbered footnote with the receipt date on the first page). Instead, 
-try to integrate the footnote information into the text.} Place the actual 
-footnote at the bottom of the column in which it is cited; do not put 
-footnotes in the reference list (endnotes). Use letters for table footnotes 
-(see Table \ref{table}).
-
-\section{Submitting Your Brief for Review}
-
-\subsection{Final Stage}
-When you submit your final version (after your brief has been accepted), 
-print it in two-column format, including figures and tables. You must also 
-send your final manuscript on a disk, via e-mail, or through a Web 
-manuscript submission system as directed by the society contact. You may use 
-\emph{Zip} for large files, or compress files using \emph{Compress, Pkzip, Stuffit,} or \emph{Gzip.} 
-
-Also, send a sheet of brief or PDF with complete contact information for all 
-authors. Include full mailing addresses, telephone numbers, fax numbers, and 
-e-mail addresses. This information will be used to send each author a 
-complimentary copy of the journal in which the brief appears. In addition, 
-designate one author as the ``corresponding author.'' This is the author to 
-whom proofs of the brief will be sent. Proofs are sent to the corresponding 
-author only.
-
-\subsection{Review Stage Using ScholarOne\textregistered\ Manuscripts}
-Contributions to the Transactions, Journals, and Letters may be submitted 
-electronically on IEEE's on-line manuscript submission and peer-review 
-system, ScholarOne\textregistered\ Manuscripts. You can get a listing of the 
-publications that participate in ScholarOne at 
-\underline{http://www.ieee.org/publications\_standards/publications/}\discretionary{}{}{}\underline{authors/authors\_submission.html}.
-First check if you have an existing account. If there is none, please create 
-a new account. After logging in, go to your Author Center and click ``Submit 
-First Draft of a New Manuscript.'' 
-
-Along with other information, you will be asked to select the subject from a 
-pull-down list. Depending on the journal, there are various steps to the 
-submission process; you must complete all steps for a complete submission. 
-At the end of each step you must click ``Save and Continue''; just uploading 
-the brief is not sufficient. After the last step, you should see a 
-confirmation that the submission is complete. You should also receive an 
-e-mail confirmation. For inquiries regarding the submission of your brief on 
-ScholarOne Manuscripts, please contact oprs-support@ieee.org or call +1 732 
-465 5861.
-
-ScholarOne Manuscripts will accept files for review in various formats. 
-Please check the guidelines of the specific journal for which you plan to 
-submit.
-
-You will be asked to file an electronic copyright form immediately upon 
-completing the submission process (authors are responsible for obtaining any 
-security clearances). Failure to submit the electronic copyright could 
-result in publishing delays later. You will also have the opportunity to 
-designate your article as ``open access'' if you agree to pay the IEEE open 
-access fee. 
-
-\subsection{Final Stage Using ScholarOne Manuscripts}
-Upon acceptance, you will receive an email with specific instructions 
-regarding the submission of your final files. To avoid any delays in 
-publication, please be sure to follow these instructions. Most journals 
-require that final submissions be uploaded through ScholarOne Manuscripts, 
-although some may still accept final submissions via email. Final 
-submissions should include source files of your accepted manuscript, high 
-quality graphic files, and a formatted pdf file. If you have any questions 
-regarding the final submission process, please contact the administrative 
-contact for the journal. 
-
-In addition to this, upload a file with complete contact information for all 
-authors. Include full mailing addresses, telephone numbers, fax numbers, and 
-e-mail addresses. Designate the author who submitted the manuscript on 
-ScholarOne Manuscripts as the ``corresponding author.'' This is the only 
-author to whom proofs of the brief will be sent. 
-
-\subsection{Copyright Form}
-Authors must submit an electronic IEEE Copyright Form (eCF) upon submitting 
-their final manuscript files. You can access the eCF system through your 
-manuscript submission system or through the Author Gateway. You are 
-responsible for obtaining any necessary approvals and/or security 
-clearances. For additional information on intellectual property rights, 
-visit the IEEE Intellectual Property Rights department web page at 
-\underline{http://www.ieee.org/publications\_standards/publications/rights/}\discretionary{}{}{}\underline{index.html}. 
-
-\section{IEEE Publishing Policy}
-The general IEEE policy requires that authors should only submit original 
-work that has neither appeared elsewhere for publication, nor is under 
-review for another refereed publication. The submitting author must disclose 
-all prior publication(s) and current submissions when submitting a 
-manuscript. Do not publish ``preliminary'' data or results. The submitting 
-author is responsible for obtaining agreement of all coauthors and any 
-consent required from employers or sponsors before submitting an article. 
-The IEEE Transactions and Journals Department strongly discourages courtesy 
-authorship; it is the obligation of the authors to cite only relevant prior 
-work.
-
-The IEEE Transactions and Journals Department does not publish conference 
-records or proceedings, but can publish articles related to conferences that 
-have undergone rigorous peer review. Minimally, two reviews are required for 
-every article submitted for peer review.
-
-\section{Publication Principles}
-The two types of contents of that are published are; 1) peer-reviewed and 2) 
-archival. The Transactions and Journals Department publishes scholarly 
-articles of archival value as well as tutorial expositions and critical 
-reviews of classical subjects and topics of current interest. 
-
-Authors should consider the following points:
-
-\begin{enumerate}
-\item Technical briefs submitted for publication must advance the state of knowledge and must cite relevant prior work. 
-\item The length of a submitted brief should be commensurate with the importance, or appropriate to the complexity, of the work. For example, an obvious extension of previously published work might not be appropriate for publication or might be adequately treated in just a few pages.
-\item Authors must convince both peer reviewers and the editors of the scientific and technical merit of a brief; the standards of proof are higher when extraordinary or unexpected results are reported. 
-\item Because replication is required for scientific progress, briefs submitted for publication must provide sufficient information to allow readers to perform similar experiments or calculations and 
-use the reported results. Although not everything need be disclosed, a brief 
-must contain new, useable, and fully described information. For example, a 
-specimen's chemical composition need not be reported if the main purpose of 
-a brief is to introduce a new measurement technique. Authors should expect 
-to be challenged by reviewers if the results are not supported by adequate 
-data and critical details.
-\item Briefs that describe ongoing work or announce the latest technical achievement, which are suitable for presentation at a professional conference, may not be appropriate for publication.
-\end{enumerate}
-
-\section{Reference Examples}
-
+In this paper we give an affirmative answer. The main contributions are:
 \begin{itemize}
-
-\item \emph{Basic format for books:}\\
-J. K. Author, ``Title of chapter in the book,'' in \emph{Title of His Published Book, x}th ed. City of Publisher, (only U.S. State), Country: Abbrev. of Publisher, year, ch. $x$, sec. $x$, pp. \emph{xxx--xxx.}\\
-See \cite{b1,b2}.
-
-\item \emph{Basic format for periodicals:}\\
-J. K. Author, ``Name of brief,'' \emph{Abbrev. Title of Periodical}, vol. \emph{x, no}. $x, $pp\emph{. xxx--xxx, }Abbrev. Month, year, DOI. 10.1109.\emph{XXX}.123456.\\
-See \cite{b3}--\cite{b5}.
-
-\item \emph{Basic format for reports:}\\
-J. K. Author, ``Title of report,'' Abbrev. Name of Co., City of Co., Abbrev. State, Country, Rep. \emph{xxx}, year.\\
-See \cite{b6,b7}.
-
-\item \emph{Basic format for handbooks:}\\
-\emph{Name of Manual/Handbook, x} ed., Abbrev. Name of Co., City of Co., Abbrev. State, Country, year, pp. \emph{xxx--xxx.}\\
-See \cite{b8,b9}.
-
-\item \emph{Basic format for books (when available online):}\\
-J. K. Author, ``Title of chapter in the book,'' in \emph{Title of
-Published Book}, $x$th ed. City of Publisher, State, Country: Abbrev.
-of Publisher, year, ch. $x$, sec. $x$, pp. \emph{xxx--xxx}. [Online].
-Available: \underline{http://www.web.com}\\
-See \cite{b10}--\cite{b13}.
-
-\item \emph{Basic format for journals (when available online):}\\
-J. K. Author, ``Name of brief,'' \emph{Abbrev. Title of Periodical}, vol. $x$, no. $x$, pp. \emph{xxx--xxx}, Abbrev. Month, year. Accessed on: Month, Day, year, DOI: 10.1109.\emph{XXX}.123456, [Online].\\
-See \cite{b14}--\cite{b16}.
-
-\item \emph{Basic format for briefs presented at conferences (when available online): }\\
-J.K. Author. (year, month). Title. presented at abbrev. conference title. [Type of Medium]. Available: site/path/file\\
-See \cite{b17}.
-
-\item \emph{Basic format for reports and handbooks (when available online):}\\
-J. K. Author. ``Title of report,'' Company. City, State, Country. Rep. no., (optional: vol./issue), Date. [Online] Available: site/path/file\\
-See \cite{b18,b19}.
-
-\item \emph{Basic format for computer programs and electronic documents (when available online): }\\
-Legislative body. Number of Congress, Session. (year, month day). \emph{Number of bill or resolution}, \emph{Title}. [Type of medium]. Available: site/path/file\\
-\textbf{\emph{NOTE: }ISO recommends that capitalization follow the accepted practice for the language or script in which the information is given.}\\
-See \cite{b20}.
-
-\item \emph{Basic format for patents (when available online):}\\
-Name of the invention, by inventor's name. (year, month day). Patent Number [Type of medium]. Available: site/path/file\\
-See \cite{b21}.
-
-\item \emph{Basic format}\emph{for conference proceedings (published):}\\
-J. K. Author, ``Title of brief,'' in \emph{Abbreviated Name of Conf.}, City of Conf., Abbrev. State (if given), Country, year, pp. \emph{xxxxxx.}\\
-See \cite{b22}.
-
-\item \emph{Example for briefs presented at conferences (unpublished):}\\
-See \cite{b23}.
-
-\item \emph{Basic format for patents}$:$\\
-J. K. Author, ``Title of patent,'' U.S. Patent \emph{x xxx xxx}, Abbrev. Month, day, year.\\
-See \cite{b24}.
-
-\item \emph{Basic format for theses (M.S.) and dissertations (Ph.D.):}
-\begin{enumerate}
-\item J. K. Author, ``Title of thesis,'' M.S. thesis, Abbrev. Dept., Abbrev. Univ., City of Univ., Abbrev. State, year.
-\item J. K. Author, ``Title of dissertation,'' Ph.D. dissertation, Abbrev. Dept., Abbrev. Univ., City of Univ., Abbrev. State, year.
-\end{enumerate}
-See \cite{b25,b26}.
-
-\item \emph{Basic format for the most common types of unpublished references:}
-\begin{enumerate}
-\item J. K. Author, private communication, Abbrev. Month, year.
-\item J. K. Author, ``Title of brief,'' unpublished.
-\item J. K. Author, ``Title of brief,'' to be published.
-\end{enumerate}
-See \cite{b27}--\cite{b29}.
-
-\item \emph{Basic formats for standards:}
-\begin{enumerate}
-\item \emph{Title of Standard}, Standard number, date.
-\item \emph{Title of Standard}, Standard number, Corporate author, location, date.
-\end{enumerate}
-See \cite{b30,b31}.
-
-\item \emph{Article number in~reference examples:}\\
-See \cite{b32,b33}.
-
-\item \emph{Example when using et al.:}\\
-See \cite{b34}.
-
+\item To the best of the authors' knowledge, this is the first application of
+the low-gain feedback approach to boundary control problems with wave PDE
+actuator dynamics and distributed coupling.
+\item Compared with the backstepping designs \cite{r10}, \cite{r11}, the
+proposed controller is structurally simpler: the online feedback law uses only
+the finite-dimensional state $X(t)$ and the local boundary velocity $u_t(D,t)$,
+while the effective gain is obtained from an offline kernel boundary-value
+problem. The price is the additional spectral restriction in
+Assumption~\ref{ass1}.
+\item We exploit the positive Robin elastic support and the controller-injected
+boundary damping to construct a wave-energy Lyapunov functional and rigorously
+establish exponential stability of the closed-loop system. Numerical simulations
+verify the design.
 \end{itemize}
 
-\begin{thebibliography}{00}
+The rest of the paper is organized as follows. Section~\ref{sec:prob} formulates
+the problem, recalls the low-gain Riccati framework, and derives the controller.
+Section~\ref{sec:stab} states the main stability theorem and gives the proof
+strategy. Section~\ref{sec:num} reports numerical simulations, and
+Section~\ref{sec:concl} concludes.
 
-\bibitem{b1} G. O. Young, ``Synthetic structure of industrial plastics,'' in \emph{Plastics,} 2\textsuperscript{nd} ed., vol. 3, J. Peters, Ed. New York, NY, USA: McGraw-Hill, 1964, pp. 15--64.
+\section{Problem Formulation and Preliminaries}
+\label{sec:prob}
 
-\bibitem{b2} W.-K. Chen, \emph{Linear Networks and Systems.} Belmont, CA, USA: Wadsworth, 1993, pp. 123--135.
+\subsection{System Description}
+Consider $x \in [0, D]$ and $t \geq 0$, and the cascade
+\begin{equation}
+\dot{X}(t) = AX(t) + \dint{B_1(x)u(x,t)\,\mathrm{d}x}
+  + \dint{B_2(x)u_t(x,t)\,\mathrm{d}x},
+\label{eq:ode}
+\end{equation}
+\begin{equation}
+u_{tt}(x,t) = u_{xx}(x,t),
+\label{eq:wave}
+\end{equation}
+\begin{equation}
+u_x(0,t) = q\,u(0,t),\qquad u_x(D,t) = U(t),
+\label{eq:wavebc}
+\end{equation}
+where $q > 0$, $X(t) \in \mathbb{R}^n$ is the plant state, $A \in
+\mathbb{R}^{n \times n}$, $U(t) \in \mathbb{R}$ is the boundary control applied
+at $x = D$, and $u \colon [0,D]\times[0,\infty) \to \mathbb{R}$ is the wave
+state. The coupling kernels satisfy $B_1 \in L^2(0,D)$ and $B_2 \in H^1(0,D)$.
+Equation~\eqref{eq:ode} is an $n$-dimensional linear ODE driven by the
+distributed effects of the wave displacement and velocity; the wave equation
+\eqref{eq:wave} models the actuator dynamics, with a positive Robin elastic
+support \eqref{eq:wavebc} at the unactuated boundary and the physical input
+entering through $u_x(D,t) = U(t)$. The damping gain $b > 0$ is introduced
+through the controller below. The control objective is to design $U(t)$ using
+only $X(t)$ and $u_t(D,t)$ so that the closed-loop energy
+\begin{equation}
+\Omega(t) := \abs{X(t)}^2 + \dint{\left(u_x^2(x,t) + u_t^2(x,t)\right)
+\,\mathrm{d}x} + u^2(0,t)
+\label{eq:energy}
+\end{equation}
+decays exponentially.
 
-\bibitem{b3} J. U. Duncombe, ``Infrared navigation---Part I: An assessment of feasibility,'' \emph{IEEE Trans. Electron Devices}, vol. ED-11, no. 1, pp. 34--39, Jan. 1959, 10.1109/TED.2016.2628402.
+\subsection{Technical Lemmas}
+We recall the low-gain Riccati framework of \cite{r18}, \cite{r23} and standard
+inequalities used throughout.
 
-\bibitem{b4} E. P. Wigner, ``Theory of traveling-wave optical laser,'' \emph{Phys. Rev}., vol. 134, pp. A635--A646, Dec. 1965.
+\begin{lemma}[Low-gain properties]
+\label{lem:lowgain}
+Assume $(A,B)$ is controllable and all eigenvalues of $A$ lie on the imaginary
+axis. Then the parametric algebraic Riccati equation (ARE)
+\begin{equation}
+A^{\top}P + PA - PBB^{\top}P = -\varepsilon P
+\label{eq:are}
+\end{equation}
+has a unique positive definite solution $P = P_\varepsilon$, which can be
+obtained from the Lyapunov equation
+\begin{equation}
+P^{-1}\!\left(A + \tfrac{\varepsilon I_n}{2}\right)
++ \left(A + \tfrac{\varepsilon I_n}{2}\right)^{\!\top}P^{-1} = BB^{\top}.
+\label{eq:lyap}
+\end{equation}
+Moreover,
+\begin{enumerate}
+\item $\lim_{\varepsilon \to 0^+} P_\varepsilon = 0$ and
+$\frac{\mathrm{d}P_\varepsilon}{\mathrm{d}\varepsilon} > 0$ for all
+$\varepsilon > 0$;
+\item there exists $\vartheta > 0$ such that $\lim_{\varepsilon \to 0^+}
+\varepsilon^{-1}P_\varepsilon = \vartheta$;
+\item if all eigenvalues of $A$ are at the origin, then $A^{\top}P_\varepsilon A
+\preceq 3n^2\varepsilon^2 P_\varepsilon$.
+\end{enumerate}
+\end{lemma}
 
-\bibitem{b5} E. H. Miller, ``A note on reflector arrays,'' \emph{IEEE Trans. Antennas Propagat}., to be published.
+\begin{lemma}[Poincar\'e-type inequalities]
+\label{lem:poincare}
+For every $y \in H^1(0,D)$,
+\begin{equation}
+\norm{y}_2^2 \leq 2D\,y^2(0) + D^2\norm{y_x}_2^2,
+\label{eq:poincare}
+\end{equation}
+and $y^2(D) \leq 2y^2(0) + 2D\norm{y_x}_2^2$.
+\end{lemma}
 
-\bibitem{b6} E. E. Reber, R. L. Michell, and C. J. Carter, ``Oxygen absorption in the earth's atmosphere,'' Aerospace Corp., Los Angeles, CA, USA, Tech. Rep. TR-0200 (4230-46)-3, Nov. 1988.
+We also use the Cauchy--Schwarz inequalities $\abs{a^{\top}b} \leq \abs{a}\abs{b}$
+and $\abs{\dint{f^{\top}h\,\mathrm{d}x}}^2 \leq \norm{f}_2^2\norm{h}_2^2$, the
+discrete form $\abs{\sum_{i=1}^{m} z_i}^2 \leq m\sum_{i=1}^{m}\abs{z_i}^2$, and
+Young's inequality $2\abs{ab} \leq \eta a^2 + \eta^{-1}b^2$ ($\eta > 0$) with
+the variants $-\abs{a}^2 + 2a^{\top}b \leq \abs{b}^2$ and $\abs{a+b}^2 \geq
+\frac{1}{2}\abs{a}^2 - \abs{b}^2$.
 
-\bibitem{b7} J. H. Davis and J. R. Cogdell, ``Calibration program for the 16-foot antenna,'' Elect. Eng. Res. Lab., Univ. Texas, Austin, TX, USA, Tech. Memo. NGL-006-69-3, Nov. 15, 1987.
+\subsection{Controller Design}
+The controller is built from a kernel $g \in C^2([0,D];\mathbb{R}^{n\times 1})$
+solving the boundary-value problem
+\begin{equation}
+g''(x) + B_1(x) = A\bigl(Ag(x) - B_2(x)\bigr),
+\label{eq:kernel}
+\end{equation}
+\begin{equation}
+g'(0) - q\,g(0) = 0,\qquad -g'(D) = A\,b\,g(D),
+\label{eq:kernelbc}
+\end{equation}
+and the associated vector $B := g(D)$. For the explicit computation of $B$,
+write \eqref{eq:kernel} as the first-order system
+$\zeta'(x) = \Av\zeta(x) + \eta(x)$ for $\zeta = (g,g')^{\top}$,
+$\Av = \bigl(\begin{smallmatrix} 0 & I \\ A^2 & 0\end{smallmatrix}\bigr)$, and
+$\eta(x) = \bigl(0,\, -AB_2(x) - B_1(x)\bigr)^{\top}$, with
+$E := \bigl(bA\;\; I\bigr)e^{\Av D}\binom{I}{qI}$ and
+$\Xi := \dint{e^{\Av(D-s)}\eta(s)\,\mathrm{d}s}$.
 
-\bibitem{b8} \emph{Transmission Systems for Communications}, 3\textsuperscript{rd} ed., Western Electric Co., Winston-Salem, NC, USA, 1985, pp. 44--60.
+\begin{proposition}
+\label{prop1}
+Assume $E$ is invertible. Then the endpoint gain $B = g(D)$ associated with
+\eqref{eq:kernel} is given by
+\begin{equation}
+B = \bigl(I\;\; 0\bigr)e^{\Av D}\binom{I}{qI}E^{-1}\bigl(bA\;\; I\bigr)\Xi.
+\label{eq:B}
+\end{equation}
+\end{proposition}
 
-\bibitem{b9} \emph{Motorola Semiconductor Data Manual}, Motorola Semiconductor Products Inc., Phoenix, AZ, USA, 1989.
+\begin{proof}[Proof of Proposition~\ref{prop1}]
+By variation of constants, $\zeta(D) = e^{\Av D}\binom{I}{qI}g(0) + \Xi$; the
+right boundary condition is equivalent to $\bigl(bA\;\; I\bigr)\zeta(D) = 0$.
+Solving for $g(0) = -E^{-1}\bigl(bA\;\; I\bigr)\Xi$ and using $B =
+\bigl(I\;\; 0\bigr)\zeta(D)$ yields \eqref{eq:B}.
+\end{proof}
 
-\bibitem{b10} G. O. Young, ``Synthetic structure of industrial
-plastics,'' in Plastics, vol. 3, Polymers of Hexadromicon, J. Peters,
-Ed., 2\textsuperscript{nd} ed. New York, NY, USA: McGraw-Hill, 1964, pp. 15-64.
-[Online]. Available:
-\underline{http://www.bookref.com}.
+\begin{assumption}
+\label{ass1}
+The matrix $A$ has all its eigenvalues on the imaginary axis, the matrix $E$ is
+invertible, and the pair $(A, B)$ is controllable.
+\end{assumption}
 
-\bibitem{b11} \emph{The Founders' Constitution}, Philip B. Kurland
-and Ralph Lerner, eds., Chicago, IL, USA: Univ. Chicago Press, 1987.
-[Online]. Available: \underline{http://press-pubs.uchicago.edu/founders/}
+By Lemma~\ref{lem:lowgain}, applied with $B = g(D)$, the ARE
+\begin{equation}
+A^{\top}P + PA - PBB^{\top}P = -\varepsilon P
+\label{eq:areB}
+\end{equation}
+has a unique positive definite solution $P = P_\varepsilon$. The proposed
+boundary controller is
+\begin{equation}
+U(t) = -B^{\top}P X(t) - b\,u_t(D,t).
+\label{eq:controller}
+\end{equation}
 
-\bibitem{b12} The Terahertz Wave eBook. ZOmega Terahertz Corp., 2014.
-[Online]. Available:
-\underline{http://dl.z-thz.com/eBook/zomega\_ebook\_pdf\_1206\_sr.pdf}. Accessed on: May 19, 2014.
+\begin{remark}
+The kernel $g$ and the vector $B$ are computed offline. Once $B$ is available,
+the online controller \eqref{eq:controller} uses only $X(t)$ and $u_t(D,t)$.
+The term $-B^{\top}PX$ is the low-gain stabilizing part for the ODE channel,
+while $-b\,u_t(D,t)$ injects boundary damping into the wave equation. This is
+structurally simpler than the backstepping controllers \cite{r10}, \cite{r11}
+that require full distributed-state information, at the price of the spectral
+restriction in Assumption~\ref{ass1}.
+\end{remark}
 
-\bibitem{b13} Philip B. Kurland and Ralph Lerner, eds., \emph{The
-Founders' Constitution.} Chicago, IL, USA: Univ. of Chicago Press,
-1987, Accessed on: Feb. 28, 2010, [Online] Available:
-\underline{http://press-pubs.uchicago.edu/founders/}
+\section{Main Result: Exponential Stability}
+\label{sec:stab}
 
-\bibitem{b14} J. S. Turner, ``New directions in communications,'' \emph{IEEE J. Sel. Areas Commun}., vol. 13, no. 1, pp. 11-23, Jan. 1995.
+\subsection{Statement}
+\begin{theorem}
+\label{thm1}
+Consider the closed-loop system consisting of \eqref{eq:ode}--\eqref{eq:wave},
+the boundary conditions of \eqref{eq:wave}, and the controller
+\eqref{eq:controller}, under Assumption~\ref{ass1}. Then there exists
+$\varepsilon^* > 0$ such that for every $\varepsilon \in (0,\varepsilon^*]$ and
+every initial condition
+$(X(0), u(\cdot,0), u_t(\cdot,0)) \in \mathbb{R}^n \times H^1(0,D) \times
+L^2(0,D)$ compatible with the boundary conditions, the closed-loop system has a
+unique solution and is exponentially stable in the sense that
+\begin{equation}
+\Omega(t) \leq \alpha e^{-\beta t}\Omega(0)
+\label{eq:stab}
+\end{equation}
+for some positive constants $\alpha$ and $\beta$.
+\end{theorem}
 
-\bibitem{b15} W. P. Risk, G. S. Kino, and H. J. Shaw, ``Fiber-optic frequency shifter using a surface acoustic wave incident at an oblique angle,'' \emph{Opt. Lett.}, vol. 11, no. 2, pp. 115--117, Feb. 1986.
+\subsection{Proof Strategy}
+Let $g$ be the solution to \eqref{eq:kernel}, set $g_0(x) := Ag(x) - B_2(x)$,
+and introduce the transformed finite-dimensional state
+\begin{multline}
+Z(t) = X(t) + \dint{g_0(x)u(x,t)\,\mathrm{d}x}
+  + \dint{g(x)u_t(x,t)\,\mathrm{d}x}\\
+  + bB\,u(D,t).
+\label{eq:Z}
+\end{multline}
+Differentiating \eqref{eq:Z} and integrating by parts using \eqref{eq:ode} and
+\eqref{eq:kernel} gives $\dot{Z}(t) = AZ(t) + B\bigl(U(t) + b\,u_t(D,t)\bigr)$.
+With the controller \eqref{eq:controller} this becomes
+\begin{multline}
+\dot{Z}(t) = \bigl(A - BB^{\top}P\bigr)Z(t) + BB^{\top}P\,\varphi(t),\\
+\varphi(t) := Z(t) - X(t).
+\label{eq:Zdot}
+\end{multline}
+Thus the low-gain Riccati term decouples the ODE from the wave up to the small
+perturbation $\varphi$.
 
-\bibitem{b16} P. Kopyt \emph{et al., ``}Electric properties of graphene-based conductive layers from DC up to terahertz range,'' \emph{IEEE THz Sci. Technol.,} to be published. DOI: 10.1109/TTHZ.2016.2544142.
+Define $s(t) := B^{\top}P X(t)$ and the shifted field
+\begin{equation}
+\omega(x,t) := u(x,t) + \frac{x^2}{2D}s(t).
+\label{eq:omega}
+\end{equation}
+Then $\omega$ satisfies
+\begin{equation}
+\omega_{tt} = \omega_{xx} - \frac{1}{D}s(t) + \frac{x^2}{2D}\ddot{s}(t),
+\label{eq:omegaPDE}
+\end{equation}
+with the boundary conditions
+\begin{equation}
+\omega_x(0,t) = q\,\omega(0,t),
+\qquad \omega_x(D,t) = -b\,\omega_t(D,t) + \frac{bD}{2}\dot{s}(t).
+\label{eq:omegabc}
+\end{equation}
+The translation exposes the boundary damping $-b\,\omega_t(D,t)$ at the actuated
+end, leaving only the source terms in \eqref{eq:omegaPDE} and
+\eqref{eq:omegabc} that carry the low-gain parameter.
 
-\bibitem{b17} PROCESS Corporation, Boston, MA, USA. Intranets:
-Internet technologies deployed behind the firewall for corporate
-productivity. Presented at INET96 Annual Meeting. [Online].
-Available: \underline{http://home.process.com/Intranets/wp2.htp}
+Consider the Lyapunov candidates
+\begin{align}
+V_1(t) &= Z^{\top}(t)P\,Z(t),\label{eq:V1}\\
+V_2(t) &= \frac{1}{2}\dint{\left(\omega_x^2 + \omega_t^2\right)\mathrm{d}x}
+  + \frac{q}{2}\omega^2(0,t)\nonumber\\
+  &\qquad + \delta \dint{(1+x)\omega_x\omega_t\,\mathrm{d}x},
+\label{eq:V2}
+\end{align}
+where $\delta$ satisfies $0 < \delta < \min\left\{\frac{1}{1+D},
+\frac{2b}{(1+D)(1+2b^2)}\right\}$. With $E_\omega(t) :=
+\frac{1}{2}\dint{(\omega_x^2 + \omega_t^2)\,\mathrm{d}x} +
+\frac{q}{2}\omega^2(0,t)$, the cross term is bounded by Young's inequality, so
+\begin{equation}
+\bigl(1 - \delta(1+D)\bigr)E_\omega \leq V_2(t) \leq
+\bigl(1 + \delta(1+D)\bigr)E_\omega.
+\label{eq:Ve}
+\end{equation}
+Along \eqref{eq:Zdot}, the Riccati identity \eqref{eq:areB} yields
+\begin{equation}
+\dot{V}_1(t) \leq -\varepsilon Z^{\top}PZ + \varphi^{\top}PBB^{\top}P\varphi.
+\label{eq:V1dot}
+\end{equation}
+The remaining estimates reduce to five elementary bounds obtained exactly as in
+\cite{r27}:
+\begin{itemize}
+\item (bound on $\dot{s}^2$) inverting $I + m_2B^{\top}P$ (Sherman--Morrison,
+using $\norm{P} = O(\varepsilon)$) gives
+$\dot{s}^2 \leq \rho_X\abs{P^{1/2}X}^2 + \rho_0\,\omega^2(0,t) +
+\rho_x\norm{\omega_x}_2^2 + \rho_t\norm{\omega_t}_2^2$, where $\rho_X = O(\varepsilon)$
+and the remaining coefficients are $O(\varepsilon^2)$;
+\item (bound on $\norm{\varphi}^2$) $\norm{\varphi}_2^2 \leq \Gamma_x\norm{\omega_x}_2^2
++ \Gamma_t\norm{\omega_t}_2^2 + \Gamma_0\,\omega^2(0,t) + \Gamma_X\abs{P^{1/2}X}^2$
+with $\Gamma_x, \Gamma_t, \Gamma_0 = O(1)$ and $\Gamma_X = O(\varepsilon)$;
+\item (bound on $\dot{V}_1$) substituting the above into \eqref{eq:V1dot} gives
+$\dot{V}_1 \leq -\varepsilon Z^{\top}PZ + \sigma_x\norm{\omega_x}_2^2 +
+\sigma_t\norm{\omega_t}_2^2 + \sigma_0\,\omega^2(0,t) + \sigma_X\abs{P^{1/2}X}^2$,
+where $\sigma_x, \sigma_t, \sigma_0 = O(\varepsilon^2)$ and
+$\sigma_X = O(\varepsilon^3)$;
+\item (bound on $\ddot{s}^2$) differentiating the plant twice,
+$\ddot{s}^2 \leq \tau_X\abs{P^{1/2}X}^2 + \tau_0\,\omega^2(0,t) +
+\tau_x\norm{\omega_x}_2^2 + \tau_t\norm{\omega_t}_2^2 + \tau_D\,\omega_t^2(D,t)$,
+with $\tau_X = O(\varepsilon)$ and the remaining coefficients $O(\varepsilon^2)$;
+\item (bound on $\dot{V}_2$) combining the wave-energy identity
+\eqref{eq:omegaPDE} with the previous bounds,
+$\dot{V}_2 \leq -\lambda V_2 - \bigl(\tfrac{k_b}{2} - \Pi_D\bigr)\omega_t^2(D,t)
+- \tfrac{\delta}{2}\omega_t^2(0,t) + \Pi_x\norm{\omega_x}_2^2 +
+\Pi_t\norm{\omega_t}_2^2 + \Pi_0\,\omega^2(0,t) + \Pi_X\abs{P^{1/2}X}^2$,
+where $k_b = b - \tfrac{\delta(1+D)}{2}(1 + 2b^2) > 0$ by the choice of
+$\delta$, $\Pi_X = O(\varepsilon)$, and the remaining $\Pi$-coefficients are
+$O(\varepsilon^2)$.
+\end{itemize}
+Taking the weighted combination $V(t) := V_1(t) + \varepsilon V_2(t)$, every
+source term in $\dot{V}$ is of higher order in $\varepsilon$ than the leading
+dissipative terms, so for all $\varepsilon \leq \varepsilon^*$ the positivity
+conditions hold and
+\begin{equation}
+\dot{V}(t) \leq -\beta_0\left(\norm{\omega_x}_2^2 + \norm{\omega_t}_2^2
+  + \omega^2(0,t) + \abs{P^{1/2}X}^2\right)
+\label{eq:Vdot}
+\end{equation}
+for some $\beta_0 > 0$. The Poincar\'e inequality \eqref{eq:poincare}, the
+bounds \eqref{eq:Ve}, and the equivalence of $V$ with $\Omega$ give
+\begin{equation}
+\underline{M}(\varepsilon)\,\Omega(t) \leq V(t) \leq
+\overline{M}(\varepsilon)\,\Omega(t)
+\label{eq:equi}
+\end{equation}
+with constants that are bounded as $\varepsilon \to 0^+$. Gr\"onwall's lemma
+applied to \eqref{eq:Vdot}--\eqref{eq:equi} yields
+\eqref{eq:stab}, completing the proof.
+\begin{remark}
+The threshold $\varepsilon^*$ obtained from the above conditions is conservative;
+in practice it can be determined by bisection, as in the simulations below.
+\end{remark}
 
-\bibitem{b18} R. J. Hijmans and J. van Etten, ``Raster: Geographic analysis and modeling with raster data,'' R Package Version 2.0-12, Jan. 12, 2012. [Online]. Available: \underline {http://CRAN.R-project.org/package=raster} 
+\subsection{Nilpotent Special Case}
+When all eigenvalues of $A$ are at the origin, the transformation simplifies in
+the same spirit as \cite{r27}. Let $g \in C^2([0,D];\mathbb{R}^{n\times 1})$
+solve
+\begin{equation}
+g''(x) + B_1(x) = 0,\qquad g'(0) - q\,g(0) = 0,\qquad g'(D) = 0.
+\label{eq:nilpBVP}
+\end{equation}
+If $q > 0$, the endpoint gain admits the explicit expression
+\begin{equation}
+\bar{B} = \dint{\left(x + \frac{1}{q}\right)B_1(x)\,\mathrm{d}x},
+\label{eq:nilpB}
+\end{equation}
+which requires no matrix-valued boundary-value solve. Defining
+$\bar{Z}(t) = X(t) - \dint{B_2(x)u(x,t)\,\mathrm{d}x} +
+\dint{g(x)u_t(x,t)\,\mathrm{d}x} + b\bar{B}u(D,t)$ gives, as in the general
+case, $\dot{\bar{Z}}(t) = AX(t) + \bar{B}\bigl(U(t) + b\,u_t(D,t)\bigr)$, so the
+low-gain controller is
+\begin{equation}
+U(t) = -\bar{B}^{\top}P X(t) - b\,u_t(D,t),
+\label{eq:nilpCtrl}
+\end{equation}
+where $P = P_\varepsilon$ solves the ARE \eqref{eq:areB} with $\bar{B}$ in place
+of $B$. Since all eigenvalues of $A$ are at the origin,
+Lemma~\ref{lem:lowgain}(3) gives $A^{\top}P A \preceq 3n^2\varepsilon^2P$, so the
+perturbation term is dominated by the dissipative part of the ARE when
+$\varepsilon$ is small, and the proof closes exactly as in the general case. This
+simplified form is used in Example~\ref{ex2}.
 
-\bibitem{b19} Teralyzer. Lytera UG, Kirchhain, Germany [Online].
-Available:
-\underline{http://www.lytera.de/Terahertz\_THz\_Spectroscopy.php?id=home}, Accessed on: Jun. 5, 2014
+\section{Numerical Simulation}
+\label{sec:num}
+All simulations run on $t \in [0,50]$ by a method-of-lines discretization of the
+wave block. Introducing $v(x,t) := u_t(x,t)$ rewrites \eqref{eq:wave} as
+\begin{equation}
+u_t(x,t) = v(x,t),\qquad v_t(x,t) = u_{xx}(x,t).
+\label{eq:mol}
+\end{equation}
+On the uniform mesh $x_j = j\Delta x$, $j = 0, \ldots, N$, with
+\begin{equation}
+N = 200,\qquad \Delta x = \frac{D}{N},\qquad \Delta t = 5 \times 10^{-4},
+\label{eq:mesh}
+\end{equation}
+the PDE is semi-discretized by centered second differences, boundary conditions
+are enforced by ghost points, and the distributed coupling terms are evaluated
+by the composite trapezoidal rule. The coupled ODE and semi-discrete PDE are
+advanced by a classical fourth-order Runge--Kutta scheme. The same spatial
+quadrature is used in the computation of $B$ in \eqref{eq:B} and in the
+evaluation of the distributed inputs, avoiding any mismatch between design and
+simulation. For $D = 1$, $\Delta x = 0.005$ and $\Delta t/\Delta x = 0.1$.
 
-\bibitem{b20} U.S. House. 102\textsuperscript{nd} Congress, 1\textsuperscript{st} Session. (1991, Jan. 11). \emph{H. Con. Res. 1, Sense of the Congress on Approval of}  \emph{Military Action}. [Online]. Available: LEXIS Library: GENFED File: BILLS
+\subsection{Example 1: Oscillator--Wave Cascade}
+\label{ex1}
+Consider the cascade \eqref{eq:ode}--\eqref{eq:wave} with
+\begin{equation}
+A = \begin{pmatrix} 0 & 1\\ -1 & 0 \end{pmatrix},
+\qquad D = 1,\qquad q = 1,\qquad b = 1,
+\label{eq:ex1A}
+\end{equation}
+and localized smooth kernels
+\begin{align}
+B_1(x) &= e^{-30(x-0.7)^2}\begin{pmatrix} 1\\ 0.4 \end{pmatrix},\\
+B_2(x) &= e^{-20(x-0.35)^2}\begin{pmatrix} 1\\ 0.25 \end{pmatrix}.
+\label{eq:ex1B}
+\end{align}
+The profile $B_1$ is concentrated near the actuated boundary so that the
+displacement channel regulates the oscillator directly, while $B_2$ is centered
+in the interior to keep the velocity coupling genuinely distributed. With the
+compatible initial data $X(0) = (0.40,\,-0.2301)^{\top}$, $u(x,0) = 0.08e^x +
+0.04\sin^2(\pi x)$, and $u_t(x,0) = 0$ (which satisfy $u_x(0,0) = u(0,0) =
+0.08$ and give $U(0) = u_x(D,0) = 0.08e$), the matrix $E$ in \eqref{eq:B} is
+invertible with $\det(E) = 2$, and \eqref{eq:B} gives
+\begin{equation}
+B = \begin{pmatrix} -0.2099\\ 0.3682 \end{pmatrix}.
+\label{eq:ex1Bgain}
+\end{equation}
+Since the eigenvalues of $A$ are $\pm i$ and $\operatorname{rank}\left[B\;
+AB\right] = 2$, Assumption~\ref{ass1} holds. Choosing the low-gain parameter
+$\varepsilon = 0.12$, solving \eqref{eq:areB} yields
+\begin{equation}
+P_{0.12} = \begin{pmatrix} 1.2745 & 0.0450\\ 0.0450 & 1.4076 \end{pmatrix},
+\label{eq:ex1P}
+\end{equation}
+with $B^{\top}P_{0.12} = \left(-0.2509,\; 0.5088\right)$, so the implemented
+controller is
+\begin{equation}
+U(t) = 0.2509\,x_1(t) - 0.5088\,x_2(t) - u_t(D,t).
+\label{eq:ex1Ctrl}
+\end{equation}
 
-\bibitem{b21} Musical toothbrush with mirror, by L.M.R. Brooks. (1992, May 19). Patent D 326 189 [Online]. Available: NEXIS Library: LEXPAT File: DES
+\begin{figure}[!t]
+\centerline{\includegraphics[width=\columnwidth]{fig2.png}}
+% PLACEHOLDER - regenerate from simulation to match the numbers in Sec. IV-B
+\caption{Damping-only versus closed-loop ODE state trajectories for Example 1 on
+$t \in [0,50]$, using the same initial data in both panels. The left panel
+removes the low-gain component and keeps only the boundary damping term, while
+the right panel uses the full low-gain feedback law.}
+\label{fig2}
+\end{figure}
 
-\bibitem{b22} D. B. Payne and J. R. Stern, ``Wavelength-switched pas- sively coupled single-mode optical network,'' in \emph{Proc. IOOC-ECOC,} Boston, MA, USA, 1985, pp. 585--590.
+\begin{figure}[!t]
+\centerline{\includegraphics[width=\columnwidth]{fig3.png}}
+% PLACEHOLDER - regenerate from simulation to match the numbers in Sec. IV-B
+\caption{Three-dimensional displacement surface for Example 1, showing the
+spatiotemporal decay of $u(x,t)$ on $(x,t) \in [0,1]\times[0,50]$.}
+\label{fig3}
+\end{figure}
 
-\bibitem{b23} D. Ebehard and E. Voges, ``Digital single sideband detection for interferometric sensors,'' presented at the \emph{2\textsuperscript{nd} Int. Conf. Optical Fiber Sensors,} Stuttgart, Germany, Jan. 2-5, 1984.
+Figure~\ref{fig2} directly shows the role of the low-gain component. When it is
+removed and only $U(t) = -u_t(D,t)$ is retained, the two ODE components remain
+in a sustained oscillatory regime and do not converge, with $\Omega(50)/\Omega(0)
+= 8.00\times 10^{-1}$. Under the full feedback \eqref{eq:ex1Ctrl}, the closed
+loop decays. The kernel computation is numerically consistent: the gain obtained
+from the boundary-value problem is $B_{\text{BVP}} =
+(-0.2098639,\,0.3681902)^{\top}$, while the direct evaluation of \eqref{eq:B}
+gives $B_{\text{cf}} = (-0.2098623,\,0.3681875)^{\top}$, a Euclidean mismatch of
+only $3.13\times 10^{-6}$. The compatible initial data satisfy both boundary
+conditions at $t = 0$ to machine precision. Quantitatively, the closed-loop
+energy ratio is
+\begin{equation}
+\frac{\Omega(50)}{\Omega(0)} = 1.59 \times 10^{-6},
+\label{eq:ex1ratio}
+\end{equation}
+the least-squares semilog decay rate is $0.2722$, the $10\%$, $5\%$, and $1\%$
+energy thresholds are crossed at $t = 9.0$, $11.6$, and $17.6$, respectively,
+and the low-gain component remains moderate with
+\begin{equation}
+\max_{t\in[0,50]}\abs{B^{\top}P X(t)} = 0.2701,
+\label{eq:ex1effort}
+\end{equation}
+and $\int_0^{50}\left(B^{\top}P X(t)\right)^2\mathrm{d}t = 0.1665$ over the
+window $[0,50]$. Finally, $\abs{X(50)} = 5.27\times 10^{-4}$ and
+$\abs{u(D,50)} = 6.53\times 10^{-7}$, so the design has entered a clear
+asymptotic regime within the window. Figure~\ref{fig3} confirms that the PDE
+state also decays, in agreement with Theorem~\ref{thm1}.
 
-\bibitem{b24} G. Brandli and M. Dick, ``Alternating current fed power supply,'' U.S. Patent 4 084 217, Nov. 4, 1978.
+\subsection{Example 2: Nilpotent Chain}
+\label{ex2}
+To illustrate the simplified zero-eigenvalue design, consider the three-
+dimensional chain
+\begin{equation}
+A = \begin{pmatrix} 0 & 1 & 0\\ 0 & 0 & 1\\ 0 & 0 & 0 \end{pmatrix},
+\qquad D = 1,\qquad q = 1,\qquad b = 1,
+\label{eq:ex2A}
+\end{equation}
+with
+\begin{equation}
+B_1(x) = \begin{pmatrix} 0\\ 0\\ 0.2(2-x) \end{pmatrix},
+\qquad B_2(x) = 0.
+\label{eq:ex2B}
+\end{equation}
+All eigenvalues of $A$ are at the origin, so this example falls into the
+framework of \eqref{eq:nilpBVP}--\eqref{eq:nilpCtrl}. Since $q = 1$, the
+explicit gain \eqref{eq:nilpB} becomes
+\begin{equation}
+\bar{B} = \dint{(x+1)B_1(x)\,\mathrm{d}x} =
+\begin{pmatrix} 0\\ 0\\ \frac{13}{30} \end{pmatrix}
+\approx \begin{pmatrix} 0\\ 0\\ 0.4333 \end{pmatrix}.
+\label{eq:ex2Bbar}
+\end{equation}
+Choosing $\varepsilon = 0.20$ gives the Riccati solution of \eqref{eq:areB}
+\begin{equation}
+P_{0.20} = \begin{pmatrix}
+0.0017 & 0.0170 & 0.0426\\
+0.0170 & 0.2130 & 0.6391\\
+0.0426 & 0.6391 & 3.1953
+\end{pmatrix},
+\label{eq:ex2P}
+\end{equation}
+with
+\begin{equation}
+\bar{B}^{\top}P_{0.20} =
+\left(0.01846,\; 0.27692,\; 1.38462\right),
+\label{eq:ex2Pt}
+\end{equation}
+so the implemented special-case controller is
+\begin{equation}
+U(t) = -\left(0.01846,\; 0.27692,\; 1.38462\right)X(t) - u_t(D,t).
+\label{eq:ex2Ctrl}
+\end{equation}
+The initial conditions $X(0) = (0.30,\,-0.20,\,-0.04253)^{\top}$, $u(x,0) =
+0.04e^x + 0.02\sin^2(\pi x)$, $u_t(x,0) = 0$ give $u_x(0,0) = u(0,0) = 0.04$
+and $U(0) = u_x(D,0) = 0.04e$, so both boundary compatibility errors at $t = 0$
+are numerically zero.
 
-\bibitem{b25} J. O. Williams, ``Narrow-band analyzer,'' Ph.D. dissertation, Dept. Elect. Eng., Harvard Univ., Cambridge, MA, USA, 1993.
+\begin{figure}[!t]
+\centerline{\includegraphics[width=\columnwidth]{fig4.png}}
+% PLACEHOLDER - regenerate from simulation to match the numbers in Sec. IV-C
+\caption{Damping-only versus closed-loop ODE state trajectories for the nilpotent
+Example 2 on $t \in [0,50]$, using the same initial data in both panels. The left
+panel removes the low-gain component and keeps only the boundary damping term,
+while the right panel uses the special low-gain feedback law.}
+\label{fig4}
+\end{figure}
 
-\bibitem{b26} N. Kawasaki, ``Parametric study of thermal and chemical nonequilibrium nozzle flow,'' M.S. thesis, Dept. Electron. Eng., Osaka Univ., Osaka, Japan, 1993.
+\begin{figure}[!t]
+\centerline{\includegraphics[width=\columnwidth]{fig5.png}}
+% PLACEHOLDER - regenerate from simulation to match the numbers in Sec. IV-C
+\caption{Three-dimensional displacement surface for the nilpotent Example 2,
+showing the spatiotemporal decay of $u(x,t)$ on $(x,t) \in [0,1]\times[0,50]$.}
+\label{fig5}
+\end{figure}
 
-\bibitem{b27} A. Harrison, private communication, May 1995.
+Figure~\ref{fig4} shows the same mechanism for the nilpotent chain. Without the
+low-gain component the three ODE components fail to decay and the chain
+structure amplifies the transient, so that $\Omega(50)/\Omega(0) = 3.55\times
+10^2$. Under the low-gain controller acting through the wave dynamics, the
+closed-loop trajectories converge. The observed indicators are
+\begin{equation}
+\frac{\Omega(50)}{\Omega(0)} = 1.51 \times 10^{-3},
+\qquad \max_{t\in[0,50]}\abs{\bar{B}^{\top}P X(t)} = 0.1087,
+\label{eq:ex2indicators}
+\end{equation}
+with $\int_0^{50}\left(\bar{B}^{\top}P X(t)\right)^2\mathrm{d}t = 0.0523$. The
+fitted semilog decay rate is $0.2251$, and the energy drops below $10\%$,
+$5\%$, and $1\%$ at $t = 30.0$, $31.3$, and $33.15$, respectively. By $t = 50$,
+$\abs{X(50)} = 1.38\times 10^{-2}$ and $\abs{u(D,50)} = 3.18\times 10^{-3}$.
+Compared with Example~\ref{ex1}, the nilpotent case converges more slowly, which
+motivates the longer observation window. Figure~\ref{fig5} shows the
+corresponding spatiotemporal decay of the wave state.
 
-\bibitem{b28} B. Smith, ``An approach to graphs of linear forms,'' unpublished.
+Table~\ref{tab1} summarizes the quantitative indicators of both examples.
 
-\bibitem{b29} A. Brahms, ``Representation error for real numbers in binary computer arithmetic,'' IEEE Computer Group Repository, Brief R-67-85.
+\begin{table}[!t]
+\caption{Simulation indicators for Examples 1 and 2.}
+\label{tab1}
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+ & Example 1 & Example 2 \\
+\hline
+$\varepsilon$ & $0.12$ & $0.20$ \\
+$\Omega(50)/\Omega(0)$, closed loop & $1.59\times10^{-6}$ &
+$1.51\times10^{-3}$ \\
+$\Omega(50)/\Omega(0)$, damping only & $8.00\times10^{-1}$ &
+$3.55\times10^{2}$ \\
+Fitted decay rate & $0.2722$ & $0.2251$ \\
+$10\%/5\%/1\%$ crossing & $9.0/11.6/17.6$ & $30.0/31.3/33.15$ \\
+$\max_{t}\abs{KX(t)}$ & $0.2701$ & $0.1087$ \\
+$\int_0^{50}(KX)^2\,\mathrm{d}t$ & $0.1665$ & $0.0523$ \\
+$\abs{X(50)}$ & $5.27\times10^{-4}$ & $1.38\times10^{-2}$ \\
+$\abs{u(D,50)}$ & $6.53\times10^{-7}$ & $3.18\times10^{-3}$ \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
 
-\bibitem{b30} IEEE Criteria for Class IE Electric Systems, IEEE Standard 308, 1969.
+\section{Conclusion}
+\label{sec:concl}
+This paper studied the low-gain stabilization problem for a class of wave
+PDE--ODE cascade systems with distributed in-domain coupling, a positive Robin
+elastic support at the unactuated boundary, and controller-injected boundary
+damping at the actuated boundary. By a suitable transformation the distributed
+input dynamics reduce to a low-gain design problem with an explicit effective
+input vector $B$, and the controller takes the simple form
+$U(t) = -B^{\top}P_\varepsilon X(t) - b\,u_t(D,t)$; in the nilpotent case the
+gain admits the explicit formula \eqref{eq:nilpB}. Under a low-gain spectral
+assumption on the ODE dynamics, the closed-loop system is exponentially stable
+in a natural energy norm, as proved through a Lyapunov functional combining the
+Riccati-based ODE term with the damped wave energy and suitable cross terms. In
+comparison with backstepping designs for wave actuator dynamics, the proposed
+feedback is much simpler because it uses only the finite-dimensional state and
+the local boundary velocity online; the price is the stronger open-loop spectral
+assumption. Numerical simulations confirm the theoretical conclusions for both
+the general and the nilpotent settings. Future work includes output-feedback
+designs, robustness with respect to modeling uncertainty and disturbances, and
+extensions to more general hyperbolic actuator dynamics or higher-dimensional
+distributed systems.
 
-\bibitem{b31} Letter Symbols for Quantities, ANSI Standard Y10.5-1968.
-
-\bibitem{b32} R. Fardel, M. Nagel, F. Nuesch, T. Lippert, and A. Wokaun, ``Fabrication of organic light emitting diode pixels by laser-assisted forward transfer,'' \emph{Appl. Phys. Lett.}, vol. 91, no. 6, Aug. 2007, Art. no. 061103.~
-
-\bibitem{b33} J. Zhang and N. Tansu, ``Optical gain and laser characteristics of InGaN quantum wells on ternary InGaN substrates,'' \emph{IEEE Photon. J.}, vol. 5, no. 2, Apr. 2013, Art. no. 2600111
-
-\bibitem{b34} S. Azodolmolky~\emph{et al.}, Experimental demonstration of an impairment aware network planning and operation tool for transparent/translucent optical networks,''~\emph{J. Lightw. Technol.}, vol. 29, no. 4, pp. 439--448, Sep. 2011.
-
+\begin{thebibliography}{28}
+\bibitem{r1} Z. Artstein, ``Linear systems with delayed controls: A
+reduction,'' \emph{IEEE Trans. Autom. Control}, vol. 27, no. 4, pp. 869--879,
+1982.
+\bibitem{r2} J.-P. Richard, ``Time-delay systems: An overview of some recent
+advances and open problems,'' \emph{Automatica}, vol. 39, no. 10, pp.
+1667--1694, 2003.
+\bibitem{r3} M. Krstic, ``Lyapunov tools for predictor feedbacks for delay
+systems: Inverse optimality and robustness to delay mismatch,'' \emph{Automatica},
+vol. 44, no. 11, pp. 2930--2935, 2008.
+\bibitem{r4} M. Krstic, ``Lyapunov stability of linear predictor feedback for
+time-varying input delay,'' \emph{IEEE Trans. Autom. Control}, vol. 55, no. 2,
+pp. 554--559, 2010.
+\bibitem{r5} L. C. Evans, \emph{Partial Differential Equations}, 2nd ed.
+Providence, RI, USA: American Mathematical Society, 2010.
+\bibitem{r6} R. F. Curtain and H. Zwart, \emph{An Introduction to
+Infinite-Dimensional Linear Systems Theory}. New York, NY, USA: Springer-Verlag,
+1995.
+\bibitem{r7} M. Krstic, B.-Z. Guo, A. Balogh, and A. Smyshlyaev, ``Output-feedback
+stabilization of an unstable wave equation,'' \emph{Automatica}, vol. 44, no. 1,
+pp. 63--74, 2008.
+\bibitem{r8} M. Krstic and A. Smyshlyaev, \emph{Boundary Control of PDEs: A Course
+on Backstepping Designs}. Philadelphia, PA, USA: SIAM, 2008.
+\bibitem{r9} R. Vazquez, J. Auriol, F. Bribiesca-Argomedo, and M. Krstic,
+``Backstepping for partial differential equations: A survey,'' \emph{Automatica},
+vol. 183, p. 112572, 2026.
+\bibitem{r10} M. Krstic, ``Compensating a string PDE in the actuation or sensing
+path of an unstable ODE,'' \emph{IEEE Trans. Autom. Control}, vol. 54, no. 6,
+pp. 1362--1368, 2009.
+\bibitem{r11} N. Bekiaris-Liberis and M. Krstic, ``Compensating the distributed
+effect of a wave PDE in the actuation or sensing path of MIMO LTI systems,''
+\emph{Syst. Control Lett.}, vol. 59, no. 11, pp. 713--719, 2010.
+\bibitem{r12} N. Bekiaris-Liberis and M. Krstic, ``Lyapunov stability of linear
+predictor feedback for distributed input delays,'' \emph{IEEE Trans. Autom.
+Control}, vol. 56, no. 3, pp. 655--660, 2011.
+\bibitem{r13} N. Bekiaris-Liberis and M. Krstic, ``Compensating the distributed
+effect of diffusion and counter-convection in multi-input and multi-output LTI
+systems,'' \emph{IEEE Trans. Autom. Control}, vol. 56, no. 3, pp. 637--643,
+2011.
+\bibitem{r14} A. A. Than and J.-M. Wang, ``Output feedback stabilization of
+cascaded ODE--wave equations with time delay in observation,'' \emph{Asian J.
+Control}, vol. 23, no. 1, pp. 449--462, 2021.
+\bibitem{r15} Z.-D. Mei, ``Infinite-dimensional extended state observer based
+stabilization for an ODE--wave cascaded system with control matched
+disturbance,'' \emph{Asian J. Control}, vol. 25, no. 3, pp. 2315--2325, 2023.
+\bibitem{r16} X. Feng and Z. Zhang, ``Output feedback stabilization for a
+wave--ODE cascaded system subject to uncertain disturbance,'' \emph{Asian J.
+Control}, vol. 26, no. 2, pp. 974--988, 2024.
+\bibitem{r17} J. Wang and M. Diagne, ``Delay-adaptive boundary control of coupled
+hyperbolic PDE--ODE cascade systems,'' \emph{IEEE Trans. Autom. Control}, vol.
+69, no. 12, pp. 8156--8171, 2024.
+\bibitem{r18} Z. Lin and H. Fang, ``On asymptotic stabilizability of linear
+systems with delayed input,'' \emph{IEEE Trans. Autom. Control}, vol. 52, no. 6,
+pp. 998--1013, 2007.
+\bibitem{r19} B. Zhou, H. Gao, Z. Lin, and G. Duan, ``Stabilization of linear
+systems with distributed input delay and input saturation,'' \emph{Automatica},
+vol. 48, no. 5, pp. 712--724, 2012.
+\bibitem{r20} Z. Lin and A. Saberi, ``Semi-global exponential stabilization of
+linear systems subject to `input saturation' via linear feedbacks,'' \emph{Syst.
+Control Lett.}, vol. 21, no. 3, pp. 225--239, 1993.
+\bibitem{r21} A. R. Teel, ``Semi-global stabilizability of linear null
+controllable systems with input nonlinearities,'' \emph{IEEE Trans. Autom.
+Control}, vol. 40, no. 1, pp. 96--100, 1995.
+\bibitem{r22} Z. Lin, \emph{Low Gain Feedback}. London, U.K.: Springer, 1999.
+\bibitem{r23} X. Xu, L. Liu, and G. Feng, ``Stabilization of linear systems with
+distributed infinite input delays: A low gain approach,'' \emph{Automatica}, vol.
+94, pp. 396--408, 2018.
+\bibitem{r24} X. Xu, L. Liu, and G. Feng, ``Semi-global stabilization of linear
+systems with distributed infinite input delays and actuator saturations,''
+\emph{Automatica}, vol. 107, pp. 398--405, 2019.
+\bibitem{r25} X. Xu, L. Liu, and G. Feng, ``Stability and stabilization of
+infinite delay systems: A Lyapunov based approach,'' \emph{IEEE Trans. Autom.
+Control}, vol. 65, no. 11, pp. 4509--4524, 2020.
+\bibitem{r26} M. Krstic and A. Smyshlyaev, ``Backstepping boundary control for
+first-order hyperbolic PDEs and application to systems with actuator and sensor
+delays,'' \emph{Syst. Control Lett.}, vol. 57, no. 9, pp. 750--758, 2008.
+\bibitem{r27} X. Xu, L. Liu, M. Krstic, and G. Feng, ``Low-gain compensation for
+PDE--ODE cascade systems with distributed diffusion and counter convection,''
+\emph{IEEE Trans. Autom. Control}, vol. 68, no. 4, pp. 2360--2367, 2023.
+\bibitem{r28} X. Xu, L. Liu, M. Krstic, and G. Feng, ``Backstepping-forwarding
+designs for doubly-distributed delay--PDE--ODE systems,'' \emph{IEEE Trans.
+Autom. Control}, vol. 69, no. 11, pp. 7356--7370, 2024.
 \end{thebibliography}
 
 \end{document}

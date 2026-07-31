@@ -1,0 +1,2606 @@
+     Undergraduate Thesis
+
+   Thesis Title:   Low-Gain Compensation for Wave
+
+                   PDE-ODE System with Distributed
+
+                               Effect
+
+Student Name:               Fengyang Wu
+
+   Student ID:                12210634
+
+  Department:                   AIM
+
+     Program:                Automation
+
+Thesis Advisor:               Xiang Xu
+            COMMITMENT OF HONESTY
+
+1. I solemnly promise that the thesis presented comes from my
+
+independent research work under my supervisor’s supervision.              All
+
+statistics and images are real and reliable.
+
+2. Except for the annotated reference, the thesis contents no other
+
+published work or achievement by person or group. All people making
+
+important contributions to the study of the thesis have been indicated
+
+clearly in the thesis.
+
+3. I promise that I did not plagiarize other people’s research achievement
+
+or forge related data in the process of designing topic and research
+
+content.
+
+4. If there is violation of any intellectual property right, I will take legal
+
+responsibility myself.
+
+
+
+
+                                                 Signature:
+
+                                                 Date:
+           Low-Gain Compensation for Wave
+           PDE-ODE System with Distributed
+                      Effect
+
+
+[ABSTRACT]: Wave PDE–ODE cascades model control systems in which
+the input is not directly applied to the finite-dimensional plant, but is transmit-
+ted through a distributed actuator with elasticity, inertia, and finite propagation
+speed. Such models appear in flexible mechanical structures, vibration sys-
+tems, transmission cables, acoustic channels, and other engineering systems
+where the actuator dynamics cannot be accurately represented by a lumped
+input. Due to their ability to capture spatial propagation and energy storage,
+wave PDE–ODE models provide a more realistic description than pure input-
+delay models. However, the boundary stabilization of these systems remains
+challenging. The wave equation is conservative in nature and lacks the natural
+dissipative mechanism of parabolic PDEs. In addition, distributed coupling be-
+tween the wave displacement, the wave velocity, and the ODE state makes the
+closed-loop system structurally more complicated than standard strict-feedback
+cascades. Existing predictor and backstepping methods can compensate for dis-
+tributed actuator dynamics, but the resulting controllers are often algebraically
+involved and may require full knowledge of the distributed PDE state. To ad-
+dress these issues, this thesis studies the boundary stabilization problem for a
+class of linear ODE systems with wave PDE input dynamics and distributed
+coupling effects, and develops a low-gain boundary feedback approach to ob-
+tain exponential stability while keeping the controller structurally simple.
+     The main contributions of this thesis can be summarized as follows. (1)
+The boundary stabilization problem of a wave PDE–ODE cascade system with
+distributed displacement and velocity coupling effects is studied. A low-gain
+boundary feedback law is proposed, consisting of a low-gain term for the finite-
+
+                                         I
+dimensional ODE subsystem and a boundary velocity damping term for the
+wave actuator. Unlike backstepping-based controllers, the proposed controller
+has a simpler online structure, as it requires only the ODE state and the local
+boundary velocity of the wave equation, while the distributed coupling effects
+are incorporated through an offline kernel boundary-value problem. This pro-
+vides a simpler stabilization scheme for wave PDE–ODE cascade systems, al-
+beit with additional spectral conditions on the open-loop ODE subsystem. (2)
+The exponential stability of the closed-loop system is rigorously established.
+Exploiting the positive Robin elastic support at the uncontrolled boundary and
+the controller-injected damping at the controlled boundary, a Lyapunov func-
+tional is constructed by combining the low-gain ODE energy, the wave energy,
+the endpoint elastic energy, and cross terms for the distributed coupling ef-
+fects. Under appropriate low-gain conditions, the closed-loop PDE–ODE cas-
+cade system is proved exponentially stable. Numerical simulations further ver-
+ify that the proposed controller stabilizes both the finite-dimensional plant state
+and the distributed wave state.
+
+
+
+
+[Key words]: PDE–ODE cascade; Wave equation; Boundary stabilization;
+Low-gain compensation
+
+
+
+
+                                        II
+[摘要]：波动方程 PDE–ODE 级联系统刻画了一类控制输入经由分布式
+执行器传输后再作用于有限维被控对象的控制系统，其中执行器具有弹
+性、惯性和有限传播速度。这类模型出现在柔性机械结构、振动系统、传
+输线缆和声学通道等工程系统中，能够描述空间传播和能量存储。然而，
+这类系统的边界镇定仍然具有挑战性：波动方程本质上是保守的，缺少
+抛物型 PDE 的自然耗散；波动位移、波动速度与 ODE 状态之间的分布式
+耦合也使闭环结构更加复杂。现有预测器和反步法可以补偿分布式执行
+器动力学，但所得控制器通常代数形式复杂，并且可能需要完整的分布
+式 PDE 状态信息。针对这些问题，本毕业设计研究一类具有波动方程输
+入动力学和分布式耦合效应的线性 ODE 系统的边界镇定问题，并发展一
+种低增益边界反馈方法，在获得指数稳定性的同时保持控制器结构简单。
+  毕业设计的主要工作可以概括如下：（1）研究了一类具有分布式位
+移耦合和速度耦合效应的波动方程 PDE–ODE 级联系统的边界镇定问题，
+提出了一种由 ODE 低增益反馈项和波动方程边界速度阻尼项组成的低
+增益边界反馈控制律。与反步法控制器相比，该控制器仅需 ODE 状态和
+波动方程局部边界速度，分布式耦合项的影响则通过离线求解的核函数
+边值问题加以刻画。因此该控制器是一个结构更简单的方案，但需对开
+环 ODE 子系统施加额外的谱条件。
+                 （2）严格证明了闭环系统的指数稳定
+性。利用未控端的正 Robin 弹性支撑和受控端的控制器注入阻尼，构造
+了包含低增益 ODE 能量、波动能量、端点弹性能量及分布式耦合交叉项
+的 Lyapunov 泛函。在适当低增益条件下，闭环 PDE–ODE 级联系统被证
+明是指数稳定的。数值仿真验证了所提控制器能同时镇定有限维被控对
+象状态和分布式波动状态。
+
+
+
+
+[关键词]：波动方程； PDE-ODE 级联系统；边界镇定；低增益补偿
+
+
+
+
+                    III
+                                        Contents
+
+Abstract . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    I
+
+摘要 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . III
+
+List of Symbols and Acronyms . . . . . . . . . . . . . . . . . . . . . . . . . VI
+
+1. Introduction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       1
+
+     1.1 Research Background . . . . . . . . . . . . . . . . . . . . . . . . . .            1
+
+     1.2 Related Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         2
+
+     1.3 Motivation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       4
+
+     1.4 Thesis Work and Organization . . . . . . . . . . . . . . . . . . . . .             4
+
+2. Preliminaries . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      6
+
+     2.1 Technical Lemmas . . . . . . . . . . . . . . . . . . . . . . . . . . . .           6
+
+3. Low-Gain Boundary Stabilization of the Wave PDE–ODE Cascade                             8
+
+     3.1 System Description . . . . . . . . . . . . . . . . . . . . . . . . . . . .         8
+
+     3.2 Controller Design . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        9
+
+     3.3 Stability Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      11
+
+     3.4 Numerical Simulations . . . . . . . . . . . . . . . . . . . . . . . . .           30
+
+          3.4.1 Numerical Setup . . . . . . . . . . . . . . . . . . . . . . . . .          30
+
+          3.4.2 Simulation Results . . . . . . . . . . . . . . . . . . . . . . . .         31
+
+     3.5 Chapter Summary . . . . . . . . . . . . . . . . . . . . . . . . . . . .           37
+
+4. Conclusion and Future Work . . . . . . . . . . . . . . . . . . . . . . . .              38
+
+     4.1 Summary . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       38
+
+     4.2 Future Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       39
+
+
+                                             IV
+References . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   39
+
+Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        42
+
+
+
+
+                                             V
+                   List of Symbols and Acronyms
+
+
+Rn               n-dimensional real Euclidean space.
+
+Rn×m             Set of all real n × m matrices.
+
+P ≻0             Symmetric matrix P is positive definite.
+
+P ⪰0             Symmetric matrix P is positive semi-definite.
+
+P 1/2            Unique positive definite square root of a positive definite matrix P .
+
+|·|              Absolute value of a scalar or Euclidean norm of a vector.
+
+∥·∥              Induced 2-norm of a matrix.
+
+             2
+  P 1/2 x        Quadratic form x⊤ P x for a positive definite matrix P .
+
+L2 (0, D)        Hilbert space of square-integrable functions on (0, D) with norm ∥·∥2 .
+
+H 1 (0, D)       Sobolev space of functions in L2 (0, D) whose first weak derivatives
+
+                 are also in L2 (0, D).
+
+ux , u t         First-order partial derivatives of u(x, t) with respect to the spatial vari-
+
+                 able x and the time variable t.
+
+uxx , utt        Second-order partial derivatives of u(x, t) with respect to x and t.
+
+g ′ , g ′′       First and second ordinary derivatives of a single-variable function g(x).
+
+O(ε)             Asymptotic order as the low-gain parameter ε → 0+ .
+
+
+
+
+                                          VI
+                                   1.    Introduction
+1.1    Research Background
+      In many control systems, the controller command reaches the ODE plant through a non-
+
+ideal actuator rather than an ideal lumped input. It may first pass through actuator dynamics
+
+associated with a non-negligible transmission length, finite propagation speed, elasticity, in-
+
+ertia, or acoustic storage. In such cases, the actuator is itself a dynamical subsystem: it
+
+stores energy, reflects disturbances at its boundaries, and delivers the commanded action to
+
+the plant only through the evolution of a distributed state. This viewpoint is closely related to
+
+the classical compensation of input delays [1]-[4], but it keeps more of the physical actuator
+
+dynamics than a pure delay representation.
+
+      Wave equations provide a natural model for actuator dynamics in which propagation
+
+and energy storage are dominant. Typical examples include flexible transmission devices,
+
+tensioned strings or cables, vibration structures, acoustic channels, and pipe-like transmis-
+
+sion mechanisms where force, displacement, pressure, or velocity waves carry the control
+
+action through space [5], [6]. Compared with diffusion models, a wave equation is hyper-
+
+bolic and essentially conservative unless damping is introduced through the boundary or the
+
+domain. Therefore, the location and form of the boundary conditions are not only modeling
+
+details; they determine how energy enters, leaves, and persists in the actuator dynamics.
+
+      The system considered in this thesis has precisely this PDE–ODE cascade structure. The
+
+boundary input U (t) is applied at the right endpoint x = D of a one-dimensional wave actu-
+
+ator u(x, t), while the left endpoint x = 0 is equipped with a positive Robin elastic support
+
+ux (0, t) = q u(0, t), q > 0. The finite-dimensional plant state X(t) is then driven through
+
+the distributed wave field, not through a direct scalar input. More specifically, the plant
+
+receives the in-domain effects of both the displacement and velocity components through
+           RD                      RD
+the terms 0 B1 (x)u(x, t) dx and 0 B2 (x)ut (x, t) dx. Such a model captures situations
+
+in which the plant is coupled to the whole actuator profile rather than to one measured or
+
+actuated boundary trace.
+
+      This distributed coupling makes the stabilization problem different from both a pure
+
+delay problem and a single-boundary interconnection. A delay model retains only the past
+
+                                               1
+values of a lumped input, while a boundary-trace model transmits information through one
+
+endpoint variable. Here, the ODE subsystem is affected by the spatially integrated wave
+
+displacement and wave velocity, so the closed-loop system is not in a simple strict-feedback
+
+form. A controller that reconstructs the whole wave state can therefore become difficult
+
+to implement. The objective of this thesis is to show that, under suitable low-gain spectral
+
+conditions, a boundary feedback law can still stabilize the coupled system by combining
+
+finite-dimensional low-gain damping with a controller-injected boundary velocity damping
+
+term. The closed-loop structure is summarized in Figure 1.
+
+                    Positive Robin elastic support        Actuated boundary at x = D
+                     ux (0, t) = q u(0, t), q > 0              ux (D, t) = U (t)
+
+
+                                                                             ∫D
+                                                                              0
+                                                                                   B1 (x)u(x, t) dx
+                                              Wave actuator                 ∫D
+   Boundary input     x=D                                                    0
+                                                                                   B2 (x)ut (x, t) dx   ODE plant
+                                          utt (x, t) = uxx (x, t)
+   U (t) at x = D                                                                                         X(t)
+                                                x ∈ [0, D]
+
+
+
+
+                                         Low-gain feedback
+                                  U (t) = −B⊤ Pε X(t) − b ut (D, t)
+
+ Figure 1. Closed-loop wave PDE–ODE cascade with distributed displacement and velocity coupling.
+
+
+1.2    Related Work
+      In past decades, boundary control of wave equations has been extensively studied, see,
+
+for example, [7], [8]. A recent survey by Vazquez et al. gives a broad account of PDE
+
+backstepping developments and applications [9]. For actuator dynamics governed by a wave
+
+PDE, an explicit compensator was first constructed in [10] for the case where the wave enters
+
+the plant through a single point of its spatial domain. The results were later extended in [11] to
+
+the distributed-interconnection case, where the wave PDE enters the ODE through in-domain
+
+coupling terms rather than through a single boundary trace. As also observed through the
+
+distributed-delay and diffusion analogues [12], [13], the key difficulty is that the overall sys-
+
+tem, consisting of the finite-dimensional state and the infinite-dimensional actuator states, is
+
+no longer in strict-feedback form. In addition, the wave subsystem is second-order in time,
+
+couples displacement and velocity states, and has infinitely many imaginary-axis modes due
+
+
+                                                              2
+to finite propagation speed. It is therefore noted from [10], [11] that backstepping-based con-
+
+trollers for wave actuator dynamics, especially in the distributed-interconnection case, tend
+
+to be algebraically involved and typically require full distributed-state information, which
+
+makes implementation difficult in practice.
+
+     Recent studies have further moved wave and hyperbolic PDE–ODE cascades toward
+
+output feedback, disturbances, and delays: Than and Wang treated observation delay in
+
+an ODE–wave cascade [14]; Mei used an infinite-dimensional extended state observer for
+
+a control-matched disturbance [15]; Feng and Zhang combined ADRC, observer design,
+
+and backstepping for a disturbed wave–ODE cascade [16]; Wang and Diagne developed
+
+delay-adaptive boundary control for hyperbolic PDE–ODE cascades with unknown input
+
+delay [17]. These results show the increasing capability of wave and hyperbolic cascade
+
+control, but they also illustrate that observer, disturbance-estimator, backstepping, or adap-
+
+tive modules are often needed in more general information or uncertainty settings.
+
+     On the other hand, low-gain feedback has also been a very successful approach to con-
+
+trol design for linear systems with various input delays [18], [19]. Low-gain feedback was
+
+first proposed in [20] to establish semiglobal stabilizability of linear systems subject to input
+
+saturation. It was then widely applied to systems with various input nonlinearities and/or
+
+input delays [18], [19], [21], [22]. More recently, low-gain feedback has been further ap-
+
+plied to stabilization problems of linear systems with unbounded input delays [23]-[25]. It is
+
+noted from these existing works [3], [18], [19], [26] that, for stabilization problems of linear
+
+systems with input delays, low-gain feedback can provide much more simplified controllers
+
+than predictor feedback under additional assumptions on the open-loop plant.
+
+     Closer to the distributed-effect mechanism considered here, Xu et al. established low-
+
+gain compensation for diffusion-counter-convection PDE–ODE cascades with distributed
+
+effects [27]; their later backstepping-forwarding design for doubly-distributed delay–PDE–
+
+ODE systems shows how distributed interconnections increase controller and proof com-
+
+plexity [28]. These developments motivate asking whether a similar low-gain simplification
+
+can be obtained for a conservative wave actuator with distributed displacement and velocity
+
+coupling.
+
+
+                                               3
+1.3    Motivation
+      The observations above motivate this thesis to consider low-gain feedback compensa-
+
+tion for systems with input dynamics modeled by distributed wave PDEs. This thesis pro-
+
+poses a low-gain controller for linear systems with distributed input dynamics governed by
+
+a wave equation, which can be formulated as a wave PDE–ODE cascade with distributed
+
+displacement and velocity interconnections. It is shown that the concerned system can be
+
+exponentially stabilized with the proposed low-gain controller as long as the open-loop plant
+
+is not exponentially unstable. It is also shown that the proposed low-gain controller has a
+
+much more simplified form than those developed via the backstepping approach in [10], [11].
+
+However, at the same time, additional restrictions on the eigenvalues of the open-loop plant
+
+have to be imposed for the low-gain controller, which are not required in the backstepping
+
+design. In contrast to the diffusion setting, the wave subsystem is conservative and does not
+
+contain intrinsic dissipation. For this reason, the present design explicitly exploits the posi-
+
+tive Robin elastic support at the unactuated boundary and the controller-injected damping at
+
+the actuated boundary in order to inject decay into the infinite-dimensional system.
+
+1.4    Thesis Work and Organization
+      Main contributions of this work, compared with relevant existing works, can be sum-
+
+marized as follows.
+
+
+   1. To the best of the author’s knowledge, this thesis is the first effort on utilizing the
+
+       low-gain feedback approach for boundary control problems with wave PDE actuator
+
+       dynamics. The low-gain feedback approach has been successful in control problems
+
+       of linear systems with input saturations and/or input delays [18]-[20]. More recently, it
+
+       has been extended to diffusion PDE–ODE cascades in [27]. However, it has not been
+
+       applied to distributed wave PDE–ODE cascades yet. This work reveals a new area
+
+       where low-gain feedback can be applied.
+
+   2. Compared with the backstepping-designed controllers in [10], [11] for linear systems
+
+       with wave actuator dynamics, the controller developed in this thesis has a more sim-
+
+       plified form and is thus easier to implement because full information of the distributed
+
+                                               4
+      actuator is not required in the feedback law. The proposed design uses only the finite-
+
+      dimensional ODE state X(t) and the local boundary velocity ut (D, t) in the online
+
+      feedback law, while the effective control gain is determined through a kernel boundary-
+
+      value problem. However, at the same time, additional restrictions on the eigenvalues
+
+      of the open-loop plant have to be imposed for the low-gain controller, whereas they
+
+      are not required in the backstepping design.
+
+   3. This thesis considers a distributed wave PDE–ODE cascade equipped with a posi-
+
+      tive Robin elastic support ux (0, t) = q u(0, t), q > 0, at the unactuated boundary
+
+      and controller-injected boundary damping at the actuated boundary. This is a posi-
+
+      tive Robin boundary condition rather than the most general Robin class; the positivity
+
+      of q is essential for the coercive wave energy containing the endpoint term 2q u2 (0, t).
+
+      Unlike the diffusion case, where decay is inherited from the parabolic operator, the
+
+      present wave subsystem is conservative and requires a dedicated energy construction
+
+      to capture the boundary elastic energy, the controller-injected damping term, and the
+
+      distributed coupling through both displacement and velocity channels. This thesis in-
+
+      troduces a wave-energy Lyapunov functional with suitable cross terms and rigorously
+
+      establishes exponential stability in a natural energy norm under the low-gain spectral
+
+      conditions.
+
+
+     The remainder of this thesis is organized as follows. Section 2 recalls the low-gain
+
+algebraic Riccati framework and the technical inequalities used later. Section 3 develops
+
+the PDE–ODE model, the kernel transformation, the controller, the stability proof, and the
+
+nilpotent special case. Section 3.4 reports numerical examples. Section 4 concludes the
+
+thesis and discusses future work.
+
+
+
+
+                                              5
+                                        2.       Preliminaries
+      This section collects the auxiliary estimates that will be reused in the controller con-
+
+struction and stability proof of Section 3. The PDE–ODE model itself is postponed to the
+
+main research chapter so that the preliminaries remain limited to genuinely reusable technical
+
+tools.
+
+2.1      Technical Lemmas
+      This subsection recalls the low-gain algebraic Riccati lemma, Cauchy-Schwarz esti-
+
+mates, and Young-type inequalities that will be used in Section 3. The low-gain framework
+
+is consistent with [18], [23].
+
+Lemma 1 (Low-gain properties). Assume a matrix pair (A, B) is controllable and all the
+
+eigenvalues of A ∈ Rn×n are on the imaginary axis. Then the following parametric ARE:
+
+
+                                    A⊤ P + P A − P BB ⊤ P = −εP                            (1)
+
+
+has a unique positive definite solution P = Pε , where P can be solved by the following
+
+Lyapunov equation:
+                                                        
+                           −1          εIn             εIn
+                                                       ⊤
+                       P            A+           + A +       P −1 = BB ⊤ .                 (2)
+                                        2               2
+
+Moreover, the following properties hold:
+
+   1. lim+ Pε = 0 and dP
+                       dε
+                         ε
+                           > 0 for all ε > 0;
+         ε→0
+
+
+   2. there exists ϑ > 0 such that lim+ ε−1 Pε = ϑ; and
+                                         ε→0
+
+
+   3. if all eigenvalues of A are at the origin, then A⊤ Pε A ⪯ 3n2 ε2 Pε .
+
+Lemma 2 (Poincare-type inequalities). For every y ∈ H 1 (0, D), there hold
+
+
+                                     ∥y∥22 ≤ 2D y 2 (0) + D2 ∥yx ∥22 ,                     (3)
+
+
+and
+
+                                      y 2 (D) ≤ 2y 2 (0) + 2D∥yx ∥22 .                     (4)
+
+
+                                                       6
+Lemma 3 (Cauchy-Schwarz inequality). For any vectors a and b of the same dimension,
+
+there holds
+
+                                             |aT b| ≤ |a| |b|.                         (5)
+
+For any f, h ∈ L2 (0, D), there holds
+                               Z D                        2
+                                      T
+                                     f (x)h(x) dx             ≤ ∥f ∥22 ∥h∥22 .         (6)
+                                 0
+
+
+In particular, if z1 , . . . , zm are vectors in a Euclidean space, then
+                                                  2
+                                      X
+                                      m                    X
+                                                           m
+                                             zi       ≤m            |zi |2 .           (7)
+                                       i=1                    i=1
+
+
+Lemma 4 (Young’s inequality and its variants). For any a, b ∈ R and η > 0, there holds
+
+
+                                      2|ab| ≤ ηa2 + η −1 b2 .                          (8)
+
+
+The following variants will also be used below. For any vectors a and b of the same dimen-
+
+sion, there hold
+
+                                  −|a|2 + 2aT b ≤ |b|2 ,                               (9)
+                                          |a − b|2 ≤ 2|a|2 + 2|b|2 ,                 (10)
+                                                     1
+                                          |a + b|2 ≥ |a|2 − |b|2 .                   (11)
+                                                     2
+
+
+
+
+                                                      7
+ 3. Low-Gain Boundary Stabilization of the Wave PDE–ODE
+                         Cascade
+      This section serves as the main research chapter of the thesis. It introduces the wave
+
+PDE–ODE cascade model, derives an ODE-state low-gain boundary controller, proves ex-
+
+ponential stability of the resulting closed-loop system, discusses the special nilpotent case,
+
+and concludes with numerical simulations.
+
+3.1    System Description
+      Consider x ∈ [0, D] and t ≥ 0, and
+                                                    Z D
+                             Ẋ(t) = AX(t) +      B1 (x)u(x, t) dx
+                                                0
+                                       Z D
+                                     +     B2 (x)ut (x, t) dx,                             (12)
+                                           0
+                         utt (x, t) = uxx (x, t),                                          (13)
+                          ux (0, t) = q u(0, t),                                           (14)
+                         ux (D, t) = U (t),                                                (15)
+
+
+where q > 0. The damping gain b > 0 will be introduced through the controller. Here X(t) ∈
+
+Rn is the finite-dimensional plant state, A ∈ Rn×n is a constant system matrix, and U (t) ∈ R
+
+is the boundary control signal applied at x = D. The function u(x, t) : [0, D]×[0, +∞) → R
+
+is the wave state, ut (x, t) denotes the wave velocity, and utt (x, t) and uxx (x, t) denote the
+
+second partial derivatives with respect to t and x, respectively. The coupling matrix functions
+
+B1 , B2 : [0, D] → Rn×1 satisfy B1 ∈ L2 (0, D) and B2 ∈ H 1 (0, D).
+
+     The constant q > 0 is the elastic support parameter at x = 0. Equation (12) is an
+                                                                          RD
+n-dimensional linear ODE driven by two distributed coupling terms: 0 B1 (x)u(x, t) dx
+                                                                         RD
+captures the integrated effect of the wave displacement on the plant, and 0 B2 (x)ut (x, t) dx
+
+captures the integrated effect of the wave velocity. Equation (13) is a one-dimensional wave
+
+equation governing the evolution of the actuator state u along the spatial domain (0, D). The
+
+boundary condition (14) is a positive Robin elastic support, where q > 0 provides elastic
+
+restoring force proportional to the displacement at x = 0; it is not intended to represent
+
+the most general Robin boundary class. The boundary condition (15) describes the actuated
+
+end at x = D, where the physical input U (t) enters through the spatial derivative ux (D, t).
+
+                                                8
+The velocity damping needed at the actuated boundary is supplied by the feedback law itself
+
+rather than by the plant boundary condition.
+
+      Throughout this chapter, the control objective is to design a boundary input U (t) using
+
+the ODE state X(t) and the local boundary velocity ut (D, t) such that the closed-loop energy
+                                          Z D
+                                                                          
+                  Ω(t) := |X(t)| +  2
+                                                   u2x (x, t) + u2t (x, t) dx + u2 (0, t)   (16)
+                                              0
+
+
+decays exponentially.
+
+3.2    Controller Design
+      The controller is built from a function g ∈ C 2 ([0, D]; Rn×1 ) satisfying
+
+                             g ′′ (x) + B1 (x) = A(Ag(x) − B2 (x)),                         (17)
+                              g ′ (0) − qg(0) = 0,                                          (18)
+                                      −g ′ (D) = Ab g(D).                                   (19)
+
+
+Define
+
+                                        g0 (x) := Ag(x) − B2 (x)                            (20)
+
+and
+
+                                                  B := g(D).                                (21)
+
+      For explicit computation of B, define
+                                                                                 
+                          0 I                                     0
+                     A :=        ,                 η(x) :=                                  (22)
+                          A2 0                             −AB2 (x) − B1 (x)
+
+and
+                                                                Z D
+                            AD I
+                   E := bA I e      ,                      Ξ :=         eA(D−s) η(s) ds.    (23)
+                                 qI                                0
+
+Proposition 1. Assume the matrix E in (23) is invertible. Then the endpoint gain B = g(D)
+
+associated with (17)–(19) is given by
+                                                             !
+                                        
+                                           AD I    −1
+                                                            
+                    B=           I 0 − I 0 e      E      bA I Ξ.                            (24)
+                                               qI
+
+
+
+
+                                                       9
+Proof. Starting from (17), the boundary-value problem for g is rewritten as
+
+
+                               g ′′ (x) = A2 g(x) − AB2 (x) − B1 (x).                 (25)
+
+
+Introduce the stacked state
+                                                        
+                                                   g(x)
+                                           ζ(x) := ′       .                          (26)
+                                                   g (x)
+
+Then (25) is equivalent to the first-order system
+
+
+                                      ζ ′ (x) = Aζ(x) + η(x),                         (27)
+
+
+where A and η are given in (22). By variation of constants,
+                                                        Z x
+                                          Ax
+                               ζ(x) = e        ζ(0) +           eA(x−s) η(s) ds.      (28)
+                                                            0
+
+
+     The left boundary condition (18) gives
+                                                                
+                                ′                                I
+                               g (0) = qg(0),           ζ(0) =     g(0).              (29)
+                                                                qI
+
+Evaluating (28) at x = D therefore yields
+                                                       
+                                                 AD     I
+                                    ζ(D) = e              g(0) + Ξ,                   (30)
+                                                       qI
+
+where Ξ is defined in (23). On the other hand, the right boundary condition (19) is
+
+                                                                       
+                       −g ′ (D) = Ab g(D),                          bA I ζ(D) = 0.    (31)
+
+
+Substituting (30) into (31) gives
+                                        
+                                   AD I            
+                               bA I e      g(0) + bA I Ξ = 0,                         (32)
+                                        qI
+
+namely,
+                                                
+                                     Eg(0) + bA I Ξ = 0.                              (33)
+
+Because E is invertible,
+                                                     
+                                     g(0) = −E −1 bA I Ξ.                             (34)
+
+
+                                                      10
+                            
+Finally, using B = g(D) = I 0 ζ(D) together with (30) and (34) gives (24).                ■
+
+Assumption 1. The matrix A has all its eigenvalues on the imaginary axis, the matrix E in
+
+(23) is invertible, and the matrix pair (A, B) is controllable.
+
+      Assumption 1 is the principal restriction introduced by the low-gain design. It does
+
+not imply stability or boundedness of the open-loop cascade, but it covers important classes
+
+of systems such as oscillators and nilpotent integrator chains. By Lemma 1, applied with
+
+B = B, the algebraic Riccati equation
+
+
+                               AT P + P A − P BBT P = −εP.                             (35)
+
+
+has a unique positive definite solution P = Pε . The proof below will restrict ε > 0 to be
+
+sufficiently small and use the low-gain scaling properties stated in Lemma 1. The proposed
+
+boundary controller is
+
+                               U (t) = −BT P X(t) − b ut (D, t).                       (36)
+
+Remark 1. The function g(x) and the vector B are computed offline. Once B is obtained,
+
+the online controller (36) only uses X(t) and ut (D, t).
+
+Remark 2. The term −BT P X(t) is the low-gain stabilizing part for the ODE channel, while
+
+−b ut (D, t) injects boundary damping into the wave equation. Hence the controller has a
+
+simpler online form than a backstepping controller requiring full distributed-state informa-
+
+tion, although this simplification comes with the additional spectral restriction in Assump-
+
+tion 1.
+
+3.3       Stability Analysis
+      The main closed-loop stability result is stated first.
+
+Theorem 1. Consider the closed-loop system under Assumption 1. It consists of the dynam-
+
+ics (12)–(13), the boundary conditions (14)–(15), and the controller (36). Then there exists
+
+ε∗ > 0 such that for every ε ∈ (0, ε∗ ] and every initial condition
+
+
+                    (X(0), u(·, 0), ut (·, 0)) ∈ Rn × H 1 (0, D) × L2 (0, D)
+
+                                                11
+compatible with the boundary conditions, the closed-loop system has a unique solution and
+
+is exponentially stable in the sense that
+
+
+                                           Ω(t) ≤ αe−βt Ω(0)                                   (37)
+
+
+for some positive constants α and β.
+
+     For the proof, let g be the solution to (17)–(19), and introduce the transformed finite-
+
+dimensional state
+                             Z D                         Z D
+           Z(t) = X(t) +           g0 (x)u(x, t) dx +          g(x)ut (x, t) dx + bBu(D, t).   (38)
+                              0                           0
+
+
+Differentiating (38) and using (12)–(13) gives
+                                  Z D                          Z D
+            Ż(t) = AX(t) +      B1 (x)u(x, t) dx +      B2 (x)ut (x, t) dx
+                              0                       0
+                      Z D                      Z D
+                    +     g0 (x)ut (x, t) dx +     g(x)uxx (x, t) dx + bBut (D, t)
+                       0                        0
+                             Z D                       Z D
+                  = AX(t) +      B1 (x)u(x, t) dx + A       g(x)ut (x, t) dx
+                              0                         0
+                      Z D
+                    +     g(x)uxx (x, t) dx + bBut (D, t),                                     (39)
+                         0
+
+
+because B2 (x) + g0 (x) = Ag(x). Integrating the uxx term by parts twice yields
+    Z D
+          g(x)uxx (x, t) dx = g(D)ux (D, t) − g(0)ux (0, t) − g ′ (D)u(D, t) + g ′ (0)u(0, t)
+     0
+                                Z D
+                              +     g ′′ (x)u(x, t) dx.                                      (40)
+                                     0
+
+
+Using (14), (15), (18), and (19), the boundary terms reduce to
+
+                 g(D)ux (D, t) − g(0)ux (0, t) − g ′ (D)u(D, t) + g ′ (0)u(0, t)
+                                                                                               (41)
+                     = BU (t) + AbBu(D, t),
+
+because the left-boundary contributions cancel. Moreover, (17) implies
+
+
+                                        g ′′ (x) + B1 (x) = Ag0 (x).                           (42)
+
+
+
+
+                                                    12
+Substituting (40)–(42) into (39) gives
+
+                                                                   
+                              Ż(t) = AZ(t) + B U (t) + b ut (D, t) .                                      (43)
+
+
+Together with the controller (36), this identity gives
+
+
+                            Ż(t) = (A − BBT P )Z(t) + BBT P φ(t)                                          (44)
+
+
+where
+
+                                         φ(t) := Z(t) − X(t).                                              (45)
+
+Define further
+
+                                              s(t) := BT P X(t)                                            (46)
+
+and
+                                                                  x2
+                                     ω(x, t) := u(x, t) +            s(t).                                 (47)
+                                                                  2D
+
+Then
+
+                                                      1          x2
+                             ωtt (x, t) = ωxx (x, t) − s(t) +       s̈(t),                                 (48)
+                                                      D         2D
+                              ωx (0, t) = q ω(0, t),                                                       (49)
+                                                        bD
+                             ωx (D, t) = −bωt (D, t) +     ṡ(t).                                          (50)
+                                                         2
+
+      Consider the Lyapunov candidates
+
+
+                                          V1 (t) = Z T (t)P Z(t)                                           (51)
+
+
+and
+              Z D                                                       Z D
+          1                                          q
+ V2 (t) =           ωx2 (x, t) + ωt2 (x, t)       dx + ω 2 (0, t) + δ         (1 + x)ωx (x, t)ωt (x, t) dx, (52)
+          2    0                                      2                  0
+
+
+where δ > 0 is chosen such that
+
+                                                  n     1         2b          o
+                            0 < δ < min                    ,                    .                          (53)
+                                                      1 + D (1 + D)(1 + 2b2 )
+
+
+
+
+                                                           13
+Define also
+                                        Z D
+                                   1                                     q
+                         Eω (t) :=            ωx2 (x, t) + ωt2 (x, t) dx + ω 2 (0, t).             (54)
+                                   2      0                               2
+
+Then
+
+                                         cω Eω (t) ≤ V2 (t) ≤ cω Eω (t),                           (55)
+
+where
+
+                               cω := 1 − δ(1 + D),             cω := 1 + δ(1 + D).                 (56)
+
+       Since P = P T , differentiating (51) along (44) gives
+
+             V̇1 (t) = Ż T (t)P Z(t) + Z T (t)P Ż(t)
+                                                              
+                     = Z T (t) (A − BBT P )T P + P (A − BBT P ) Z(t)
+                         + 2Z T (t)P BBT P φ(t)
+                       = −εZ T (t)P Z(t) − Z T (t)P BBT P Z(t) + 2Z T (t)P BBT P φ(t)
+                       ≤ −εZ T (t)P Z(t) + φT (t)P BBT P φ(t).                                     (57)
+
+
+Here the third line uses the Riccati identity (35). The last step follows from Lemma 4 with
+
+a = BT P Z(t) and b = BT P φ(t).
+
+       Differentiating (52) along (48)–(50) yields
+                  Z D                              Z D
+      V̇2 (t) =      ωx (x, t)ωxt (x, t) dx +      ωt (x, t)ωtt (x, t) dx + qω(0, t)ωt (0, t)
+                   0                           0
+                     Z D                                    Z D
+                  +δ     (1 + x)ωxt (x, t)ωt (x, t) dx + δ        (1 + x)ωx (x, t)ωtt (x, t) dx.   (58)
+                         0                                         0
+
+
+Set
+                                                         1        x2
+                                        r(x, t) := −       s(t) +    s̈(t),                        (59)
+                                                         D        2D
+
+so that ωtt = ωxx + r. The derivative of the basic wave energy in (54) satisfies
+                               Z D                 Z D
+                  Ėω (t) =          ωx ωxt dx +      ωt (ωxx + r) dx + qω(0, t)ωt (0, t)
+                                 0                  0
+                                                               Z D
+                                       D
+                             = [ωx ωt ]0 + qω(0, t)ωt (0, t) +     ωt (x, t)r(x, t) dx
+                                                                0
+                                                                   Z D
+                                              bD
+                             = −bωt (D, t) +
+                                    2
+                                                  ṡ(t)ωt (D, t) +      ωt (x, t)r(x, t) dx.       (60)
+                                               2                    0
+
+
+
+
+                                                          14
+For the cross term in (52), integration by parts gives
+            Z D
+      d                             1                1
+                  (1 + x)ωx ωt dx = [(1 + x)ωt2 ]D
+                                                 0 + [(1 + x)ωx ]0
+                                                                  2 D
+      dt     0                      2                2
+                                        Z D                  Z D
+                                      1
+                                    −         2     2
+                                            (ωx + ωt ) dx +       (1 + x)ωx r dx
+                                      2 0                     0
+                                        Z
+                                      1 D 2                  1+D 2               1
+                                  = −       (ωx + ωt2 ) dx +          ωt (D, t) − ωt2 (0, t)
+                                      2 0                       2                2
+                                                                       2
+                                      1+D                     bD              q2
+                                    +          −bωt (D, t) +       ṡ(t) − ω 2 (0, t)
+                                        2                      2               2
+                                      Z D
+                                    +     (1 + x)ωx (x, t)r(x, t) dx.                        (61)
+                                         0
+
+
+Using Lemma 4 in (61) yields
+            Z D                         Z
+       d                              δ D 2                    δ(1 + D)
+     δ            (1 + x)ωx ωt dx ≤ −        (ωx + ωt2 ) dx +           (1 + 2b2 )ωt2 (D, t)
+       dt    0                        2 0                          2
+                                                      2
+                                      δ 2          δq 2            δ(1 + D)b2 D2 2
+                                    − ωt (0, t) −       ω (0, t) +                ṡ (t)
+                                      2             2                    4
+                                        Z D
+                                    +δ      (1 + x)ωx (x, t)r(x, t) dx.                      (62)
+                                              0
+
+
+Combining (60) and (62), and then expanding r by (59), gives
+                   Z                                                              
+                 δ D 2                                         δ(1 + D)
+     V̇2 (t) ≤ −          ωx (x, t) + ωt (x, t) dx − b −
+                                        2
+                                                                          (1 + 2b ) ωt2 (D, t)
+                                                                                 2
+                 2 0                                                 2
+                                   2
+                 δ             δq 2              bD                    δ(1 + D)b2 D2 2
+               − ωt2 (0, t) −        ω (0, t) +      ṡ(t)ωt (D, t) +                ṡ (t)
+                 2               2                2                          4
+                 Z D            1                       
+                                                x2
+               +      ωt (x, t) − s(t) +            s̈(t) dx
+                  0                  D         2D
+                   Z D                    1                        
+                                                           x2
+               +δ      (1 + x)ωx (x, t) − s(t) +               s̈(t) dx.                       (63)
+                    0                          D           2D
+
+The derivative of V2 contains terms involving ṡ. Thus, ṡ is first estimated in terms of the
+
+variables appearing in V1 and V2 .
+
+Lemma 5. For sufficiently small ε > 0, there exist nonnegative coefficient functions ρi (ε),
+
+i ∈ {X, 0, x, t}, such that
+
+                                         2
+           ṡ2 (t) ≤ ρX (ε) P 1/2 X(t)       + ρ0 (ε)ω 2 (0, t) + ρx (ε) ∥ωx ∥22 + ρt (ε) ∥ωt ∥22 .   (64)
+
+
+
+
+                                                     15
+Moreover,
+
+
+     ρX (ε) = O(ε),              ρ0 (ε) = O(ε2 ),             ρx (ε) = O(ε2 ),          ρt (ε) = O(ε2 ).     (65)
+
+
+Proof. Define
+                                Z D                                     Z D
+                                             x2                                         x2
+                     m1 :=            B1 (x)    dx,             m2 :=          B2 (x)      dx.               (66)
+                                 0           2D                           0             2D
+                            2                         2
+Substituting u = ω − 2D
+                     x
+                        s and ut = ωt − 2D
+                                        x
+                                           ṡ into (12) gives
+                      Z D                             Z D
+ Ẋ(t) = AX(t) +                B1 (x)ω(x, t) dx +             B2 (x)ωt (x, t) dx − m1 s(t) − m2 ṡ(t). (67)
+                       0                                  0
+
+
+Since ṡ(t) = BT P Ẋ(t), (67) can be rewritten as
+                                            Z D                               Z D
+                 
+             T
+ In + m2 B P Ẋ(t) = AX(t) +                      B1 (x)ω(x, t) dx +                B2 (x)ωt (x, t) dx − m1 s(t).
+                                             0                                 0
+                                                                                                             (68)
+
+For sufficiently small ε, the matrix on the left is invertible. Indeed,
+
+
+                                     |BT P m2 | ≤ |B| |m2 | ∥P ∥ = O(ε),                                     (69)
+
+
+so 1 + BT P m2 ̸= 0 for all ε ∈ (0, ε0 ] with ε0 sufficiently small. Hence, by the Sherman–
+
+Morrison formula,
+
+                                                          −1               m2 BT P
+                       M (ε) := In + m2 BT P                     = In −               .                      (70)
+                                                                          1 + BT P m2
+
+Therefore,
+
+                           M (ε) = In + O(ε),                  ∥M (ε)∥ = 1 + O(ε).                           (71)
+
+     Applying M (ε) to (68) gives
+                                                               Z D
+                     Ẋ(t) = M (ε)AX(t) + M (ε)        B1 (x)ω(x, t) dx
+                                                   0
+                                     Z D                                                                     (72)
+                             + M (ε)     B2 (x)ωt (x, t) dx − M (ε)m1 s(t).
+                                             0
+
+
+
+
+                                                          16
+Left-multiplying by P yields
+                                                                 Z D
+                 P Ẋ(t) = P M (ε)AX(t) + P M (ε)        B1 (x)ω(x, t) dx
+                                                     0
+                                     Z D                                                       (73)
+                           + P M (ε)     B2 (x)ωt (x, t) dx − P M (ε)m1 s(t).
+                                             0
+
+
+Set
+
+                                                 Pbε := ε−1 Pε .                               (74)
+
+By Lemma 1, Pbε remains uniformly bounded for ε ∈ (0, ε0 ]. Thus
+
+                            |P M (ε)AX| = ε Pbε M (ε)APbε−1/2 Pbε1/2 X
+                                              √                                                (75)
+                                        ≤ cXA ε P 1/2 X
+
+for some constant cXA > 0 independent of ε.
+
+      By Lemma 2,
+                                                             √
+                                 ∥ω∥2 ≤ D ∥ωx ∥2 +               2D |ω(0, t)|.                 (76)
+
+Hence,                      Z D
+                  P M (ε)         B1 (x)ω(x, t) dx ≤ ∥P ∥ ∥M (ε)∥ ∥B1 ∥2 ∥ω∥2
+                             0                                                                 (77)
+                                                            ≤ c10 ε|ω(0, t)| + c1x ε ∥ωx ∥2
+and
+                                      Z D
+                            P M (ε)         B2 (x)ωt (x, t) dx ≤ c2t ε ∥ωt ∥2                  (78)
+                                       0
+
+for suitable constants c10 , c1x , c2t > 0 independent of ε.
+
+      For s(t) = BT P X(t),
+
+                                                       2                              2
+                   s2 (t) = BT P 1/2 P 1/2 X(t)             ≤ |B|2 ∥P ∥ P 1/2 X(t)         .   (79)
+
+
+Therefore,
+                     |P M (ε)m1 s| ≤ ∥P ∥ ∥M (ε)∥ |m1 | |s|
+                                      ≤ ∥P ∥3/2 ∥M (ε)∥ |m1 | |B| P 1/2 X                      (80)
+                                      ≤ cXs ε3/2 P 1/2 X .
+Collecting (75)–(80), and enlarging the constants if necessary, gives
+
+
+      |P Ẋ(t)| ≤ χX (ε) P 1/2 X(t) + χ0 (ε)|ω(0, t)| + χx (ε) ∥ωx ∥2 + χt (ε) ∥ωt ∥2 ,        (81)
+
+
+
+                                                       17
+where
+
+                   χX (ε) = O(ε1/2 ),          χ0 (ε) = χx (ε) = χt (ε) = O(ε).                 (82)
+
+     Finally, since ṡ(t) = BT P Ẋ(t),
+
+
+                                      |ṡ(t)|2 ≤ |B|2 |P Ẋ(t)|2 .                              (83)
+
+
+Using Lemma 3 in (81) gives (64) with
+
+
+                             ρi (ε) = 4|B|2 χ2i (ε),     i ∈ {X, 0, x, t}.                      (84)
+
+
+The orders in (65) follow from (82).                                                              ■
+
+     The term φ = Z − X appears in the derivative of V1 . To control this perturbation, this
+
+work estimates φ by the wave variables and the weighted ODE state.
+
+Lemma 6. There exist nonnegative coefficient functions Γi (ε), i ∈ {x, t, 0, X}, such that
+
+                                                                                            2
+     ∥φ(t)∥2 ≤ Γx (ε) ∥ωx ∥22 + Γt (ε) ∥ωt ∥22 + Γ0 (ε)ω 2 (0, t) + ΓX (ε) P 1/2 X(t)           (85)
+
+
+Moreover,
+                   Γx (ε) = O(1),           Γt (ε) = O(1),           Γ0 (ε) = O(1),
+                                                                                                (86)
+                   ΓX (ε) = O(ε).
+                                                                2                      2
+Proof. From (38), (45), and the identities u = ω − 2D
+                                                   x
+                                                      s, ut = ωt − 2D
+                                                                   x
+                                                                      ṡ, and u(D) =
+
+ω(D) − D2 s, one obtains
+                   Z D                         Z D
+          φ(t) =      g0 (x)ω(x, t) dx +      g(x)ωt (x, t) dx
+                    0
+                     Z D                 0
+                                                          Z D            
+                                  x2      bD                          x2                        (87)
+                   −       g0 (x)    dx +     B s(t) −           g(x)    dx ṡ(t)
+                       0          2D        2                  0      2D
+                   + bBω(D, t).
+
+Introduce the fixed vectors
+                        Z D                                           Z D
+                                     x2      bD                                    x2
+               α0 :=          g0 (x)    dx +    B,           β0 :=          g(x)      dx.       (88)
+                         0           2D       2                        0           2D
+
+
+
+
+                                                   18
+Then
+          Z D                          Z D
+   φ=           g0 (x)ω(x, t) dx +           g(x)ωt (x, t) dx − α0 s(t) − β0 ṡ(t) + bBω(D, t).       (89)
+           0                            0
+
+
+     Using Lemma 3, each term is estimated separately. By Lemma 2,
+                    Z D                        2
+                                                                                       
+                          g0 (x)ω(x, t) dx         ≤ ∥g0 ∥22 2D ω 2 (0, t) + D2 ∥ωx ∥22 .             (90)
+                     0
+
+
+Also,
+                                 Z D                         2
+                                       g(x)ωt (x, t) dx          ≤ ∥g∥22 ∥ωt ∥22 .                    (91)
+                                   0
+
+By Lemma 2,
+                                                                          
+                           |bBω(D, t)|2 ≤ b2 |B|2 2ω 2 (0, t) + 2D ∥ωx ∥22 .                          (92)
+
+Therefore (89) implies
+                                          
+        ∥φ(t)∥2 ≤ 5D2 ∥g0 ∥22 + 10b2 D|B|2 ∥ωx ∥22 + 5 ∥g∥22 ∥ωt ∥22
+                                                                                                     (93)
+                  + 10D ∥g0 ∥22 + 10b2 |B|2 ω 2 (0, t) + 5|α0 |2 s2 (t) + 5|β0 |2 ṡ2 (t).
+
+Substituting (79) and (64) into (93) yields (85) with
+
+                          Γx (ε) := 5D2 ∥g0 ∥22 + 10b2 D|B|2 + 5|β0 |2 ρx (ε),
+                           Γt (ε) := 5 ∥g∥22 + 5|β0 |2 ρt (ε),
+                                                                                                      (94)
+                          Γ0 (ε) := 10D ∥g0 ∥22 + 10b2 |B|2 + 5|β0 |2 ρ0 (ε),
+                          ΓX (ε) := 5|α0 |2 |B|2 ∥P ∥ + 5|β0 |2 ρX (ε).
+
+     Since (65) yields
+
+
+                         ρX (ε) = O(ε),            ρ0 (ε) = ρx (ε) = ρt (ε) = O(ε2 ),
+
+
+(94) implies
+
+
+        Γx (ε) = O(1),          Γt (ε) = O(1),            Γ0 (ε) = O(1),             ΓX (ε) = O(ε).   (95)
+
+
+                                                                                                        ■
+
+     With this estimate of φ, the raw derivative (57) gives the following upper bound for V̇1 .
+
+Lemma 7. For sufficiently small ε > 0, there exist nonnegative coefficient functions σi (ε),
+
+
+                                                        19
+i ∈ {x, t, 0, X}, such that
+
+                    V̇1 (t) ≤ − εZ T (t)P Z(t) + σx (ε) ∥ωx ∥22 + σt (ε) ∥ωt ∥22
+                                                                           2                       (96)
+                              + σ0 (ε)ω 2 (0, t) + σX (ε) P 1/2 X(t)           .
+
+Moreover,
+
+
+    σx (ε) = O(ε2 ),       σt (ε) = O(ε2 ),        σ0 (ε) = O(ε2 ),            σX (ε) = O(ε3 ).    (97)
+
+
+Proof. From (57),
+
+                               φT P BBT P φ ≤ |B|2 ∥P ∥2 ∥φ∥2 .                                    (98)
+
+Combining (98) with Lemma 6 yields (96) with
+
+
+                        σi (ε) = |B|2 ∥P ∥2 Γi (ε),         i ∈ {x, t, 0, X}.                      (99)
+
+
+Using ∥P ∥ = O(ε) from Lemma 1 and the orders in (86) gives (97).                                    ■
+
+     The source term in the transformed wave equation also contains s̈. Before estimating
+
+V̇2 , the following upper bound for s̈ is needed.
+
+Lemma 8. For sufficiently small ε > 0, there exist nonnegative coefficient functions τi (ε),
+
+i ∈ {X, 0, x, t, D}, such that
+                                                  2
+                  |s̈(t)|2 ≤ τX (ε) P 1/2 X(t)        + τ0 (ε)ω 2 (0, t)
+                                                                                                  (100)
+                              + τx (ε) ∥ωx ∥22 + τt (ε) ∥ωt ∥22 + τD (ε)ωt2 (D, t),
+
+Moreover,
+
+                τX (ε) = O(ε),          τ0 (ε) = τx (ε) = τt (ε) = τD (ε) = O(ε2 ).               (101)
+
+Proof. Differentiating (12) with respect to time gives
+                                  Z D                          Z D
+              Ẍ(t) = AẊ(t) +          B1 (x)ut (x, t) dx +          B2 (x)utt (x, t) dx.        (102)
+                                   0                             0
+
+
+Since
+                                                           x2
+                                  u(x, t) = ω(x, t) −         s(t),                               (103)
+                                                           2D
+
+
+
+
+                                                 20
+there holds
+                                                               x2
+                                    ut (x, t) = ωt (x, t) −       ṡ(t)                                (104)
+                                                               2D
+
+and
+                                                               x2
+                                   utt (x, t) = ωtt (x, t) −      s̈(t).                               (105)
+                                                               2D
+
+On the other hand, differentiating (103) twice with respect to x gives
+
+                                                                   1
+                                   uxx (x, t) = ωxx (x, t) −         s(t).                             (106)
+                                                                   D
+
+Since the plant PDE is utt = uxx , (105) and (106) imply
+
+                                                                   1
+                                    utt (x, t) = ωxx (x, t) −        s(t)                              (107)
+                                                                   D
+
+and therefore (48). Substituting (104) and (107) into (102) gives
+                      Z D                                     Z D
+ Ẍ(t) = AẊ(t) +           B1 (x)ωt (x, t) dx − m1 ṡ(t) +          B2 (x)ωxx (x, t) dx − m3 s(t), (108)
+                        0                                      0
+
+
+where
+                                                  Z D
+                                             1
+                                       m3 :=            B2 (x) dx.                                     (109)
+                                             D     0
+
+      The ωxx term is now integrated by parts:
+ Z D                                                                         Z D
+       B2 (x)ωxx (x, t) dx = B2 (D)ωx (D, t) − B2 (0)ωx (0, t) −                   B2′ (x)ωx (x, t) dx. (110)
+  0                                                                           0
+
+
+Using the boundary conditions (49) and (50),
+
+                                                                                   bD
+                    ωx (0, t) = qω(0, t),      ωx (D, t) = −bωt (D, t) +              ṡ(t).           (111)
+                                                                                    2
+
+Substituting (111) into (110) yields
+              Z D
+                    B2 (x)ωxx (x, t) dx = − bB2 (D)ωt (D, t) − qB2 (0)ω(0, t)
+               0
+                                            Z D                                                        (112)
+                                                                       bD
+                                          −      B2′ (x)ωx (x, t) dx +    B2 (D)ṡ(t).
+                                             0                          2
+
+
+
+
+                                                   21
+Hence (108) becomes
+                                  Z D                              Z D
+              Ẍ(t) = AẊ(t) +              B1 (x)ωt (x, t) dx −            B2′ (x)ωx (x, t) dx
+                                       0                            0                              (113)
+                         − qB2 (0)ω(0, t) − bB2 (D)ωt (D, t) + m4 ṡ(t) − m3 s(t),
+
+where
+                                                 bD
+                                       m4 :=        B2 (D) − m1 .                                  (114)
+                                                  2
+
+     Left-multiplying (113) by P gives
+                                 Z D                                Z D
+      P Ẍ(t) = P AẊ(t) + P               B1 (x)ωt (x, t) dx − P            B2′ (x)ωx (x, t) dx
+                                   0                                    0                          (115)
+                  − qP B2 (0)ω(0, t) − bP B2 (D)ωt (D, t) + P m4 ṡ(t) − P m3 s(t).
+
+The first term is handled with the Riccati identity:
+
+
+                                P A = −AT P + P BBT P − εP.                                        (116)
+
+
+Therefore,
+                                                         
+                            |P AẊ| ≤ ∥A∥ + |B|2 ∥P ∥ + ε |P Ẋ|.                                  (117)
+
+Combining (117) with (81), and using (79) and Lemma 5, gives
+
+                         |P Ẍ(t)| ≤ ϑX (ε) P 1/2 X(t) + ϑ0 (ε)|ω(0, t)|
+                                     ϑx (ε) ∥ωx ∥2 + ϑt (ε) ∥ωt ∥2                                 (118)
+                                     ϑD (ε)|ωt (D, t)|,
+
+where
+
+              ϑX (ε) = O(ε1/2 ),             ϑ0 (ε) = ϑx (ε) = ϑt (ε) = ϑD (ε) = O(ε).             (119)
+
+Since s̈(t) = BT P Ẍ(t), the same argument as in (83), with Lemma 3, gives (100). The
+
+orders in (101) follow from (119).                                                                    ■
+
+     Combining the wave energy identity with the estimates for s, ṡ, and s̈ yields the deriva-
+
+tive estimate for V2 .
+
+Lemma 9. For sufficiently small ε > 0, there exist λ > 0, kb > 0, and nonnegative coeffi-
+
+
+
+
+                                                     22
+cient functions Πi (ε), i ∈ {x, t, 0, D, X}, such that
+                                               
+                                     kb                      δ
+   V̇2 (t) ≤ − λV2 (t) −                − ΠD (ε) ωt2 (D, t) − ωt2 (0, t)
+                                     2                       2                                                     (120)
+                                                                                                           2
+                + Πx (ε) ∥ωx ∥22 + Πt (ε) ∥ωt ∥22 + Π0 (ε)ω 2 (0, t) + ΠX (ε)             P   1/2
+                                                                                                    X(t)       .
+
+Moreover,
+                       Πx (ε) = O(ε2 ),             Πt (ε) = O(ε2 ),           Π0 (ε) = O(ε2 ),
+                                                                                                                   (121)
+                       ΠD (ε) = O(ε2 ),             ΠX (ε) = O(ε).
+
+Proof. Returning to (63), define
+
+                                                     δ(1 + D)
+                                      kb := b −               (1 + 2b2 ) > 0.                                      (122)
+                                                         2
+
+For the boundary cross term, Lemma 4 gives
+
+                                bD                 kb            b2 D 2 2
+                                   ṡ(t)ωt (D, t) ≤ ωt2 (D, t) +       ṡ (t).                                     (123)
+                                 2                 2              2kb
+                                                                   √
+For the s-terms, using Lemmas 3 and 4, ∥1∥2 =                          D, and ∥1 + x∥∞ = 1 + D,
+                          Z D                            
+                                           1                            δ            2 2
+                                ωt (x, t) − s(t)              dx ≤        ∥ωt ∥22 +    s (t),                      (124)
+                           0               D                            8           δD
+
+and
+               Z D                                   
+                                       1                           δ           2δ(1 + D)2 2
+           δ         (1 + x)ωx (x, t) − s(t)              dx ≤       ∥ωx ∥22 +           s (t).                    (125)
+                0                      D                           8               D
+
+For the s̈-terms, Lemmas 3 and 4 give
+                               Z D
+                                                 x2           δ          D3 2
+                                     ωt (x, t)      s̈(t) dx ≤ ∥ωt ∥22 +     s̈ (t),                               (126)
+                                0                2D           8          10δ
+
+and
+          Z D                                                                                  
+                                 x2           δ                               D3 D4 D5
+      δ         (1 + x)ωx (x, t)    s̈(t) dx ≤ ∥ωx ∥22 + δ                       +   +              s̈2 (t).       (127)
+           0                     2D           8                               10   6   14
+
+Substituting (123)–(127) into (63) gives
+
+                        δ              δ               kb      δ         δq 2 2
+          V̇2 (t) ≤ −      ∥ωx ∥22 − ∥ωt ∥22 − ωt2 (D, t) − ωt2 (0, t) −     ω (0, t)
+                        4              4                2      2          2                                        (128)
+                      + cs s2 (t) + cṡ ṡ2 (t) + cs̈ s̈2 (t),
+
+
+                                                              23
+where
+                                       2    2δ(1 + D)2
+                               cs :=      +            ,
+                                      δD         D
+                                      b2 D2 δ(1 + D)b2 D2
+                               cṡ :=       +              ,                          (129)
+                                       2kb         4
+                                               3               
+                                      D3       D     D4 D5
+                               cs̈ :=      +δ      +     +        .
+                                      10δ       10    6      14
+     Using (79), Lemma 5, and Lemma 8 in (128) gives (120) with
+
+                          Πx (ε) := cṡ ρx (ε) + cs̈ τx (ε),
+                          Πt (ε) := cṡ ρt (ε) + cs̈ τt (ε),
+                          Π0 (ε) := cṡ ρ0 (ε) + cs̈ τ0 (ε),                          (130)
+                          ΠD (ε) := cs̈ τD (ε),
+                          ΠX (ε) := cs |B|2 ∥P ∥ + cṡ ρX (ε) + cs̈ τX (ε).
+
+Since cs , cṡ , and cs̈ are independent of ε, (65) and (101) give (121).
+
+     Since (55) implies V2 ≤ cω Eω and
+
+                                       1          1         q
+                             Eω =        ∥ωx ∥22 + ∥ωt ∥22 + ω 2 (0, t),
+                                       2          2         2
+
+the first line of (128) dominates −λV2 (t) for every
+                                                                  
+                                           1                 δ
+                                     0<λ≤    min               , qδ .                 (131)
+                                          cω                 2
+
+This is the λ used in (120).                                                              ■
+
+Proof of Theorem 1. Choose
+
+                                        V (t) = V1 (t) + εV2 (t).                     (132)
+
+Combining Lemmas 7 and 9 yields
+                                                             
+                                                  kb                       εδ
+        V̇ (t) ≤ − εZ (t)P Z(t) − ελV2 (t) − ε
+                      T
+                                                      − ΠD (ε) ωt2 (D, t) − ωt2 (0, t)
+                                                   2                       2
+                                                             
+                 + σx (ε) + εΠx (ε) ∥ωx ∥2 + σt (ε) + εΠt (ε) ∥ωt ∥2
+                                            2                       2
+
+                                                                            2
+                 + σ0 (ε) + εΠ0 (ε) ω 2 (0, t) + σX (ε) + εΠX (ε) P 1/2 X(t) .         (133)
+
+
+By (55),
+                                     cω          c           c q
+                          V2 (t) ≥      ∥ωx ∥22 + ω ∥ωt ∥22 + ω ω 2 (0, t).           (134)
+                                      2           2           2
+
+
+
+
+                                                   24
+Moreover, using Z = X + φ and Lemma 4, one has
+
+                                        1           2
+                      Z T (t)P Z(t) ≥     P 1/2 X(t) − ∥P ∥ ∥φ(t)∥2 .                     (135)
+                                        2
+
+Using Lemma 6 further gives
+
+             ∥P ∥ ∥φ(t)∥2 ≤ ∥P ∥ Γx (ε) ∥ωx ∥22 + ∥P ∥ Γt (ε) ∥ωt ∥22
+                                                                                  2
+                              + ∥P ∥ Γ0 (ε)ω 2 (0, t) + ∥P ∥ ΓX (ε) P 1/2 X(t)        .   (136)
+
+
+Substituting (134), (135), and (136) into (133) gives
+                         λc                                      
+             V̇ (t) ≤ − ε ω − σx (ε) − εΠx (ε) − ε ∥P ∥ Γx (ε) ∥ωx ∥22
+                           2
+                         λc                                     
+                      − ε    ω
+                               − σt (ε) − εΠt (ε) − ε ∥P ∥ Γt (ε) ∥ωt ∥22
+                           2
+                         λc q                                     
+                      − ε    ω
+                                − σ0 (ε) − εΠ0 (ε) − ε ∥P ∥ Γ0 (ε) ω 2 (0, t)
+                        ε 2                                                 2
+                      −    − σX (ε) − εΠX (ε) − ε ∥P ∥ ΓX (ε) P 1/2 X(t)
+                         2
+                                       
+                           kb                         εδ
+                      −ε       − ΠD (ε) ωt2 (D, t) − ωt2 (0, t).                          (137)
+                           2                           2
+
+By (97), (121), and (86), every remainder in the first four brackets of (137) is of higher order
+
+than the leading dissipative term. Hence there exists ε∗ > 0 such that for all ε ∈ (0, ε∗ ],
+
+                       λcω                                          λc
+                      ε     − σx (ε) − εΠx (ε) − ε ∥P ∥ Γx (ε) ≥ ε ω ,                    (138)
+                        2                                            4
+                        λcω                                         λcω
+                      ε      − σt (ε) − εΠt (ε) − ε ∥P ∥ Γt (ε) ≥ ε     ,                 (139)
+                          2                                          4
+                      λc q                                          λc q
+                     ε ω − σ0 (ε) − εΠ0 (ε) − ε ∥P ∥ Γ0 (ε) ≥ ε ω ,                       (140)
+                        2                                            4
+                        ε                                         ε
+                          − σX (ε) − εΠX (ε) − ε ∥P ∥ ΓX (ε) ≥ ,                          (141)
+                        2                                         4
+                                                  kb              kb
+                                                     − ΠD (ε) ≥ .                         (142)
+                                                  2                4
+
+Consequently, there exists β0 > 0 such that
+
+                                                                         2
+                                                                            
+                 V̇ (t) ≤ −β0 ∥ωx ∥22 + ∥ωt ∥22 + ω 2 (0, t) + P 1/2 X(t)     .           (143)
+
+
+     It remains to connect V with the original energy (16). Define
+
+
+                                    χ(ε) := 2 ∥P ∥ ΓX (ε).                                (144)
+
+
+                                               25
+From X = Z − φ, Lemma 4, and Lemma 6, one obtains
+
+                             2           2              2 ∥P ∥ Γx (ε)
+                P 1/2 X(t)       ≤            V1 (t) +                ∥ωx ∥22
+                                     1 − χ(ε)             1 − χ(ε)
+                                        2 ∥P ∥ Γt (ε)           2 ∥P ∥ Γ0 (ε) 2
+                                     +                ∥ωt ∥22 +               ω (0, t),   (145)
+                                          1 − χ(ε)                1 − χ(ε)
+
+provided that χ(ε) ≤ 1/2. Moreover, Lemmas 4, 3, and 5 give
+
+                                      2D                          2
+                ∥ux ∥22 ≤ 2 ∥ωx ∥22 +    |B|2 ∥P ∥ P 1/2 X(t) ,                           (146)
+                                       3
+                                        3
+                                      D                        2
+                ∥ut ∥22 ≤ 2 ∥ωt ∥22 +      ρX (ε) P 1/2 X(t) + ρ0 (ε)ω 2 (0, t)
+                                      10                                    
+                                           + ρx (ε) ∥ωx ∥22 + ρt (ε) ∥ωt ∥22 ,            (147)
+                                                                                  2
+              u2 (0, t) = ω 2 (0, t),        |X(t)|2 ≤ λmin (P )−1 P 1/2 X(t)         .   (148)
+
+
+Hence,
+                                     2D                D3                   2
+              Ω(t) ≤ λmin (P )−1 +        |B|2 ∥P ∥ +      ρX (ε) P 1/2 X(t)
+                                       3                10
+                              D 3                       D3        
+                       + 2+        ρx (ε) ∥ωx ∥2 + 2 +
+                                                 2
+                                                               ρt (ε) ∥ωt ∥22             (149)
+                                10                         10
+                              D3        
+                       + 1+        ρ0 (ε) ω 2 (0, t).
+                                10
+Substituting (145) into (149) gives
+
+                         2ΘX (ε)
+                Ω(t) ≤            V1 (t)
+                         1 − χ(ε)
+                                                                  
+                                  D3           2 ∥P ∥ Γx (ε)ΘX (ε)
+                         + 2+         ρx (ε) +                        ∥ωx ∥22
+                                  10                1 − χ(ε)
+                                                                  
+                                  D 3
+                                               2 ∥P ∥ Γt (ε)ΘX (ε)
+                         + 2+         ρt (ε) +                       ∥ωt ∥22
+                                  10                1 − χ(ε)
+                                                                  
+                                  D 3
+                                               2 ∥P ∥ Γ0 (ε)ΘX (ε)
+                         + 1+         ρ0 (ε) +                       ω 2 (0, t),          (150)
+                                  10                1 − χ(ε)
+
+where
+                                                   2D             D3
+                     ΘX (ε) := λmin (P )−1 +          |B|2 ∥P ∥ +    ρX (ε).              (151)
+                                                    3             10
+
+
+
+
+                                                   26
+    Since V (t) = V1 (t) + εV2 (t) and (134) holds, one may choose
+                                   (
+                                       1 − χ(ε)
+                   M (ε) := min                 ,
+                                       2ΘX (ε)
+                                                          εcω
+                                                                            ,
+                                       2 2 + D10 ρx (ε) + 2∥P ∥Γ1−χ(ε)
+                                                                 x (ε)ΘX (ε)
+                                               3
+
+
+
+                                                      εcω                               (152)
+                                                                           ,
+                                             D 3          2∥P ∥Γt (ε)ΘX (ε)
+                                       2 2 + 10 ρt (ε) +       1−χ(ε)
+                                                                              )
+                                                      εqcω
+                                                                             .
+                                       2 1 + D10 ρ0 (ε) + 2∥P ∥Γ 0 (ε)ΘX (ε)
+                                               3
+                                                               1−χ(ε)
+
+
+For the upper bound, the original form of φ gives
+                      Z D                        Z D
+             φ(t) =         g0 (x)u(x, t) dx +          g(x)ut (x, t) dx + bBu(D, t).   (153)
+                        0                           0
+
+
+Therefore, by Lemmas 2 and 3,
+                                                 
+                ∥φ(t)∥2 ≤ 3D2 ∥g0 ∥22 + 6Db2 |B|2 ∥ux ∥22 + 3 ∥g∥22 ∥ut ∥22
+                                                                                       (154)
+                          + 6D ∥g0 ∥22 + 6b2 |B|2 u2 (0, t).
+
+Thus, using Lemma 4,
+                                                                      
+           V1 (t) ≤ 2 ∥P ∥ |X(t)|2 + 2 ∥P ∥ 3D2 ∥g0 ∥22 + 6Db2 |B|2 ∥ux ∥22
+                                                                         
+                    + 6 ∥P ∥ ∥g∥22 ∥ut ∥22 + 2 ∥P ∥ 6D ∥g0 ∥22 + 6b2 |B|2 u2 (0, t).    (155)
+
+
+Next,
+                             1 + δ(1 + D)                    q
+                  V2 (t) ≤                  ∥ωx ∥22 + ∥ωt ∥22 + ω 2 (0, t).             (156)
+                                   2                           2
+
+Since Lemmas 4 and 3 give
+
+                                                       2D 2
+                                 ∥ωx ∥22 ≤ 2 ∥ux ∥22 +     s (t),                       (157)
+                                                        3
+                                                       D3 2
+                                 ∥ωt ∥22 ≤ 2 ∥ut ∥22 +    ṡ (t),                       (158)
+                                                       10
+                                  s2 (t) ≤ |B|2 ∥P ∥2 |X(t)|2 ,                         (159)
+
+
+and, by Lemmas 2 and 3,
+
+           ṡ2 (t) ≤ 3|B|2 ∥P ∥2 ∥A∥2 |X(t)|2 + 3D2 |B|2 ∥P ∥2 ∥B1 ∥22 ∥ux ∥22
+                                                                                        (160)
+                      + 3|B|2 ∥P ∥2 ∥B2 ∥22 ∥ut ∥22 + 6D|B|2 ∥P ∥2 ∥B1 ∥22 u2 (0, t),
+
+
+
+                                                 27
+one obtains
+                                                                       
+                   1 + δ(1 + D) 2D                 3D3
+          V2 (t) ≤                   |B| ∥P ∥ +
+                                        2      2
+                                                         |B| ∥P ∥ ∥A∥ |X(t)|2
+                                                            2     2   2
+                          2        3                 10
+                                           5
+                                                                
+                      1 + δ(1 + D)      3D
+                   +                 2+       |B| ∥P ∥ ∥B1 ∥2 ∥ux ∥22
+                                                 2      2     2
+                             2            10
+                                                               
+                      1 + δ(1 + D)      3D3
+                   +                 2+       |B| ∥P ∥ ∥B2 ∥2 ∥ut ∥22
+                                                 2      2     2
+                             2            10
+                                                                 
+                        q 3(1 + δ(1 + D))D4
+                   +       +                   |B| ∥P ∥ ∥B1 ∥2 u2 (0, t).
+                                                   2      2     2
+                                                                                      (161)
+                        2           10
+
+Hence
+
+                             M (ε)Ω(t) ≤ V (t) ≤ M (ε)Ω(t),                           (162)
+
+with the local abbreviation CP := |B|2 ∥P ∥2 in the following display:
+                                                                
+                        1 + δ(1 + D)    2D         3D3
+    1 (ε) := 2 ∥P ∥ + ε                                CP ∥A∥ ,2
+   Θ+                                        CP +
+                              2           3         10
+                                                                                   
+                                                 1 + δ(1 + D)        3D5
+   Θ2 (ε) := 2 ∥P ∥ 3D ∥g0 ∥2 + 6Db |B| + ε
+    +                   2      2      2     2
+                                                                   2+     CP ∥B1 ∥2 ,
+                                                                                  2
+                                                        2              10
+                                                                
+                             1 + δ(1 + D)         3D3
+   Θ3 (ε) := 6 ∥P ∥ ∥g∥2 + ε
+    +                  2
+                                               2+      CP ∥B2 ∥2 ,
+                                                               2
+                                   2               10
+                                               q
+    4 (ε) := 2 ∥P ∥ 6D ∥g0 ∥2 + 6b |B|
+                             2
+   Θ+                              2    2
+                                            +ε
+                                                2
+                3(1 + δ(1 + D))D4
+            +ε                      CP ∥B1 ∥22 .                                    (163)
+                         10
+                                  
+                      M (ε) := max Θ+       +       +       +
+                                    1 (ε), Θ2 (ε), Θ3 (ε), Θ4 (ε) .                   (164)
+
+The well-posedness and uniqueness of the closed-loop solution follow from the standard
+
+well-posedness theory for the wave equation with positive Robin support and boundary
+
+damping, coupled with a finite-dimensional linear system. Combining (143) and (162), one
+
+obtains
+                                           M (ε) −βt
+                                  Ω(t) ≤         e Ω(0)                               (165)
+                                           M (ε)
+
+for some β > 0. This implies (37) and completes the proof.                                ■
+
+Remark 3. The proof above shows that ε∗ can be chosen from the explicit positivity condi-
+
+tions (138)–(142) together with the requirement χ(ε) ≤ 1/2 in (144). These inequalities are
+
+conservative, because they only guarantee that every bracket in (137) remains positive. In
+
+practice, the true admissible upper bound is usually much larger, and it can be approximated
+
+                                            28
+efficiently by a bisection search.
+
+      Finally, consider the special situation in which all eigenvalues of A are located at the
+
+origin. Then A is nilpotent, and the auxiliary transformation can be simplified in exactly the
+
+same spirit as the nilpotent special theorem in [27]. Define
+
+
+                                             B̄ := g(D)                                    (166)
+
+
+and
+                        Z D                        Z D
+       Z̄(t) = X(t) −         B2 (x)u(x, t) dx +          g(x)ut (x, t) dx + bB̄u(D, t).   (167)
+                         0                            0
+
+
+Let g ∈ C 2 ([0, D]; Rn×1 ) solve
+
+
+                g ′′ (x) + B1 (x) = 0,       g ′ (0) − qg(0) = 0,          g ′ (D) = 0.    (168)
+
+
+If q > 0, then one obtains the explicit endpoint gain
+                                         Z D             
+                                                   1
+                                  B̄ =          x+            B1 (x) dx.                   (169)
+                                         0         q
+
+Compared with the general formula (24), the quantity (169) is much easier to evaluate be-
+
+cause no matrix-valued second-order equation needs to be solved.
+
+      Direct differentiation of (167), together with (168) and the boundary conditions of (12)–
+
+(15), gives
+                              ˙                                    
+                             Z̄(t) = AX(t) + B̄ U (t) + b ut (D, t) .                      (170)
+
+Hence, the low-gain controller in this nilpotent case is chosen as
+
+
+                                U (t) = −B̄T P X(t) − b ut (D, t)                          (171)
+
+
+where P = Pε solves
+
+                                AT P + P A − P B̄B̄T P = −εP.                              (172)
+
+Defining
+
+                                      ϕ̄(t) := Z̄(t) − X(t),                               (173)
+
+
+                                                 29
+one can rewrite (170) as
+
+                       ˙                                    
+                      Z̄(t) = A − B̄B̄T P Z̄(t) − A − B̄B̄T P ϕ̄(t).                        (174)
+
+
+Therefore, the proof closes exactly as in the diffusion nilpotent special case: since all eigen-
+
+values of A are at the origin, the low-gain estimate implies that AT P A is of order ε2 P , so
+
+the perturbation term in (174) is dominated by the dissipative part generated by (172) when
+
+ε is sufficiently small. This simplified nilpotent form is the one used in Example 2 of the
+
+simulation section.
+
+3.4     Numerical Simulations
+      This subsection presents two numerical simulations: a nominal oscillator-wave exam-
+
+ple for the general stability result, and a nilpotent special-case example aligned with the
+
+simplified design in the preceding stability analysis. For each example, the componentwise
+
+ODE trajectories in open loop and closed loop are compared, the displacement surface of the
+
+wave state in closed loop is displayed, and quantitative indicators such as the energy ratio,
+
+the fitted decay rate, and the control effort are reported.
+
+3.4.1   Numerical Setup
+
+      All simulations are carried out on the interval t ∈ [0, 50] by a method-of-lines discretiza-
+
+tion of (13)–(15). This horizon is long enough to display the asymptotic decay of the nominal
+
+example and still sufficiently long to show the slower transient of the nilpotent case without
+
+overextending the figures. Introducing the auxiliary variable v(x, t) := ut (x, t) rewrites the
+
+PDE block as
+
+                          ut (x, t) = v(x, t),        vt (x, t) = uxx (x, t).               (175)
+
+On the uniform mesh xj = j∆x, j = 0, 1, . . . , N , choose
+
+                                                 D
+                        N = 200,         ∆x =      ,        ∆t = 5 × 10−4 .                 (176)
+                                                 N
+
+Since all examples below use D = 1, one has ∆x = 0.005 and hence ∆t/∆x = 0.1. This
+
+is sufficiently small for the explicit time stepping of the semi-discrete wave equation, and
+
+
+                                                 30
+the spatial grid is also fine enough to resolve the localized Gaussian kernels used in Exam-
+
+ple 1 without visible quadrature error. For visualization and quantitative post-processing, the
+
+solution is sampled every 100 Runge–Kutta steps, which yields about 1000 plotted instants
+
+over [0, 50] for each run.
+
+       At the interior nodes j = 1, . . . , N − 1, the PDE is approximated by
+
+                                 u̇j (t) = vj (t),                                              (177)
+                                           uj+1 (t) − 2uj (t) + uj−1 (t)
+                                 v̇j (t) =                               .                      (178)
+                                                       ∆x2
+
+The boundary conditions are enforced by ghost points:
+
+
+             u−1 (t) = u1 (t) − 2q∆x u0 (t),              uN +1 (t) = uN −1 (t) + 2∆x U (t),    (179)
+
+
+after which the same centered second-derivative formula is applied at j = 0 and j = N . The
+
+distributed coupling terms in the ODE are approximated by the composite trapezoidal rule,
+
+namely
+ Z D                                                                               !
+                              1                X
+                                               N −1
+                                                                    1
+        Bℓ (x)ϕ(x, t) dx ≈ ∆x Bℓ (x0 )ϕ0 (t) +      Bℓ (xj )ϕj (t) + Bℓ (xN )ϕN (t) , (180)
+   0                          2                j=1
+                                                                    2
+
+for ℓ ∈ {1, 2} and ϕ ∈ {u, v}. The coupled finite-dimensional ODE and the semi-discrete
+
+PDE are then advanced together by a classical fourth-order Runge–Kutta scheme. The same
+
+spatial quadrature is used both in the computation of B in (24) or B̄ in (169) and in the
+
+evaluation of the distributed ODE inputs, which avoids a mismatch between controller design
+
+and numerical simulation.
+
+3.4.2    Simulation Results
+
+Example 1. Consider the oscillator-wave cascade
+                                         Z D                        Z D
+                 Ẋ(t) = AX(t) +               B1 (x)u(x, t) dx +         B2 (x)ut (x, t) dx,   (181)
+                                          0                          0
+              utt (x, t) = uxx (x, t),                                                          (182)
+
+
+with
+                             
+                          0 1
+                      A=        ,                D = 1,         q = 1,       b = 1.             (183)
+                         −1 0
+
+                                                     31
+The distributed couplings are selected as
+                                                                                                    
+                             −30(x−0.7)2        1                              −20(x−0.35)2         0
+                B1 (x) = e                           ,            B2 (x) = e                             .     (184)
+                                               0.4                                                0.25
+
+The profile B1 is concentrated closer to the actuated boundary so that the displacement chan-
+
+nel directly affects the regulation of the oscillator, whereas B2 is centered in the interior to
+
+keep the velocity coupling genuinely distributed. Both kernels are smooth and localized,
+
+which makes them numerically well resolved on the above grid while still producing a visi-
+
+ble PDE-to-ODE interaction.
+
+     The compatible initial conditions are chosen as
+                 
+           0.40
+   X(0) =           ,               u(x, 0) = 0.08ex + 0.04 sin2 (πx),                        ut (x, 0) = 0.   (185)
+          −0.2301
+
+These data satisfy the positive Robin boundary condition at the left endpoint exactly, since
+
+ux (0, 0) = u(0, 0) = 0.08. Moreover, ux (D, 0) = 0.08e, and the value of X(0) is selected so
+
+that the feedback law computed below also gives U (0) = 0.08e. This compatibility avoids
+
+an artificial start-up impulse at the controlled boundary and makes the observed transient
+
+genuinely reflect the closed-loop dynamics.
+
+     For the above parameters, the matrix in (23) becomes
+                                          
+                           −0.3012 1.3818
+                        E=                   ,                            det(E) = 2,                          (186)
+                           −1.3818 −0.3012
+
+so E is invertible. Evaluating (24) gives
+                                                         
+                                                  −0.2099
+                                               B=           .                                                  (187)
+                                                   0.3682
+
+Since the eigenvalues of A are ±i and
+
+                                                   
+                                           rank B AB = 2,                                                      (188)
+
+
+Assumption 1 is satisfied. The nominal low-gain parameter is then chosen as
+
+
+                                                    ε = 0.12.                                                  (189)
+
+
+                                                             32
+                                      Example 1: ODE state comparison
+                         Open loop                                            Closed loop
+                                                x1(t)          0.4                               x1(t)
+       0.4                                      x2(t)                                            x2(t)
+
+       0.2                                                     0.2
+
+       0.0                                                     0.0
+X(t)
+
+
+
+
+       0.2                                                     0.2
+
+       0.4                                                     0.4
+
+             0   10     20       30        40           50           0   10   20       30   40           50
+                             t                                                     t
+
+Figure 2. Damping-only versus closed-loop ODE state trajectories for Example 1 on t ∈ [0, 50], using
+the same initial data in both panels. The left panel removes the low-gain component and keeps only the
+boundary damping term, while the right panel uses the full low-gain feedback law.
+
+
+This value is small enough to remain in the low-gain regime emphasized by Theorem 1, but
+
+large enough to keep the decay clearly visible on [0, 50] while still preserving the mild-control
+
+character of low-gain feedback. Solving (35) yields
+                                      
+                         1.2745 0.0450                                               
+                 P0.12 =                 ,                   BT P0.12 = −0.2509 0.5088 ,         (190)
+                         0.0450 1.4076
+
+and therefore the implemented controller is
+
+
+                         U (t) = 0.2509 x1 (t) − 0.5088 x2 (t) − ut (D, t).                      (191)
+
+
+        Figure 2 directly shows the role of the low-gain component in the cascade. In the run
+
+where this component is removed and only U (t) = −ut (D, t) is retained, the two ODE
+
+components remain in a sustained oscillatory regime and do not converge to the origin on
+
+[0, 50], with Ω(50)/Ω(0) = 8.00 × 10−1 . By contrast, the closed-loop trajectories decay to
+
+zero once the full boundary feedback is applied. This comparison shows that the stabilizing
+
+action is transmitted through the wave dynamics with controller-injected boundary damping
+
+to the ODE subsystem. Figure 3 then confirms that the PDE state also decays under the same
+
+feedback, in agreement with Theorem 1. The kernel computation is numerically consistent:
+
+the gain obtained from the boundary-value problem is BBVP = [−0.2098639, 0.3681902]T ,
+
+while the direct evaluation of (24) gives Bcf = [−0.2098623, 0.3681875]T , so the Euclidean
+
+
+                                                        33
+                                         Example 1: displacement surface
+
+
+
+                                                                                                           0.30
+
+                                                                                                           0.25
+
+                                                                                                           0.20
+             0.3                                                                                           0.15
+                 0.2
+                                                                                                           0.10
+       u(x, t)
+
+
+
+
+                 0.1
+                                                                                                           0.05
+                 0.0                                                                        50
+                  0.1                                                               40                     0.00
+                    1.0                                                        30
+                                                                           t                                   0.05
+                          0.8                                       20
+                                0.6
+                                x 0.4                     10
+                                        0.2          0
+                                              0.0
+
+
+Figure 3. Three-dimensional displacement surface for Example 1, showing the spatiotemporal decay of
+u(x, t) on (x, t) ∈ [0, 1] × [0, 50].
+
+
+mismatch is only 3.13 × 10−6 . The compatible initial data in (185) satisfy both boundary
+
+conditions at t = 0 to machine precision. Quantitatively, the closed-loop energy ratio satis-
+
+fies
+                                                    Ω(50)
+                                                          = 1.59 × 10−6 ,                                             (192)
+                                                    Ω(0)
+
+the least-squares semilog decay rate is 0.2722, the 10%, 5%, and 1% energy thresholds are
+
+crossed at t = 9.0, 11.6, and 17.6, respectively, and the low-gain component remains mod-
+
+erate with
+                                                                    Z 50
+                                   T
+                                                                                           2
+                        max B P X(t) = 0.2701,                                 BT P X(t)        dt = 0.1665.          (193)
+                       t∈[0,50]                                      0
+
+
+At the end of the simulation, |X(50)| = 5.27 × 10−4 and |u(D, 50)| = 6.53 × 10−7 , which
+
+shows that the nominal design has already entered a clear asymptotic regime within the 50-
+
+second window.
+
+
+
+
+                                                               34
+Example 2.     To illustrate the simplified zero-eigenvalue design discussed above, choose
+
+the three-dimensional chain
+                               
+                          0 1 0
+                  A = 0 0 1  ,           D = 1,          q = 1,     b = 1,                (194)
+                          0 0 0
+
+and                                           
+                                         0
+                         B1 (x) =       0     ,          B2 (x) = 0.                      (195)
+                                    0.2(2 − x)
+All eigenvalues of A are located at the origin, so Example 2 falls exactly into the framework
+
+of (167)–(174). The affine profile in the third channel preserves the nilpotent chain struc-
+
+ture of the reference diffusion example while remaining compatible with the wave-equation
+
+special boundary-value problem (168). Since q = 1, the explicit gain (169) becomes
+                                                                    
+                            Z 1                       0            0
+                     B̄ =                           
+                                  (x + 1)B1 (x) dx = 0  ≈        0 .                     (196)
+                             0                        13
+                                                      30
+                                                                0.4333
+
+Choosing the low-gain parameter as
+
+                                           ε = 0.20                                         (197)
+
+gives the Riccati solution of (172)
+                                
+            0.0017 0.0170 0.0426                                                
+   P0.20 = 0.0170 0.2130 0.6391 ,           B̄T P0.20 = 0.01846 0.27692 1.38462 .
+            0.0426 0.6391 3.1953
+                                                                                            (198)
+
+Hence the implemented special-case controller is
+
+                                                 
+                 U (t) = − 0.01846 0.27692 1.38462 X(t) − ut (D, t).                        (199)
+
+
+The initial conditions are selected as
+                       
+                0.30
+  X(0) =  −0.20  ,             u(x, 0) = 0.04ex + 0.02 sin2 (πx),        ut (x, 0) = 0.   (200)
+              −0.04253
+
+Again, ux (0, 0) = u(0, 0) = 0.04 and ux (D, 0) = 0.04e. The value of X(0) is chosen so that
+
+the nilpotent feedback law also gives U (0) = 0.04e, hence the left and right compatibility
+
+errors are both numerically zero. This is the wave-equation analogue of the reference nilpo-
+
+
+                                              35
+                                  Example 2: nilpotent ODE state comparison
+                         Open loop                                                 Closed loop
+                                                      x1(t)                                           x1(t)
+       0                                              x2(t)                                           x2(t)
+                                                      x3(t)         0.2                               x3(t)
+       1
+       2                                                            0.0
+       3
+                                                                    0.2
+X(t)
+
+
+
+
+       4
+       5                                                            0.4
+       6                                                            0.6
+       7
+           0     10     20       30              40           50          0   10   20       30   40           50
+                             t                                                          t
+
+Figure 4. Damping-only versus closed-loop ODE state trajectories for the nilpotent Example 2 on t ∈
+[0, 50], using the same initial data in both panels. The left panel removes the low-gain component and
+keeps only the boundary damping term, while the right panel uses the special low-gain feedback law.
+
+
+tent simulation: the ODE block is a three-dimensional nilpotent chain, the gain is obtained
+
+from the simplified special theorem, and the feedback uses only X(t) and the local boundary
+
+velocity ut (D, t).
+
+           Figure 4 shows the same mechanism for the nilpotent chain. Without the low-gain
+
+component, the three ODE components fail to decay and the chain structure amplifies the
+
+transient, so that Ω(50)/Ω(0) = 3.55×102 . In contrast, the closed-loop trajectories converge
+
+to the origin under the low-gain controller acting through the wave dynamics with controller-
+
+injected boundary damping. Figure 5 shows the corresponding spatiotemporal decay of the
+
+wave state. As in Example 1, both boundary compatibility errors at t = 0 are numerically
+
+zero. The observed closed-loop indicators are
+
+                                               Ω(50)
+                                                     = 1.51 × 10−3 ,
+                                                Ω(0)
+                                             T
+                                       max B̄ P X(t) = 0.1087,                                        (201)
+                                      t∈[0,50]
+                                 Z 50
+                                                              2
+                                          B̄T P X(t)               dt = 0.0523.
+                                  0
+
+
+The fitted semilog decay rate is 0.2251, the energy drops below 10% at t = 30.0, below 5%
+
+at t = 31.3, and below 1% at t = 33.15. By t = 50, one has |X(50)| = 1.38 × 10−2 and
+
+|u(D, 50)| = 3.18 × 10−3 . Compared with Example 1, the nilpotent case converges more
+
+slowly, which is precisely why a longer but still moderate window such as 50 seconds is
+
+
+
+                                                               36
+                                     Example 2: displacement surface
+
+
+
+
+                                                                                        0.10
+
+
+                                                                                        0.05
+           0.10
+           0.05                                                                         0.00
+      u(x, t)
+
+
+
+
+           0.00
+             0.05                                                                  50    0.05
+             0.10                                                             40
+                1.0                                                      30
+                                                                     t                   0.10
+                      0.8                                       20
+                            0.6
+                            x 0.4                     10
+                                    0.2         0
+                                          0.0
+
+
+Figure 5. Three-dimensional displacement surface for the nilpotent Example 2, showing the spatiotem-
+poral decay of u(x, t) on (x, t) ∈ [0, 1] × [0, 50].
+
+
+needed to display the asymptotic regime cleanly.
+
+3.5    Chapter Summary
+      This chapter has presented the main low-gain boundary stabilization result for the wave
+
+PDE–ODE cascade. It first stated the system model and energy objective, then gave the
+
+offline gain computation, the low-gain Riccati equation, the boundary controller, and the
+
+stability proof. In the proof, the Riccati term provides finite-dimensional dissipation, while
+
+the controller-injected boundary damping absorbs the remaining wave terms for sufficiently
+
+small ε. The nilpotent case further illustrates that the general construction reduces to a sim-
+
+pler explicit endpoint gain when the ODE dynamics have all eigenvalues at the origin.
+
+
+
+
+                                                           37
+                       4.    Conclusion and Future Work
+4.1    Summary
+      This thesis studied the low-gain stabilization problem for a class of wave PDE–ODE
+
+cascade systems with distributed in-domain coupling, a positive Robin elastic support at the
+
+unactuated boundary, and controller-injected boundary damping at the actuated boundary.
+
+By a suitable transformation, the distributed input dynamics reduce to a low-gain design
+
+problem with an explicit effective input vector B. For the general case, the controller was
+
+constructed as U (t) = −B⊤ Pε X(t) − b ut (D, t), where Pε is the low-gain Riccati solution.
+
+For the nilpotent case, the transformation and the effective gain were further simplified,
+
+which yielded a more transparent controller formula.
+
+      The main theoretical result shows that, under the low-gain spectral assumption on the
+
+ODE dynamics and the boundary damping injected by the controller, the closed-loop system
+
+is exponentially stable in a natural energy norm. The proof relies on a Lyapunov functional
+
+that combines the Riccati-based ODE term with the damped wave energy and suitable cross
+
+terms, thereby capturing the effect of the distributed displacement and velocity couplings. In
+
+comparison with existing backstepping controllers for wave actuator dynamics, the present
+
+design has a much simpler feedback structure because it uses only the finite-dimensional state
+
+X(t) and the local boundary velocity ut (D, t) online. The price for this simplification is that
+
+stronger assumptions on the open-loop ODE dynamics are required than in the backstepping
+
+framework.
+
+      The numerical examples confirm the theoretical conclusions for both the general and
+
+nilpotent settings, showing clear decay of the ODE states and the distributed wave profile un-
+
+der the proposed controller. Overall, this work extends the low-gain compensation method-
+
+ology from diffusion PDE–ODE cascades to the wave-equation setting and shows that a
+
+boundary damping term in the controller can provide the dissipation needed for the low-gain
+
+mechanism to succeed in a hyperbolic system.
+
+
+
+
+                                              38
+4.2    Future Work
+      Future work may include output-feedback designs, robustness with respect to modeling
+
+uncertainty and disturbances, and extensions to more general hyperbolic actuator dynamics
+
+or higher-dimensional distributed systems.
+
+
+
+
+                                             39
+                                          References
+
+ [1]   ARTSTEIN Z. Linear systems with delayed controls: A reduction[J]. IEEE Transactions on Auto-
+       matic Control, 1982, 27(4): 869-879.
+ [2]   RICHARD J P. Time-delay systems: an overview of some recent advances and open problems[J].
+       Automatica, 2003, 39(10): 1667-1694.
+ [3]   KRSTIC M. Lyapunov tools for predictor feedbacks for delay systems: inverse optimality and
+       robustness to delay mismatch[J]. Automatica, 2008, 44(11): 2930-2935.
+ [4]   KRSTIC M. Lyapunov stability of linear predictor feedback for time-varying input delay[J]. IEEE
+       Transactions on Automatic Control, 2010, 55(2): 554-559.
+ [5]   EVANS L C. Partial Differential Equations[M]. 2nd. Providence, RI: American Mathematical So-
+       ciety, 2010.
+ [6]   CURTAIN R F, ZWART H. An Introduction to Infinite-Dimensional Linear Systems Theory[M].
+       New York: Springer-Verlag, 1995.
+ [7]   KRSTIC M, GUO B Z, BALOGH A, et al. Output-feedback stabilization of an unstable wave
+       equation[J]. Automatica, 2008, 44(1): 63-74.
+ [8]   KRSTIC M, SMYSHLYAEV A. Boundary Control of PDEs: A Course on Backstepping Designs
+       [M]. SIAM, 2008.
+ [9]   VAZQUEZ R, AURIOL J, BRIBIESCA-ARGOMEDO F, et al. Backstepping for partial differen-
+       tial equations: A survey[J]. Automatica, 2026, 183: 112572.
+[10]   KRSTIC M. Compensating a string PDE in the actuation or sensing path of an unstable ODE[J].
+       IEEE Transactions on Automatic Control, 2009, 54(6): 1362-1368.
+[11]   BEKIARIS-LIBERIS N, KRSTIC M. Compensating the distributed effect of a wave PDE in the
+       actuation or sensing path of MIMO LTI systems[J]. Systems & Control Letters, 2010, 59(11): 713-
+       719.
+[12]   BEKIARIS-LIBERIS N, KRSTIC M. Lyapunov stability of linear predictor feedback for dis-
+       tributed input delays[J]. IEEE Transactions on Automatic Control, 2011, 56(3): 655-660.
+[13]   BEKIARIS-LIBERIS N, KRSTIC M. Compensating the distributed effect of diffusion and counter-
+       convection in multi-input and multi-output LTI systems[J]. IEEE Transactions on Automatic Con-
+       trol, 2011, 56(3): 637-643.
+[14]   THAN A A, WANG J M. Output feedback stabilization of cascaded ODE–wave equations with
+       time delay in observation[J]. Asian Journal of Control, 2021, 23(1): 449-462.
+[15]   MEI Z D. Infinite-dimensional extended state observer based stabilization for an ODE–wave cas-
+       caded system with control matched disturbance[J]. Asian Journal of Control, 2023, 25(3): 2315-
+       2325.
+[16]   FENG X, ZHANG Z. Output feedback stabilization for a wave–ODE cascaded system subject to
+       uncertain disturbance[J]. Asian Journal of Control, 2024, 26(2): 974-988.
+[17]   WANG J, DIAGNE M. Delay-adaptive boundary control of coupled hyperbolic PDE–ODE cascade
+       systems[J]. IEEE Transactions on Automatic Control, 2024, 69(12): 8156-8171.
+
+
+
+                                                 40
+[18]   LIN Z, FANG H. On asymptotic stabilizability of linear systems with delayed input[J]. IEEE Trans-
+       actions on Automatic Control, 2007, 52(6): 998-1013.
+[19]   ZHOU B, GAO H, LIN Z, et al. Stabilization of linear systems with distributed input delay and
+       input saturation[J]. Automatica, 2012, 48(5): 712-724.
+[20]   LIN Z, SABERI A. Semi-global exponential stabilization of linear systems subject to “input satu-
+       ration” via linear feedbacks[J]. Systems & Control Letters, 1993, 21(3): 225-239.
+[21]   TEEL A R. Semi-global stabilizability of linear null controllable systems with input nonlinearities
+       [J]. IEEE Transactions on Automatic Control, 1995, 40(1): 96-100.
+[22]   LIN Z. Low Gain Feedback[M]. London: Springer, 1999.
+[23]   XU X, LIU L, FENG G. Stabilization of linear systems with distributed infinite input delays: A
+       low gain approach[J]. Automatica, 2018, 94: 396-408.
+[24]   XU X, LIU L, FENG G. Semi-global stabilization of linear systems with distributed infinite input
+       delays and actuator saturations[J]. Automatica, 2019, 107: 398-405.
+[25]   XU X, LIU L, FENG G. Stability and stabilization of infinite delay systems: A Lyapunov based
+       approach[J]. IEEE Transactions on Automatic Control, 2020, 65(11): 4509-4524.
+[26]   KRSTIC M, SMYSHLYAEV A. Backstepping boundary control for first-order hyperbolic PDEs
+       and application to systems with actuator and sensor delays[J]. Systems & Control Letters, 2008,
+       57(9): 750-758.
+[27]   XU X, LIU L, KRSTIC M, et al. Low-gain compensation for PDE–ODE cascade systems with
+       distributed diffusion and counter convection[J]. IEEE Transactions on Automatic Control, 2023,
+       68(4): 2360-2367.
+[28]   XU X, LIU L, KRSTIC M, et al. Backstepping-forwarding designs for doubly-distributed delay-
+       PDE–ODE systems[J]. IEEE Transactions on Automatic Control, 2024, 69(11): 7356-7370.
+
+
+
+
+                                                   41
+                                 Acknowledgments
+
+
+     I would like to express my sincere gratitude to my advisor, Professor Xiang Xu, for his
+
+patient guidance, rigorous attitude toward research, and invaluable suggestions throughout
+
+the completion of this thesis. His insight and encouragement have been essential to the
+
+development of this work.
+
+     I am also grateful to my senior fellow student Wu Tao for his generous guidance, helpful
+
+discussions, and practical advice during the preparation of this thesis.
+
+     I also wish to thank the faculty members and fellow students in the Department of Au-
+
+tomation and Intelligent Manufacturing at Southern University of Science and Technology
+
+for the discussions, support, and academic environment they provided during my undergrad-
+
+uate study.
+
+     Finally, I am deeply grateful to my family for their understanding, encouragement, and
+
+unwavering support throughout my studies.
+
+
+
+
+                                              42
+
