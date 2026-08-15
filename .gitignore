@@ -35,3 +35,7 @@
 # 编辑器临时文件
 *.swp
 *.bak
+
+# Python / uv 虚拟环境与缓存
+.venv/
+__pycache__/

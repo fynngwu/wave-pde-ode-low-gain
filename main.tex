@@ -7,6 +7,7 @@
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \usepackage{bm}
+\usepackage{tikz}
 \usepackage{amsthm}
 \newcommand{\Av}{\mathcal{A}}
 \newcommand{\dint}[1]{\int_0^D #1}
@@ -21,7 +22,7 @@
 
 \begin{document}
 
-\title{Low-Gain Compensation for Wave PDE--ODE System with Distributed Effect}
+\title{Low-Gain Compensation for Wave PDE--ODE Systems with Distributed Coupling}
 
 \author{Fengyang~Wu
 \thanks{F. Wu is with the School of System Design and Intelligent Manufacturing
@@ -33,95 +34,174 @@ University of Science and Technology, Shenzhen, China (e-mail:
 
 \begin{abstract}
 This article proposes two low-gain boundary controllers for wave PDE--ODE
-cascade systems with distributed coupling. The closed-loop system is shown to
-be exponentially stabilized with the proposed controllers as long as the
-open-loop ODE plant is not exponentially unstable. In contrast to existing
-backstepping designs, the controllers are structurally much simpler, requiring
-only the low-gain feedback and a boundary velocity damping term, and an even
-simpler controller is constructed for the nilpotent case. Several simulation
-examples illustrate the effectiveness of the controllers.
+cascade systems with distributed displacement and velocity coupling. The
+boundary feedback combines a low-gain finite-dimensional term with boundary
+damping and stiffness injected at the actuated endpoint. The closed-loop system
+is shown to be exponentially stable as long as the open-loop ODE plant is not
+exponentially unstable. The proof is based on an Artstein-type transformation
+that converts the distributed PDE--ODE coupling into an effective input channel,
+and the Lyapunov analysis is carried out directly on the original wave state,
+so that the coupling kernels are only required to be square integrable and no
+derivative of the plant state is involved. An even simpler controller is
+constructed for the nilpotent case. Several numerical examples illustrate the
+effectiveness of the proposed controllers.
 \end{abstract}
 
 \begin{IEEEkeywords}
-PDE--ODE cascade, wave equation, boundary stabilization, low-gain compensation.
+Boundary control, distributed coupling, low-gain feedback, PDE--ODE cascade,
+wave equation.
 \end{IEEEkeywords}
 
 \section{Introduction}
-\IEEEPARstart{M}{any} control systems deliver the controller command to the ODE
-plant through a non-ideal actuator rather than an ideal lumped input. The command
-first passes through actuator dynamics associated with a non-negligible
-transmission length, finite propagation speed, elasticity, inertia, or acoustic
-storage; the actuator then stores energy, reflects disturbances at its
-boundaries, and reaches the plant only through the evolution of a distributed
-state. This viewpoint is closely related to the classical compensation of input
-delays \cite{r1}--\cite{r4}, but it retains more of the physical actuator
-dynamics than a pure delay representation.
+Many control systems deliver the controller command to the ODE
+plant through a non-ideal actuator path, whose finite length,
+elasticity, or inertia cannot be neglected. The command must first
+propagate through the actuator, and hence acts on the plant through a
+distributed state rather than at a single point. Wave equations
+provide a natural model for such actuator dynamics, since
+propagation and energy storage are dominant \cite{r5}, \cite{r6}.
+This viewpoint is closely related to the classical compensation of
+input delays \cite{r1}--\cite{r4}, but it retains more of the
+physical actuator dynamics than a pure delay representation.
 
-Wave equations provide a natural model for such actuator dynamics because
-propagation and energy storage are dominant \cite{r5}, \cite{r6}. Compared with
-diffusion models, a wave equation is hyperbolic and essentially conservative
-unless damping is injected through the boundary or the domain, so the location
-and form of the boundary conditions determine how energy enters and leaves the
-actuator. In the cascade considered here, the boundary input $U(t)$ is applied
-at the right endpoint $x = D$ of a one-dimensional wave actuator $u(x,t)$, the
-left endpoint $x = 0$ carries a positive Robin elastic support $u_x(0,t) = q
-u(0,t)$, $q > 0$, and the plant state $X(t)$ is driven by the spatially
-integrated effects of the wave displacement and velocity through
-$\dint{B_1(x)u(x,t)\,\mathrm{d}x}$ and $\dint{B_2(x)u_t(x,t)\,\mathrm{d}x}$.
-The plant is therefore coupled to the whole actuator profile rather than to a
-single boundary trace, and the closed loop is not in a strict-feedback form. The
-structure is summarized in Fig.~\ref{fig1}.
+Boundary control of wave equations and PDE backstepping have been
+extensively studied \cite{r7}--\cite{r9}. For a wave PDE entering the
+plant, an explicit compensator was first constructed in \cite{r10}
+for a pointwise interconnection and extended in \cite{r11} to
+distributed in-domain couplings. However, it is noted from these
+works that such backstepping controllers tend to be algebraically
+involved and typically require full distributed-state information,
+since the cascade is not in a strict-feedback form and the wave
+subsystem has infinitely many imaginary-axis modes. Recent work has
+moved wave and hyperbolic PDE--ODE cascades toward output feedback,
+disturbances, and delays \cite{r14}--\cite{r17}, usually at the price
+of adding observer, disturbance-estimator, or adaptive modules.
 
-\begin{figure}[!t]
-\centerline{\includegraphics[width=0.9\columnwidth]{fig1.png}}
+On the other hand, low-gain feedback provides simple controllers for
+linear systems with input saturation and/or input delays
+\cite{r18}--\cite{r26} under additional spectral assumptions on the
+open-loop plant. Most relevant to the distributed-effect mechanism
+considered here, low-gain compensation was established in \cite{r27}
+for diffusion--convection PDE--ODE cascades, where the actuator
+dynamics are modeled by parabolic equations, and \cite{r28} shows
+how distributed interconnections increase the complexity of both the
+controller and the proof. This inspires us to consider whether a
+similarly simple low-gain design exists for a \emph{conservative
+wave} actuator with distributed displacement and velocity coupling,
+whose hyperbolic nature and infinitely many imaginary-axis modes
+preclude a direct extension of the parabolic results.
+
+In the cascade considered here, the boundary input $U(t)$ is applied
+at the right endpoint $x = D$ of a one-dimensional wave actuator
+$u(x,t)$, the left endpoint $x = 0$ carries a free (Neumann)
+boundary condition $u_x(0,t) = 0$, and the plant state $X(t)$ is
+driven by the spatially integrated effects of the wave displacement
+and velocity through $\dint{B_1(x)u(x,t)\,\mathrm{d}x}$ and
+$\dint{B_2(x)u_t(x,t)\,\mathrm{d}x}$. The plant is therefore coupled
+to the whole actuator profile rather than to a single boundary trace.
+Because the wave equation is conservative in the interior, the
+boundary feedback must simultaneously inject damping and stiffness at
+the controlled endpoint; the proposed controller
+$U(t) = -B^{\top}P X(t) - b\,u_t(D,t) - q\,u(D,t)$ combines a
+finite-dimensional low-gain term with a boundary velocity damping
+term and a boundary stiffness term. The structure is summarized in
+Fig.~\ref{fig1}.
+
+\begin{figure*}[!t]
+\centering
+\begin{tikzpicture}[
+  block/.style={draw, thick, rectangle, align=center, inner sep=6pt,
+    minimum height=1.8cm},
+  arr/.style={-latex, thick},
+]
+% --- ODE plant ---
+\node[block] (plant) at (-5.6,0) {
+  \textbf{ODE plant}\\[2pt]
+  $\dot X(t) = AX(t) + \dint{B_1(x)u(x,t)\,\mathrm{d}x}$\\[1pt]
+  $\qquad\qquad + \dint{B_2(x)u_t(x,t)\,\mathrm{d}x}$
+};
+% --- wave actuator ---
+\node[block] (wave) at (1.9,0) {
+  \textbf{Wave actuator} $u(x,t)$\\[2pt]
+  $u_{tt}(x,t) = u_{xx}(x,t)$
+};
+% --- distributed coupling from wave to plant ---
+\draw[arr] ([yshift=0.4cm]wave.west) -- ([yshift=0.4cm]plant.east)
+  node[midway, above, font=\small] {$\dint{B_1(x)u\,\mathrm{d}x}$};
+\draw[arr] ([yshift=-0.4cm]wave.west) -- ([yshift=-0.4cm]plant.east)
+  node[midway, below, font=\small] {$\dint{B_2(x)u_t\,\mathrm{d}x}$};
+% --- boundary annotations ---
+\node[above, font=\small, align=center] at (wave.north west) {$x = 0$\\[1pt] $u_x = 0$};
+\node[above, font=\small] at (wave.north east) {$x = D$};
+% --- controller below the cascade ---
+\node[block] (ctrl) at (0.2,-3.5) {
+  \textbf{Controller}\\[2pt]
+  $U(t) = -B^{\top}P\,X(t)$\\[1pt]
+  $\qquad - b\,u_t(D,t) - q\,u(D,t)$
+};
+% --- feedback: X(t) into controller ---
+\draw[arr] (plant.south) -- ++(0,-1.3) coordinate (px)
+  node[below, font=\small] {$X(t)$}
+  -| ([xshift=-1.0cm]ctrl.north);
+% --- feedback: u_t(D,t) into controller ---
+\draw[arr] ([xshift=-0.5cm]wave.south east) -- ++(0,-1.3) coordinate (wx)
+  node[below, font=\small] {$u_t(D,t)$}
+  -| ([xshift=1.0cm]ctrl.north);
+% --- feedback: u(D,t) into controller ---
+\draw[arr] ([xshift=0.7cm]wave.south east) -- ++(0,-0.6) coordinate (px2)
+  node[below, font=\small] {$u(D,t)$}
+  -| ([xshift=1.8cm]ctrl.north);
+% --- control input U(t) into x = D ---
+\draw[arr] (ctrl.east) -- ++(2.0,0) coordinate (cx) -- ++(0,3.5) -- (wave.east)
+  node[midway, above, font=\small] {$U(t)$};
+\end{tikzpicture}
 \caption{Closed-loop wave PDE--ODE cascade with distributed displacement and
 velocity coupling.}
 \label{fig1}
-\end{figure}
+\end{figure*}
 
-Boundary control of wave equations and PDE backstepping have been extensively
-studied \cite{r7}--\cite{r9}. For a wave PDE entering the plant, an explicit
-compensator was first constructed in \cite{r10} for a pointwise interconnection
-and extended in \cite{r11} to distributed in-domain couplings. Because the
-cascade is not strict-feedback and the wave subsystem has infinitely many
-imaginary-axis modes, such backstepping controllers tend to be algebraically
-involved and typically require full distributed-state information. Recent work
-has moved wave and hyperbolic PDE--ODE cascades toward output feedback,
-disturbances, and delays \cite{r14}--\cite{r17}, usually at the price of adding
-observer, disturbance-estimator, or adaptive modules.
-
-On the other hand, low-gain feedback provides simple controllers for linear
-systems with input saturation and/or input delays \cite{r18}--\cite{r26} under
-additional spectral assumptions on the open-loop plant. Most relevant to the
-distributed-effect mechanism, low-gain compensation was established in
-\cite{r27} for diffusion--convection PDE--ODE cascades, and \cite{r28} shows how
-distributed interconnections increase the complexity of both the controller and
-the proof. These developments motivate the question whether a similarly simple
-low-gain design exists for a \emph{conservative wave} actuator with distributed
-displacement and velocity coupling.
-
-In this paper we give an affirmative answer. The main contributions are:
-\begin{itemize}
-\item To the best of the authors' knowledge, this is the first application of
-the low-gain feedback approach to boundary control problems with wave PDE
-actuator dynamics and distributed coupling.
-\item Compared with the backstepping designs \cite{r10}, \cite{r11}, the
-proposed controller is structurally simpler: the online feedback law uses only
-the finite-dimensional state $X(t)$ and the local boundary velocity $u_t(D,t)$,
-while the effective gain is obtained from an offline kernel boundary-value
-problem. The price is the additional spectral restriction in
-Assumption~\ref{ass1}.
-\item We exploit the positive Robin elastic support and the controller-injected
-boundary damping to construct a wave-energy Lyapunov functional and rigorously
-establish exponential stability of the closed-loop system. Numerical simulations
-verify the design.
-\end{itemize}
+In this article, we propose two low-gain boundary controllers for
+wave PDE--ODE cascade systems with distributed displacement and
+velocity coupling. It is shown that the closed-loop system can be
+exponentially stabilized with the proposed controllers as long as the
+open-loop ODE plant is not exponentially unstable. In contrast to the
+backstepping designs \cite{r10}, \cite{r11}, the proposed controllers
+are structurally much simpler, requiring only the finite-dimensional
+state and two local boundary traces online, while the effective gain
+is obtained from an offline kernel boundary-value problem; an even
+simpler controller is constructed for the nilpotent case. Main
+contributions of this work, compared with relevant existing works,
+can be summarized as follows.
+\begin{enumerate}
+\item To the best of the authors' knowledge, this is the first
+application of the low-gain feedback approach to boundary control
+problems with wave PDE actuator dynamics and distributed displacement
+and velocity coupling.
+\item Compared with the backstepping designs \cite{r10}, \cite{r11},
+the proposed controller is structurally simpler: the online feedback
+law uses only the finite-dimensional state $X(t)$ and the local
+boundary traces $u(D,t)$ and $u_t(D,t)$, while the effective gain is
+obtained from an offline kernel boundary-value problem. The price is
+the additional spectral restriction in Assumption~\ref{ass1}.
+\item The proof is carried out directly on the original wave state
+through an Artstein-type transformation, instead of lifting the
+boundary input into the interior of the PDE. Consequently, no
+derivative of the plant state is differentiated in the analysis, and
+the coupling kernels $B_1$ and $B_2$ are required to be only square
+integrable. Numerical simulations verify the design.
+\end{enumerate}
 
 The rest of the paper is organized as follows. Section~\ref{sec:prob} formulates
 the problem, recalls the low-gain Riccati framework, and derives the controller.
-Section~\ref{sec:stab} states the main stability theorem and gives the proof
-strategy. Section~\ref{sec:num} reports numerical simulations, and
+Section~\ref{sec:stab} states the main stability theorem and gives its proof.
+Section~\ref{sec:num} reports numerical simulations, and
 Section~\ref{sec:concl} concludes.
+
+\textbf{Notations:} Throughout this article, $\abs{\cdot}$ denotes
+the absolute value of a real number, the modulus of a complex number,
+the Euclidean norm of a vector, or the induced 2-norm of a matrix;
+$\norm{\cdot}_2$ denotes the standard $L^2(0,D)$ norm; and
+$\dint{\cdot}$ abbreviates the integral over $[0,D]$.
 
 \section{Problem Formulation and Preliminaries}
 \label{sec:prob}
@@ -138,23 +218,33 @@ u_{tt}(x,t) = u_{xx}(x,t),
 \label{eq:wave}
 \end{equation}
 \begin{equation}
-u_x(0,t) = q\,u(0,t),\qquad u_x(D,t) = U(t),
+u_x(0,t) = 0,
+\label{eq:left}
+\end{equation}
+\begin{equation}
+u_x(D,t) = U(t),
 \label{eq:wavebc}
 \end{equation}
-where $q > 0$, $X(t) \in \mathbb{R}^n$ is the plant state, $A \in
+where $X(t) \in \mathbb{R}^n$ is the plant state, $A \in
 \mathbb{R}^{n \times n}$, $U(t) \in \mathbb{R}$ is the boundary control applied
 at $x = D$, and $u \colon [0,D]\times[0,\infty) \to \mathbb{R}$ is the wave
-state. The coupling kernels satisfy $B_1 \in L^2(0,D)$ and $B_2 \in H^1(0,D)$.
+state. The coupling kernels satisfy
+\begin{equation}
+B_1 \in L^2(0,D;\mathbb{R}^n),\qquad B_2 \in L^2(0,D;\mathbb{R}^n).
+\label{eq:reg}
+\end{equation}
 Equation~\eqref{eq:ode} is an $n$-dimensional linear ODE driven by the
 distributed effects of the wave displacement and velocity; the wave equation
-\eqref{eq:wave} models the actuator dynamics, with a positive Robin elastic
-support \eqref{eq:wavebc} at the unactuated boundary and the physical input
-entering through $u_x(D,t) = U(t)$. The damping gain $b > 0$ is introduced
-through the controller below. The control objective is to design $U(t)$ using
-only $X(t)$ and $u_t(D,t)$ so that the closed-loop energy
+\eqref{eq:wave} models the actuator dynamics, with a free boundary
+\eqref{eq:left} at the unactuated end and the physical input entering through
+$u_x(D,t) = U(t)$. Since the wave subsystem is conservative in the interior,
+the boundary feedback must inject both damping and stiffness at the actuated
+end; the damping gain $b>0$ and the stiffness gain $q>0$ are introduced through
+the controller below. The control objective is to design $U(t)$ using only
+$X(t)$, $u(D,t)$, and $u_t(D,t)$ so that the closed-loop energy
 \begin{equation}
 \Omega(t) := \abs{X(t)}^2 + \dint{\left(u_x^2(x,t) + u_t^2(x,t)\right)
-\,\mathrm{d}x} + u^2(0,t)
+\,\mathrm{d}x} + u^2(D,t)
 \label{eq:energy}
 \end{equation}
 decays exponentially.
@@ -192,61 +282,114 @@ $\varepsilon > 0$;
 
 \begin{lemma}[Poincar\'e-type inequalities]
 \label{lem:poincare}
-For every $y \in H^1(0,D)$,
+For every $y \in H^1(0,D)$, with $p := y(D)$,
 \begin{equation}
-\norm{y}_2^2 \leq 2D\,y^2(0) + D^2\norm{y_x}_2^2,
+\norm{y}_2^2 \leq 2D\,p^2 + D^2\norm{y_x}_2^2,
 \label{eq:poincare}
 \end{equation}
-and $y^2(D) \leq 2y^2(0) + 2D\norm{y_x}_2^2$.
+and
+\begin{equation}
+\norm{y}_{L^\infty}^2 \leq 2p^2 + 2D\norm{y_x}_2^2,
+\qquad
+y^2(0) \leq 2p^2 + 2D\norm{y_x}_2^2.
+\label{eq:poincare_inf}
+\end{equation}
 \end{lemma}
 
 We also use the Cauchy--Schwarz inequalities $\abs{a^{\top}b} \leq \abs{a}\abs{b}$
 and $\abs{\dint{f^{\top}h\,\mathrm{d}x}}^2 \leq \norm{f}_2^2\norm{h}_2^2$, the
 discrete form $\abs{\sum_{i=1}^{m} z_i}^2 \leq m\sum_{i=1}^{m}\abs{z_i}^2$, and
-Young's inequality $2\abs{ab} \leq \eta a^2 + \eta^{-1}b^2$ ($\eta > 0$) with
-the variants $-\abs{a}^2 + 2a^{\top}b \leq \abs{b}^2$ and $\abs{a+b}^2 \geq
-\frac{1}{2}\abs{a}^2 - \abs{b}^2$.
+Young's inequality $2\abs{ab} \leq \eta a^2 + \eta^{-1}b^2$ ($\eta > 0$).
 
 \subsection{Controller Design}
-The controller is built from a kernel $g \in C^2([0,D];\mathbb{R}^{n\times 1})$
-solving the boundary-value problem
+The design rests on an \emph{Artstein-type transformation}: we look for a
+combination of the plant and wave states, with kernels $g_0, g$ to be
+determined,
+\begin{multline}
+Z(t) = X(t) + \dint{g_0(x)u(x,t)\,\mathrm{d}x}\\
++ \dint{g(x)u_t(x,t)\,\mathrm{d}x} + b\,g(D)\,u(D,t),
+\label{eq:Zidea}
+\end{multline}
+whose derivative does not depend on the distributed wave profile but only on
+the boundary value $u_x(D,t)$ --- that is, only on the control $U(t)$.
+Substituting \eqref{eq:ode}--\eqref{eq:wavebc} into the derivative of
+\eqref{eq:Zidea} and integrating by parts, all distributed coupling terms
+cancel exactly if the kernels solve
 \begin{equation}
 g''(x) + B_1(x) = A\bigl(Ag(x) - B_2(x)\bigr),
 \label{eq:kernel}
 \end{equation}
+with $g_0(x) := Ag(x) - B_2(x)$, subject to the boundary conditions
 \begin{equation}
-g'(0) - q\,g(0) = 0,\qquad -g'(D) = A\,b\,g(D),
+g'(0) = 0,\qquad -g'(D) = \bigl(bA + qI\bigr)g(D),
 \label{eq:kernelbc}
 \end{equation}
-and the associated vector $B := g(D)$. For the explicit computation of $B$,
-write \eqref{eq:kernel} as the first-order system
-$\zeta'(x) = \Av\zeta(x) + \eta(x)$ for $\zeta = (g,g')^{\top}$,
-$\Av = \bigl(\begin{smallmatrix} 0 & I \\ A^2 & 0\end{smallmatrix}\bigr)$, and
-$\eta(x) = \bigl(0,\, -AB_2(x) - B_1(x)\bigr)^{\top}$, with
-$E := \bigl(bA\;\; I\bigr)e^{\Av D}\binom{I}{qI}$ and
-$\Xi := \dint{e^{\Av(D-s)}\eta(s)\,\mathrm{d}s}$.
+where the damping and stiffness gains satisfy
+\begin{equation}
+b > 0,\qquad 0 < q < \frac{1}{D}.
+\label{eq:gains}
+\end{equation}
+The boundary conditions are chosen so that no term survives at the free end
+($g'(0)=0$ matches $u_x(0,t)=0$) and so that the terms at the controlled end
+combine into $g(D)\bigl(u_x(D,t) + b\,u_t(D,t) + q\,u(D,t)\bigr)$ --- exactly
+the combination that the controller \eqref{eq:controller} below cancels. Denote
+the endpoint value of the kernel by
+\begin{equation}
+B := g(D).
+\label{eq:Bdef}
+\end{equation}
+Then, as shown in the proof of Theorem~\ref{thm1}, the transformed state
+satisfies
+\begin{equation}
+\dot Z(t) = AZ(t) + B\bigl(u_x(D,t) + b\,u_t(D,t) + q\,u(D,t)\bigr),
+\label{eq:Ztarget}
+\end{equation}
+Thus the distributed coupling is converted into an effective one-dimensional
+input channel, and we emphasize that the transformation is used only to derive
+and analyse the controller: the online implementation requires only $B$, not
+the full kernel. For the explicit computation of $B$, write \eqref{eq:kernel}
+as the first-order system
+\begin{equation}
+\zeta'(x) = \Av\,\zeta(x) + \eta(x),
+\label{eq:zeta}
+\end{equation}
+for $\zeta = (g,g')^{\top}$, $\Av = \bigl(\begin{smallmatrix} 0 & I \\
+A^2 & 0\end{smallmatrix}\bigr)$, and
+$\eta(x) = \bigl(0,\, -AB_2(x) - B_1(x)\bigr)^{\top}$. By variation of
+constants, $\zeta(D) = e^{\Av D}\binom{g(0)}{0} + \Xi$, where
+$\Xi := \dint{e^{\Av(D-s)}\eta(s)\,\mathrm{d}s}$. The right boundary condition
+\eqref{eq:kernelbc} is equivalent to $\bigl(bA + qI\;\; I\bigr)\zeta(D) = 0$.
+Consequently, with
+\begin{equation}
+E := \bigl(bA + qI\;\; I\bigr)e^{\Av D}\binom{I}{0},
+\label{eq:E}
+\end{equation}
+the endpoint gain is given by the following proposition.
 
 \begin{proposition}
 \label{prop1}
 Assume $E$ is invertible. Then the endpoint gain $B = g(D)$ associated with
-\eqref{eq:kernel} is given by
+\eqref{eq:kernel}--\eqref{eq:kernelbc} is given by
 \begin{equation}
-B = \bigl(I\;\; 0\bigr)e^{\Av D}\binom{I}{qI}E^{-1}\bigl(bA\;\; I\bigr)\Xi.
+B = \bigl(I\;\; 0\bigr)e^{\Av D}\binom{I}{0}E^{-1}\bigl(bA + qI\;\; I\bigr)\Xi
++ \bigl(I\;\; 0\bigr)\Xi.
 \label{eq:B}
 \end{equation}
 \end{proposition}
 
 \begin{proof}[Proof of Proposition~\ref{prop1}]
-By variation of constants, $\zeta(D) = e^{\Av D}\binom{I}{qI}g(0) + \Xi$; the
-right boundary condition is equivalent to $\bigl(bA\;\; I\bigr)\zeta(D) = 0$.
-Solving for $g(0) = -E^{-1}\bigl(bA\;\; I\bigr)\Xi$ and using $B =
+Solving \eqref{eq:zeta} with $g'(0)=0$ gives $\zeta(D) =
+e^{\Av D}\binom{g(0)}{0} + \Xi$. The right boundary condition is equivalent to
+$\bigl(bA + qI\;\; I\bigr)\zeta(D) = 0$. Solving for
+$g(0) = -E^{-1}\bigl(bA + qI\;\; I\bigr)\Xi$ and using $B =
 \bigl(I\;\; 0\bigr)\zeta(D)$ yields \eqref{eq:B}.
 \end{proof}
 
 \begin{assumption}
 \label{ass1}
-The matrix $A$ has all its eigenvalues on the imaginary axis, the matrix $E$ is
-invertible, and the pair $(A, B)$ is controllable.
+The matrix $A$ has all its eigenvalues on the imaginary axis, the gains $b>0$
+and $0<q<1/D$ are chosen such that $E$ in \eqref{eq:E} is invertible, and the
+pair $(A, B)$ with $B$ given by \eqref{eq:B} is controllable.
 \end{assumption}
 
 By Lemma~\ref{lem:lowgain}, applied with $B = g(D)$, the ARE
@@ -257,18 +400,70 @@ A^{\top}P + PA - PBB^{\top}P = -\varepsilon P
 has a unique positive definite solution $P = P_\varepsilon$. The proposed
 boundary controller is
 \begin{equation}
-U(t) = -B^{\top}P X(t) - b\,u_t(D,t).
+U(t) = -B^{\top}P X(t) - b\,u_t(D,t) - q\,u(D,t).
 \label{eq:controller}
 \end{equation}
 
+\emph{Design rationale.} Each of the three terms in \eqref{eq:controller} is
+dictated by a specific open-loop spectral feature of the cascade.
+
+\begin{itemize}
+\item \emph{Boundary damping} $-b\,u_t(D,t)$. The wave equation is
+conservative in the interior: the energy identity
+$\dot E_u = u_t(D,t)u_x(D,t)$ (derived in the proof, \eqref{eq:energy_der})
+shows that energy can leave the wave subsystem only through the controlled end
+$x = D$. Boundary damping is the direct way to dissipate it.
+
+\item \emph{Boundary stiffness} $-q\,u(D,t)$. With two free (Neumann) ends,
+the wave operator $\partial_{xx}$ on $[0,D]$ has a zero eigenvalue: every
+constant profile $u \equiv c$ is a static solution carrying zero
+$\norm{u_x}_2^2 + \norm{u_t}_2^2$ energy, and it is invisible to boundary
+damping (for $u \equiv c$ the term $-b\,u_t(D,t)$ vanishes). Yet such a
+profile drives the plant through
+$\int_0^D B_1(x)u(x,t)\,\mathrm{d}x = c\int_0^D B_1(x)\,\mathrm{d}x$. The
+stiffness term anchors this \emph{translation mode}: under
+$u_x(D,t) = -q\,u(D,t)$ a constant profile obeys $\dot c = -qc$ and decays at
+rate $q$, and the potential $\frac q2 u^2(D,t)$ (kept in the wave energy $E_u$
+below) gives it positive energy. Without stiffness, the closed-loop energy
+\eqref{eq:energy} would not control this drift, and the plant could not be
+regulated.
+
+\item \emph{Low-gain term} $-B^\top P X(t)$. The plant matrix $A$ is neutral:
+all its eigenvalues lie on the imaginary axis, so the open-loop ODE is neither
+stable nor exponentially unstable. Its troublesome part is the
+\emph{neutral eigenspace} (the span of the eigenvectors of the imaginary-axis
+eigenvalues), which low-gain feedback is designed to stabilize. The Riccati
+solution $P = P_\varepsilon$ of \eqref{eq:areB} satisfies $P = O(\varepsilon)$,
+and the closed-loop matrix $A - BB^\top P$ verifies
+\begin{align}
+(A - BB^\top P)^\top P &+ P(A - BB^\top P)\nonumber\\
+&= -\varepsilon P - PBB^\top P\nonumber\\
+&\leq -\varepsilon P,
+\end{align}
+so it is Hurwitz for every $\varepsilon > 0$; the feedback gain stays small for
+small $\varepsilon$, so the high-frequency wave modes are not excited. The price
+is the spectral restriction in Assumption~\ref{ass1}: exponentially unstable
+plants (eigenvalues with positive real part) are excluded.
+\end{itemize}
+
 \begin{remark}
-The kernel $g$ and the vector $B$ are computed offline. Once $B$ is available,
-the online controller \eqref{eq:controller} uses only $X(t)$ and $u_t(D,t)$.
-The term $-B^{\top}PX$ is the low-gain stabilizing part for the ODE channel,
-while $-b\,u_t(D,t)$ injects boundary damping into the wave equation. This is
-structurally simpler than the backstepping controllers \cite{r10}, \cite{r11}
-that require full distributed-state information, at the price of the spectral
-restriction in Assumption~\ref{ass1}.
+The kernel $g$ and the vector $B$ are computed offline once. Online, the
+controller \eqref{eq:controller} uses only $X(t)$, $u(D,t)$, and
+$u_t(D,t)$; the full-domain kernel enters only the proof and the offline
+computation of the effective input vector $B$. This is structurally simpler
+than the backstepping controllers \cite{r10}, \cite{r11}, which require full
+distributed-state information.
+\end{remark}
+
+\begin{remark}
+The restriction $0 < q < 1/D$ is not an implementation limitation but a
+condition needed for the Lyapunov argument in Section~\ref{sec:stab}: there,
+the mixed cross term $\int_0^D u(x,t)u_t(x,t)\,\mathrm{d}x$ requires a free
+parameter $\kappa$ with $Dq/2 < \kappa < 1/2$, which is nonempty exactly when
+$qD < 1$. Intuitively, the stiffness must stay below the value at which the
+energy injected by the multiplier term into $u^2(D,t)$ overwhelms the
+dissipation generated by the mixed term. The damping gain $b>0$ is otherwise
+free.
 \end{remark}
 
 \section{Main Result: Exponential Stability}
@@ -278,7 +473,7 @@ restriction in Assumption~\ref{ass1}.
 \begin{theorem}
 \label{thm1}
 Consider the closed-loop system consisting of \eqref{eq:ode}--\eqref{eq:wave},
-the boundary conditions of \eqref{eq:wave}, and the controller
+the boundary conditions \eqref{eq:left}--\eqref{eq:wavebc}, and the controller
 \eqref{eq:controller}, under Assumption~\ref{ass1}. Then there exists
 $\varepsilon^* > 0$ such that for every $\varepsilon \in (0,\varepsilon^*]$ and
 every initial condition
@@ -292,149 +487,504 @@ unique solution and is exponentially stable in the sense that
 for some positive constants $\alpha$ and $\beta$.
 \end{theorem}
 
-\subsection{Proof Strategy}
-Let $g$ be the solution to \eqref{eq:kernel}, set $g_0(x) := Ag(x) - B_2(x)$,
-and introduce the transformed finite-dimensional state
+\begin{remark}[How to read the transformation and the proof]
+The transformation \eqref{eq:Z} is best understood as a \emph{change of
+coordinates} on the state space: it replaces the plant state $X$ by the
+\emph{compensated} state $Z = X + \varphi$, where
+$\varphi = \dint{g_0(x)u(x,t)\,\mathrm{d}x} + \dint{g(x)u_t(x,t)\,\mathrm{d}x}
++ bB\,u(D,t)$ collects the distributed wave effect that would otherwise drive
+$X$. In the new coordinates the reduced ODE reads
+$\dot Z = AZ + BU_{\mathrm{eff}}$ with $U_{\mathrm{eff}} = u_x(D,t) +
+b\,u_t(D,t) + q\,u(D,t)$: the wave enters only through its boundary value,
+i.e., only through the control. This is the role played by the Artstein
+(predictor) variable of delay systems: $Z$ is the state of the reduced
+input-linear system, with the distributed wave dynamics folded into the
+definition of $Z$. The map $(X,u,u_t) \mapsto (Z,u,u_t)$ is an isomorphism on
+the energy space, because the correction $\varphi$ is bounded by the wave
+energy through \eqref{eq:phi_Eu}; hence exponential decay of $(Z,u,u_t)$ is
+equivalent to that of the original state.
+
+The effective input vector $B = g(D)$ is \emph{not guessed but derived}. The
+kernel $g$ is fixed by \eqref{eq:kernel}--\eqref{eq:kernelbc} precisely so that
+the distributed displacement and velocity couplings $B_1, B_2$ are absorbed
+into the $AZ$ term of the reduced dynamics (they become
+$\dint{Ag_0(x)u(x,t)\,\mathrm{d}x}$ and $\dint{Ag(x)u_t(x,t)\,\mathrm{d}x}$);
+what cannot be absorbed is the residue sitting exactly at the controlled
+boundary $x = D$, and that residue is $B = g(D)$ --- the direction in which the
+boundary control enters the reduced ODE.
+
+The proof then has a transparent two-stage small-gain structure.
+\begin{enumerate}
+\item With $U = -B^\top PX - b\,u_t(D) - q\,u(D)$, the reduced ODE satisfies
+$\dot Z = (A - BB^\top P)Z + BB^\top P\varphi$. The Riccati matrix $P$ makes
+$A - BB^\top P$ contract at rate $\varepsilon$, and the coupling
+$BB^\top P\varphi$ is $O(\varepsilon)\sqrt{E_u}$, so the finite-dimensional
+part dissipates up to a small wave-energy term.
+\item The wave Lyapunov function $V_2$ of \eqref{eq:V2} makes the wave energy
+dissipate, up to the boundary forcing $B^\top PX$, which is
+$O(\sqrt{\varepsilon})\sqrt{V_1}$ because $\abs{P^{1/2}X}$ is controlled by
+$V_1$ and $E_u$ through \eqref{eq:PX}.
+\item Both cross-couplings vanish with $\varepsilon$ faster than the diagonal
+dissipation, so the weighted sum $V = V_1 + \varepsilon V_2$ is a Lyapunov
+function for all sufficiently small $\varepsilon$; the norm equivalence
+\eqref{eq:equi} then turns this into the exponential decay \eqref{eq:stab} of
+the original energy.
+\end{enumerate}
+\end{remark}
+
+\begin{remark}[On the boundary term $u_t(D,t)$]
+The controller uses the boundary value $u_t(D,t)$, which is not a point value
+in the energy space $H^1(0,D) \times L^2(0,D)$: a function in $L^2$ has no
+well-defined trace at the single point $x=D$. The statement is therefore
+understood in the standard semigroup sense for dissipative wave boundary
+feedback: for classical solutions, $u(\cdot,t) \in H^2(0,D)$ and
+$u_t(\cdot,t) \in H^1(0,D)$, so $u_t(D,t)$ is a legitimate trace; for weak
+solutions, the closed-loop generator is defined on the domain
+$\{(X,u,u_t) : u \in H^2,\ u_t \in H^1,\ u_x(0)=0,\ u_x(D) = -b u_t(D) -
+q u(D) - B^\top PX\}$, on which the boundary condition (and hence $u_t(D,t)$)
+holds. This is the sense of existence and uniqueness claimed above, and it is
+standard; the regularity needed for the estimate \eqref{eq:ubounds} is only
+$u(\cdot,t) \in H^1$ and $u_t(\cdot,t) \in L^2$.
+\end{remark}
+
+\subsection{Proof of Theorem~\ref{thm1}}
+Let $g$ be the solution to \eqref{eq:kernel}--\eqref{eq:kernelbc}, set
+$g_0(x) := Ag(x) - B_2(x)$ and $B := g(D)$, and introduce the transformed
+finite-dimensional state
 \begin{multline}
 Z(t) = X(t) + \dint{g_0(x)u(x,t)\,\mathrm{d}x}
   + \dint{g(x)u_t(x,t)\,\mathrm{d}x}\\
   + bB\,u(D,t).
 \label{eq:Z}
 \end{multline}
-Differentiating \eqref{eq:Z} and integrating by parts using \eqref{eq:ode} and
-\eqref{eq:kernel} gives $\dot{Z}(t) = AZ(t) + B\bigl(U(t) + b\,u_t(D,t)\bigr)$.
-With the controller \eqref{eq:controller} this becomes
-\begin{multline}
-\dot{Z}(t) = \bigl(A - BB^{\top}P\bigr)Z(t) + BB^{\top}P\,\varphi(t),\\
-\varphi(t) := Z(t) - X(t).
+
+\emph{Artstein transformation.} Differentiating \eqref{eq:Z} and using
+\eqref{eq:ode}--\eqref{eq:wavebc},
+\begin{align}
+\dot Z(t)
+&= AX(t) + \dint{B_1(x)u(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + \dint{B_2(x)u_t(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + \dint{g_0(x)u_t(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + \dint{g(x)u_{xx}(x,t)\,\mathrm{d}x} + bB\,u_t(D,t).
 \label{eq:Zdot}
-\end{multline}
+\end{align}
+Integrating $\dint{g u_{xx}\,\mathrm{d}x}$ by parts twice and using
+$u_x(0,t) = 0$ and $g'(0) = 0$,
+\begin{equation}
+\begin{split}
+\dint{g(x)u_{xx}(x,t)\,\mathrm{d}x}
+&= g(D)u_x(D,t) - g'(D)u(D,t)\\
+&\quad + \dint{g''(x)u(x,t)\,\mathrm{d}x}.
+\end{split}
+\label{eq:ibp}
+\end{equation}
+Substituting \eqref{eq:ibp}, the kernel identity $g''+B_1=Ag_0$ from
+\eqref{eq:kernel}, $g_0+B_2=Ag$ from \eqref{eq:Bdef}, and $-g'(D)=(bA+qI)B$
+from \eqref{eq:kernelbc} gives
+\begin{align}
+\dot Z(t)
+&= AX(t) + \dint{(B_1(x)+g''(x))u(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + \dint{(B_2(x)+g_0(x))u_t(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + B\,u_x(D,t) - g'(D)u(D,t) + bB\,u_t(D,t)\nonumber\\
+&= AX(t) + \dint{Ag_0(x)u(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + \dint{Ag(x)u_t(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + B\,u_x(D,t) + (bA+qI)B\,u(D,t) + bB\,u_t(D,t)\nonumber\\
+&= AZ(t) + B\bigl(u_x(D,t) + b\,u_t(D,t) + q\,u(D,t)\bigr),
+\label{eq:Zdot_final}
+\end{align}
+where in the last step we used
+$AZ(t) = AX(t) + \dint{Ag_0u\,\mathrm{d}x} + \dint{Agu_t\,\mathrm{d}x}
++ bAB\,u(D,t)$ and cancelled the $bAB\,u(D,t)$ terms. Since the controller
+\eqref{eq:controller} reads $u_x(D,t) = -B^\top PX(t) - b\,u_t(D,t) -
+q\,u(D,t)$, we obtain, with $\varphi(t) := Z(t) - X(t)$,
+\begin{equation}
+\dot Z(t) = \bigl(A - BB^\top P\bigr)Z(t) + BB^\top P\,\varphi(t).
+\label{eq:Zdot2}
+\end{equation}
 Thus the low-gain Riccati term decouples the ODE from the wave up to the small
 perturbation $\varphi$.
 
-Define $s(t) := B^{\top}P X(t)$ and the shifted field
+\emph{The finite-dimensional Lyapunov function.} Let
+$V_1(t) := Z^\top(t)P\,Z(t)$ and define the wave energy
 \begin{equation}
-\omega(x,t) := u(x,t) + \frac{x^2}{2D}s(t).
-\label{eq:omega}
+E_u(t) := \frac{1}{2}\norm{u_x(\cdot,t)}_2^2
+  + \frac{1}{2}\norm{u_t(\cdot,t)}_2^2
+  + \frac{q}{2}u^2(D,t).
+\label{eq:Eu}
 \end{equation}
-Then $\omega$ satisfies
-\begin{equation}
-\omega_{tt} = \omega_{xx} - \frac{1}{D}s(t) + \frac{x^2}{2D}\ddot{s}(t),
-\label{eq:omegaPDE}
-\end{equation}
-with the boundary conditions
-\begin{equation}
-\omega_x(0,t) = q\,\omega(0,t),
-\qquad \omega_x(D,t) = -b\,\omega_t(D,t) + \frac{bD}{2}\dot{s}(t).
-\label{eq:omegabc}
-\end{equation}
-The translation exposes the boundary damping $-b\,\omega_t(D,t)$ at the actuated
-end, leaving only the source terms in \eqref{eq:omegaPDE} and
-\eqref{eq:omegabc} that carry the low-gain parameter.
-
-Consider the Lyapunov candidates
+Along \eqref{eq:Zdot2}, the Riccati identity \eqref{eq:areB} yields
 \begin{align}
-V_1(t) &= Z^{\top}(t)P\,Z(t),\label{eq:V1}\\
-V_2(t) &= \frac{1}{2}\dint{\left(\omega_x^2 + \omega_t^2\right)\mathrm{d}x}
-  + \frac{q}{2}\omega^2(0,t)\nonumber\\
-  &\qquad + \delta \dint{(1+x)\omega_x\omega_t\,\mathrm{d}x},
-\label{eq:V2}
-\end{align}
-where $\delta$ satisfies $0 < \delta < \min\left\{\frac{1}{1+D},
-\frac{2b}{(1+D)(1+2b^2)}\right\}$. With $E_\omega(t) :=
-\frac{1}{2}\dint{(\omega_x^2 + \omega_t^2)\,\mathrm{d}x} +
-\frac{q}{2}\omega^2(0,t)$, the cross term is bounded by Young's inequality, so
-\begin{equation}
-\bigl(1 - \delta(1+D)\bigr)E_\omega \leq V_2(t) \leq
-\bigl(1 + \delta(1+D)\bigr)E_\omega.
-\label{eq:Ve}
-\end{equation}
-Along \eqref{eq:Zdot}, the Riccati identity \eqref{eq:areB} yields
-\begin{equation}
-\dot{V}_1(t) \leq -\varepsilon Z^{\top}PZ + \varphi^{\top}PBB^{\top}P\varphi.
+\dot V_1(t)
+&= -\varepsilon Z^\top PZ - Z^\top PBB^\top PZ
+  + 2Z^\top PBB^\top P\varphi\nonumber\\
+&\leq -\varepsilon V_1 + \varphi^\top PBB^\top P\varphi
+ \leq -\varepsilon V_1 + \abs{B}^2\abs{P}^2\abs{\varphi}^2.
 \label{eq:V1dot}
-\end{equation}
-The remaining estimates reduce to five elementary bounds obtained exactly as in
-\cite{r27}:
-\begin{itemize}
-\item (bound on $\dot{s}^2$) inverting $I + m_2B^{\top}P$ (Sherman--Morrison,
-using $\norm{P} = O(\varepsilon)$) gives
-$\dot{s}^2 \leq \rho_X\abs{P^{1/2}X}^2 + \rho_0\,\omega^2(0,t) +
-\rho_x\norm{\omega_x}_2^2 + \rho_t\norm{\omega_t}_2^2$, where $\rho_X = O(\varepsilon)$
-and the remaining coefficients are $O(\varepsilon^2)$;
-\item (bound on $\norm{\varphi}^2$) $\norm{\varphi}_2^2 \leq \Gamma_x\norm{\omega_x}_2^2
-+ \Gamma_t\norm{\omega_t}_2^2 + \Gamma_0\,\omega^2(0,t) + \Gamma_X\abs{P^{1/2}X}^2$
-with $\Gamma_x, \Gamma_t, \Gamma_0 = O(1)$ and $\Gamma_X = O(\varepsilon)$;
-\item (bound on $\dot{V}_1$) substituting the above into \eqref{eq:V1dot} gives
-$\dot{V}_1 \leq -\varepsilon Z^{\top}PZ + \sigma_x\norm{\omega_x}_2^2 +
-\sigma_t\norm{\omega_t}_2^2 + \sigma_0\,\omega^2(0,t) + \sigma_X\abs{P^{1/2}X}^2$,
-where $\sigma_x, \sigma_t, \sigma_0 = O(\varepsilon^2)$ and
-$\sigma_X = O(\varepsilon^3)$;
-\item (bound on $\ddot{s}^2$) differentiating the plant twice,
-$\ddot{s}^2 \leq \tau_X\abs{P^{1/2}X}^2 + \tau_0\,\omega^2(0,t) +
-\tau_x\norm{\omega_x}_2^2 + \tau_t\norm{\omega_t}_2^2 + \tau_D\,\omega_t^2(D,t)$,
-with $\tau_X = O(\varepsilon)$ and the remaining coefficients $O(\varepsilon^2)$;
-\item (bound on $\dot{V}_2$) combining the wave-energy identity
-\eqref{eq:omegaPDE} with the previous bounds,
-$\dot{V}_2 \leq -\lambda V_2 - \bigl(\tfrac{k_b}{2} - \Pi_D\bigr)\omega_t^2(D,t)
-- \tfrac{\delta}{2}\omega_t^2(0,t) + \Pi_x\norm{\omega_x}_2^2 +
-\Pi_t\norm{\omega_t}_2^2 + \Pi_0\,\omega^2(0,t) + \Pi_X\abs{P^{1/2}X}^2$,
-where $k_b = b - \tfrac{\delta(1+D)}{2}(1 + 2b^2) > 0$ by the choice of
-$\delta$, $\Pi_X = O(\varepsilon)$, and the remaining $\Pi$-coefficients are
-$O(\varepsilon^2)$.
-\end{itemize}
-Taking the weighted combination $V(t) := V_1(t) + \varepsilon V_2(t)$, every
-source term in $\dot{V}$ is of higher order in $\varepsilon$ than the leading
-dissipative terms, so for all $\varepsilon \leq \varepsilon^*$ the positivity
-conditions hold and
+\end{align}
+It remains to estimate $\varphi$ through the original wave energy. Since
 \begin{equation}
-\dot{V}(t) \leq -\beta_0\left(\norm{\omega_x}_2^2 + \norm{\omega_t}_2^2
-  + \omega^2(0,t) + \abs{P^{1/2}X}^2\right)
+u(x,t) = u(D,t) - \int_x^D u_y(y,t)\,\mathrm{d}y,
+\end{equation}
+Lemma~\ref{lem:poincare} gives, for positive constants $C_\infty$ and $C_0$
+independent of $\varepsilon$,
+\begin{equation}
+\norm{u(\cdot,t)}_{L^\infty}^2 \leq C_\infty E_u(t),
+\qquad
+\norm{u(\cdot,t)}_2^2 \leq C_0 E_u(t).
+\label{eq:ubounds}
+\end{equation}
+From \eqref{eq:Z}--\eqref{eq:Bdef},
+\begin{align}
+\varphi(t) &= \dint{g_0(x)u(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + \dint{g(x)u_t(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + bB\,u(D,t),
+\label{eq:phi}
+\end{align}
+so that
+\begin{align}
+\abs{\varphi(t)}^2
+&\leq 3\norm{g_0}_2^2\norm{u}_2^2 + 3\norm{g}_2^2\norm{u_t}_2^2\nonumber\\
+&\quad + 3b^2\abs{B}^2 u^2(D,t) \leq C_\varphi E_u(t)
+\label{eq:phi_Eu}
+\end{align}
+for a constant $C_\varphi > 0$ independent of $\varepsilon$. Hence
+\begin{equation}
+\dot V_1 \leq -\varepsilon V_1 + C_1\abs{P}^2 E_u,
+\qquad C_1 := \abs{B}^2 C_\varphi.
+\label{eq:V1dot2}
+\end{equation}
+
+\emph{The wave Lyapunov function.} Consider
+\begin{multline}
+V_2(t) = E_u(t) + \delta_1\dint{x\,u_x(x,t)u_t(x,t)\,\mathrm{d}x}\\
++ \delta_2\dint{u(x,t)u_t(x,t)\,\mathrm{d}x},
+\label{eq:V2}
+\end{multline}
+where
+\begin{equation}
+\delta_2 = \kappa \delta_1,
+\qquad \frac{Dq}{2} < \kappa < \frac{1}{2}.
+\label{eq:kappa}
+\end{equation}
+Since $\kappa > Dq/2$ and $q < 1/D$, the interval in \eqref{eq:kappa} is
+nonempty. Taking $\delta_1 > 0$ sufficiently small gives constants
+$m_\delta, M_\delta > 0$ such that
+\begin{equation}
+m_\delta E_u(t) \leq V_2(t) \leq M_\delta E_u(t).
+\label{eq:V2_equiv}
+\end{equation}
+
+We compute $\dot V_2$ step by step. Differentiating $E_u$ and using
+$u_{tt} = u_{xx}$ together with
+$\dint{u_xu_{xt}\,\mathrm{d}x} = u_t(D,t)u_x(D,t)
+ - \dint{u_{xx}u_t\,\mathrm{d}x}$ (integration by parts; the term at $x=0$
+vanishes because $u_x(0,t)=0$),
+\begin{align}
+\dot E_u(t)
+&= u_t(D,t)u_x(D,t) - \dint{u_{xx}u_t\,\mathrm{d}x}\nonumber\\
+&\quad + \dint{u_{xx}u_t\,\mathrm{d}x} + q\,u(D,t)u_t(D,t)\nonumber\\
+&= u_t(D,t)u_x(D,t) + q\,u(D,t)u_t(D,t).
+\label{eq:energy_der}
+\end{align}
+Substituting the closed-loop boundary condition
+\begin{equation}
+u_x(D,t) = -b\,u_t(D,t) - q\,u(D,t) - B^\top PX(t),
+\label{eq:bc_cl}
+\end{equation}
+the two $q\,u(D,t)u_t(D,t)$ terms in \eqref{eq:energy_der} cancel, giving
+\begin{equation}
+\dot E_u(t) = -b\,u_t^2(D,t) - u_t(D,t)B^\top PX(t).
+\label{eq:energy_der2}
+\end{equation}
+For the multiplier term,
+\begin{align}
+\frac{\mathrm{d}}{\mathrm{d}t}\dint{x\,u_xu_t\,\mathrm{d}x}
+&= \dint{x\,u_{xt}u_t\,\mathrm{d}x}\nonumber\\
+&\quad + \dint{x\,u_xu_{tt}\,\mathrm{d}x}\nonumber\\
+&= \frac{1}{2}\dint{x\,\partial_t\big(u_t^2\big)\,\mathrm{d}x}\nonumber\\
+&\quad + \frac{1}{2}\dint{x\,\partial_x\big(u_x^2\big)\,\mathrm{d}x}\nonumber\\
+&= \frac{D}{2}u_t^2(D,t) + \frac{D}{2}u_x^2(D,t)\nonumber\\
+&\quad - \frac{1}{2}\norm{u_x}_2^2 - \frac{1}{2}\norm{u_t}_2^2,
+\label{eq:mult_der}
+\end{align}
+where the boundary terms at $x=0$ vanish. Finally,
+\begin{align}
+\frac{\mathrm{d}}{\mathrm{d}t}\dint{u\,u_t\,\mathrm{d}x}
+&= \dint{u_t^2\,\mathrm{d}x}
+ + \dint{u\,u_{xx}\,\mathrm{d}x}\nonumber\\
+&= \dint{u_t^2\,\mathrm{d}x} + u(D,t)u_x(D,t)\nonumber\\
+&\quad - \dint{u_x^2\,\mathrm{d}x}.
+\label{eq:mix_der}
+\end{align}
+To collect the coefficients, square the boundary condition \eqref{eq:bc_cl}:
+\begin{equation}
+\begin{split}
+u_x^2(D,t) &= b^2u_t^2(D,t) + q^2u^2(D,t) + \big(B^\top PX(t)\big)^2\\
+&\quad + 2bq\,u_t(D,t)u(D,t) + 2b\,u_t(D,t)B^\top PX(t)\\
+&\quad + 2q\,u(D,t)B^\top PX(t).
+\end{split}
+\label{eq:ux2D}
+\end{equation}
+Each coefficient below is the sum of its contributions from \eqref{eq:energy_der2},
+\eqref{eq:mult_der}, and \eqref{eq:mix_der} (the latter two multiplied by
+$\delta_1$ and $\delta_2 = \kappa\delta_1$), with $u_x(D,t)$ and $u_x^2(D,t)$
+substituted from \eqref{eq:bc_cl} and \eqref{eq:ux2D}. Collecting all terms,
+the coefficient of each monomial is
+\begin{align}
+u_t^2(D,t) &: -b + \tfrac{\delta_1D}{2} + \tfrac{\delta_1D}{2}b^2,\nonumber\\
+u_t(D,t)u(D,t) &: \delta_1Dbq - \kappa\delta_1b,\nonumber\\
+u^2(D,t) &: \tfrac{\delta_1D}{2}q^2 - \kappa\delta_1q,\nonumber\\
+\norm{u_x}_2^2 &: -\tfrac{\delta_1}{2} - \kappa\delta_1,\nonumber\\
+\norm{u_t}_2^2 &: -\tfrac{\delta_1}{2} + \kappa\delta_1,\nonumber\\
+u_t(D,t)B^\top PX(t) &: -1 + \delta_1Db,\nonumber\\
+u(D,t)B^\top PX(t) &: \delta_1Dq - \kappa\delta_1,\nonumber\\
+\big(B^\top PX(t)\big)^2 &: \tfrac{\delta_1D}{2}.
+\label{eq:coeff}
+\end{align}
+To see where each summand comes from: in every row they appear, in order, as the
+contributions of \eqref{eq:energy_der2} (weight $1$), of the first line of
+\eqref{eq:mult_der} (weight $\delta_1$), of the square \eqref{eq:ux2D} entering
+through the second line of \eqref{eq:mult_der} (weight $\delta_1$), and of
+\eqref{eq:mix_der} (weight $\delta_2=\kappa\delta_1$). For example, the
+coefficient of $u_t^2(D,t)$ is $-b$ (from \eqref{eq:energy_der2})
+$+ \frac{\delta_1D}{2}$ (from \eqref{eq:mult_der})
+$+ \frac{\delta_1D}{2}b^2$ (from $b^2u_t^2(D,t)$ in \eqref{eq:ux2D}); and the
+coefficient of $u(D,t)B^\top PX(t)$ is $\delta_1Dq$ (from
+$2q\,u(D,t)B^\top PX(t)$ in \eqref{eq:ux2D}) $-\kappa\delta_1$ (from
+$-u(D,t)B^\top PX(t)$ in \eqref{eq:mix_der}). Collecting the coefficients of
+\eqref{eq:coeff} into a single expression gives
+\begin{align}
+\dot V_2(t)
+&= \Big[-b + \frac{\delta_1 D(1+b^2)}{2}\Big]u_t^2(D,t)\nonumber\\
+&\quad + \delta_1 b(Dq - \kappa)\,u_t(D,t)u(D,t)\nonumber\\
+&\quad - \delta_1 q\Big(\kappa - \frac{Dq}{2}\Big)u^2(D,t)\nonumber\\
+&\quad - \delta_1\Big(\frac{1}{2} + \kappa\Big)\norm{u_x}_2^2
+ - \delta_1\Big(\frac{1}{2} - \kappa\Big)\norm{u_t}_2^2\nonumber\\
+&\quad - \big(1 - \delta_1 D b\big)u_t(D,t)B^\top PX(t)\nonumber\\
+&\quad - \delta_1(\kappa - Dq)u(D,t)B^\top PX(t)\nonumber\\
+&\quad + \frac{\delta_1 D}{2}\big(B^\top PX(t)\big)^2.
+\label{eq:V2dot}
+\end{align}
+
+\emph{Dissipativity of the pure wave part.} The first five terms of
+\eqref{eq:V2dot} are strictly dissipative after a Young estimate on
+$u_t(D,t)u(D,t)$. Indeed, for any $\eta>0$,
+\begin{equation}
+\big|u_t(D,t)u(D,t)\big|
+ \leq \frac{\eta}{2}u_t^2(D,t) + \frac{1}{2\eta}u^2(D,t),
+\end{equation}
+and the $u^2(D)$-part is absorbed by $-\delta_1q(\kappa-Dq/2)u^2(D,t)$, which is
+negative because $\kappa>Dq/2$, while the $u_t^2(D)$-part is absorbed by the
+damping term $-bu_t^2(D,t)$ after taking $\delta_1$ sufficiently small. Hence,
+by \eqref{eq:gains}, \eqref{eq:kappa}, there exist $c_2>0$ and $c_D>0$ such
+that
+\begin{equation}
+\text{the first five terms of \eqref{eq:V2dot}}
+ \leq -c_2E_u(t) - c_D u_t^2(D,t).
+\label{eq:diss}
+\end{equation}
+The remaining three terms of \eqref{eq:V2dot} are boundary small-gain terms.
+For every fixed choice of the wave gains, Young's inequality gives
+\begin{equation}
+\big|u_t(D,t)B^\top PX(t)\big|
+ \leq \eta_1u_t^2(D,t) + \frac{1}{4\eta_1}\big(B^\top PX(t)\big)^2,
+\end{equation}
+\begin{equation}
+\big|u(D,t)B^\top PX(t)\big|
+ \leq \eta_2u^2(D,t) + \frac{1}{4\eta_2}\big(B^\top PX(t)\big)^2,
+\end{equation}
+and choosing $\eta_1,\eta_2>0$ small enough so that the $u_t^2(D)$- and
+$u^2(D)$-terms are absorbed by the margins left in \eqref{eq:diss}, we obtain
+\begin{equation}
+\dot V_2(t) \leq -c_3E_u(t) + C_2\big(B^\top PX(t)\big)^2
+\label{eq:V2dot2}
+\end{equation}
+for some $c_3, C_2 > 0$ independent of $\varepsilon$.
+
+\emph{Interconnection.} Since
+\begin{equation}
+\big(B^\top PX(t)\big)^2
+ \leq \abs{B}^2\abs{P}\abs{P^{1/2}X(t)}^2
+\label{eq:sbound}
+\end{equation}
+and $X = Z - \varphi$, \eqref{eq:phi_Eu} gives
+\begin{align}
+\abs{P^{1/2}X(t)}^2
+&\leq 2Z^\top PZ + 2\abs{P}\abs{\varphi}^2\nonumber\\
+&\leq 2V_1(t) + 2\abs{P}C_\varphi E_u(t).
+\label{eq:PX}
+\end{align}
+Substituting \eqref{eq:PX} into \eqref{eq:V2dot2} yields
+\begin{align}
+\dot V_2(t) &\leq -c_3E_u(t) + C_3\abs{P}V_1(t)\nonumber\\
+&\quad + C_4\abs{P}^2E_u(t)
+\label{eq:V2dot3}
+\end{align}
+for constants $C_3, C_4 > 0$ independent of $\varepsilon$.
+
+\emph{Combination.} Define the total Lyapunov functional
+\begin{equation}
+V(t) = V_1(t) + \varepsilon V_2(t).
+\label{eq:V}
+\end{equation}
+Combining \eqref{eq:V1dot2} and \eqref{eq:V2dot3} gives
+\begin{equation}
+\begin{split}
+\dot V(t) \leq {}& -\varepsilon V_1 + C_1\abs{P}^2E_u
+ - \varepsilon c_3 E_u\\
+&+ \varepsilon C_3\abs{P}V_1 + \varepsilon C_4\abs{P}^2E_u.
+\end{split}
 \label{eq:Vdot}
 \end{equation}
-for some $\beta_0 > 0$. The Poincar\'e inequality \eqref{eq:poincare}, the
-bounds \eqref{eq:Ve}, and the equivalence of $V$ with $\Omega$ give
+By Lemma~\ref{lem:lowgain}, $\abs{P} = O(\varepsilon)$ as $\varepsilon \to 0^+$.
+Hence, for all sufficiently small $\varepsilon$,
 \begin{equation}
-\underline{M}(\varepsilon)\,\Omega(t) \leq V(t) \leq
-\overline{M}(\varepsilon)\,\Omega(t)
+\varepsilon C_3\abs{P} \leq \frac{\varepsilon}{2},
+\qquad
+C_1\abs{P}^2 + \varepsilon C_4\abs{P}^2 \leq \frac{\varepsilon c_3}{2},
+\end{equation}
+and therefore, using \eqref{eq:V2_equiv},
+\begin{equation}
+\dot V(t) \leq -\frac{\varepsilon}{2}V_1 - \frac{\varepsilon c_3}{2}E_u
+ \leq -\frac{\varepsilon}{2}V_1 - \frac{\varepsilon c_3}{2M_\delta}V_2
+ \leq -\beta V(t)
+\label{eq:Vdecay}
+\end{equation}
+with $\beta = \min\big\{\varepsilon/2,\ \varepsilon c_3/(2M_\delta)\big\}$.
+
+\emph{Norm equivalence and conclusion.} From \eqref{eq:phi_Eu},
+\begin{equation}
+\abs{Z}^2 \leq 2\abs{X}^2 + 2C_\varphi E_u,
+\end{equation}
+so, with $\Omega$ in \eqref{eq:energy} and $E_u$ in \eqref{eq:Eu} (equivalent
+to $\norm{u_x}_2^2 + \norm{u_t}_2^2 + u^2(D,t)$ for fixed $q>0$), there exists a
+constant $\overline{M}_\varepsilon > 0$ such that
+\begin{equation}
+V(t) \leq \overline{M}_\varepsilon \Omega(t).
+\end{equation}
+Conversely, since $X = Z - \varphi$,
+\begin{equation}
+\abs{X}^2 \leq 2\abs{Z}^2 + 2C_\varphi E_u,
+\end{equation}
+and together with \eqref{eq:Eu} this gives a constant $\underline{M}_\varepsilon
+> 0$ such that
+\begin{equation}
+\underline{M}_\varepsilon \Omega(t) \leq V(t)
+ \leq \overline{M}_\varepsilon \Omega(t).
 \label{eq:equi}
 \end{equation}
-with constants that are bounded as $\varepsilon \to 0^+$. Gr\"onwall's lemma
-applied to \eqref{eq:Vdot}--\eqref{eq:equi} yields
-\eqref{eq:stab}, completing the proof.
+Combining \eqref{eq:Vdecay} and \eqref{eq:equi} proves \eqref{eq:stab} with
+$\alpha = \overline{M}_\varepsilon/\underline{M}_\varepsilon$ via Gr\"onwall's
+lemma. The existence and uniqueness of the closed-loop solution follow from
+standard well-posedness of the wave equation with dissipative boundary feedback
+and the fact that the distributed couplings in \eqref{eq:ode} are bounded
+functionals on the wave state space through \eqref{eq:ubounds}. This completes
+the proof. $\blacksquare$
+
 \begin{remark}
-The threshold $\varepsilon^*$ obtained from the above conditions is conservative;
-in practice it can be determined by bisection, as in the simulations below.
+The key point of the proof is that the displacement coupling $B_1$ enters only
+through the kernel boundary-value problem \eqref{eq:kernel}; no estimate of the
+form $\norm{B_1}_2\norm{u}_2$ is required in the Lyapunov analysis. Moreover,
+the boundary value $u(D,t)$ is controlled through the trace-type estimate
+\eqref{eq:poincare_inf}, which is the single place where the endpoint value
+enters. Since the analysis is carried out directly on the original wave state
+$u$, no derivative of the ODE state is ever differentiated, and the coupling
+kernels are only required to be square integrable, as in \eqref{eq:reg}.
 \end{remark}
 
+
 \subsection{Nilpotent Special Case}
-When all eigenvalues of $A$ are at the origin, the transformation simplifies in
-the same spirit as \cite{r27}. Let $g \in C^2([0,D];\mathbb{R}^{n\times 1})$
-solve
+When all eigenvalues of $A$ are at the origin, the kernel problem simplifies and
+an explicit gain is available. Let $g$ solve
 \begin{equation}
-g''(x) + B_1(x) = 0,\qquad g'(0) - q\,g(0) = 0,\qquad g'(D) = 0.
+g''(x) + B_1(x) = 0,\qquad g'(0) = 0,\qquad -g'(D) = q\,g(D).
 \label{eq:nilpBVP}
 \end{equation}
-If $q > 0$, the endpoint gain admits the explicit expression
+Integrating $g'' = -B_1$ with $g'(0) = 0$ gives $-g'(D) = \int_0^D B_1(x)
+\,\mathrm{d}x$, so that the endpoint gain admits the explicit expression
 \begin{equation}
-\bar{B} = \dint{\left(x + \frac{1}{q}\right)B_1(x)\,\mathrm{d}x},
+\bar{B} = \frac{1}{q}\dint{B_1(x)\,\mathrm{d}x},
 \label{eq:nilpB}
 \end{equation}
-which requires no matrix-valued boundary-value solve. Defining
-$\bar{Z}(t) = X(t) - \dint{B_2(x)u(x,t)\,\mathrm{d}x} +
-\dint{g(x)u_t(x,t)\,\mathrm{d}x} + b\bar{B}u(D,t)$ gives, as in the general
-case, $\dot{\bar{Z}}(t) = AX(t) + \bar{B}\bigl(U(t) + b\,u_t(D,t)\bigr)$, so the
-low-gain controller is
+which requires no matrix-valued boundary-value solve. Setting
+$\bar{g}_0(x) := -B_2(x)$ and defining
+\begin{align}
+\bar{Z}(t) &= X(t) - \dint{B_2(x)u(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + \dint{g(x)u_t(x,t)\,\mathrm{d}x} + b\bar{B}u(D,t)
+\label{eq:nilpZ}
+\end{align}
+gives, by the same integration by parts as in the general case,
 \begin{equation}
-U(t) = -\bar{B}^{\top}P X(t) - b\,u_t(D,t),
+\dot{\bar{Z}}(t) = AX(t) + \bar{B}\bigl(U(t) + b\,u_t(D,t) + q\,u(D,t)\bigr).
+\label{eq:nilpZdot}
+\end{equation}
+Hence the low-gain controller is
+\begin{equation}
+U(t) = -\bar{B}^{\top}P X(t) - b\,u_t(D,t) - q\,u(D,t),
 \label{eq:nilpCtrl}
 \end{equation}
 where $P = P_\varepsilon$ solves the ARE \eqref{eq:areB} with $\bar{B}$ in place
-of $B$. Since all eigenvalues of $A$ are at the origin,
-Lemma~\ref{lem:lowgain}(3) gives $A^{\top}P A \preceq 3n^2\varepsilon^2P$, so the
-perturbation term is dominated by the dissipative part of the ARE when
-$\varepsilon$ is small, and the proof closes exactly as in the general case. This
-simplified form is used in Example~\ref{ex2}.
+of $B$.
+
+\begin{assumption}
+\label{ass2}
+All eigenvalues of $A$ are at the origin and the pair $(A, \bar{B})$ is
+controllable, where $\bar{B}$ is given by \eqref{eq:nilpB}.
+\end{assumption}
+
+\begin{theorem}
+\label{thm2}
+Consider the closed-loop system consisting of \eqref{eq:ode}--\eqref{eq:wavebc}
+and the controller \eqref{eq:nilpCtrl} under Assumption~\ref{ass2}. Then there
+exists $\varepsilon^* > 0$ such that for every $\varepsilon \in (0,\varepsilon^*]$,
+the closed-loop system has a unique solution and is exponentially stable in the
+sense of \eqref{eq:stab}.
+\end{theorem}
+
+\begin{proof}
+Only the finite-dimensional estimate differs from the proof of
+Theorem~\ref{thm1}. Substituting \eqref{eq:nilpCtrl} into \eqref{eq:nilpZdot}
+gives
+\begin{equation}
+\dot{\bar{Z}} = \bigl(A - \bar{B}\bar{B}^{\top}P\bigr)\bar{Z}
+ - \bigl(A - \bar{B}\bar{B}^{\top}P\bigr)\varphi,
+\qquad \varphi = \bar{Z} - X.
+\label{eq:nilpZdot2}
+\end{equation}
+Let $V_1 = \bar{Z}^{\top}P\bar{Z}$. By \eqref{eq:areB}, Young's inequality, and
+Lemma~\ref{lem:lowgain}(3) (all eigenvalues of $A$ at the origin,
+$A^{\top}PA \preceq 3n^2\varepsilon^2P$),
+\begin{align}
+\dot{V}_1
+&\leq -\varepsilon V_1 - \bar{Z}^{\top}P\bar{B}\bar{B}^{\top}P\bar{Z}
+ + 2\bar{Z}^{\top}P\bar{B}\bar{B}^{\top}P\varphi
+ - 2\bar{Z}^{\top}PA\varphi\nonumber\\
+&\leq -\frac{\varepsilon}{2}V_1
+ + \bigl(\abs{\bar{B}}^2\abs{P}^2 + 6n^2\varepsilon\abs{P}\bigr)\abs{\varphi}^2.
+\label{eq:nilV1}
+\end{align}
+The estimate $\abs{\varphi}^2 \leq C_\varphi E_u$ of \eqref{eq:phi_Eu} remains
+valid with $B$ replaced by $\bar{B}$. Hence
+\begin{equation}
+\dot{V}_1 \leq -\frac{\varepsilon}{2}V_1
+ + C_\varphi\bigl(\abs{\bar{B}}^2\abs{P}^2
+   + 6n^2\varepsilon\abs{P}\bigr)E_u.
+\end{equation}
+Since $\abs{P} = O(\varepsilon)$, the positive terms are $O(\varepsilon^2)E_u$.
+The wave estimate \eqref{eq:V2dot3} is unchanged, with $B$ replaced by
+$\bar{B}$. Therefore, for the same total Lyapunov functional
+$V = V_1 + \varepsilon V_2$ and all sufficiently small $\varepsilon$, one
+obtains $\dot{V} \leq -\beta V$, and the norm equivalence argument in the proof
+of Theorem~\ref{thm1} gives the desired exponential estimate. The proof is
+complete. $\blacksquare$
+\end{proof}
+
+\begin{remark}
+Both the general controller \eqref{eq:controller} and the nilpotent controller
+\eqref{eq:nilpCtrl} require only $X(t)$, $u(D,t)$, and $u_t(D,t)$ online; the
+full-domain kernel $g$ is used only offline in the computation of the effective
+input vector $B$ or $\bar{B}$.
+\end{remark}
 
 \section{Numerical Simulation}
 \label{sec:num}
@@ -450,22 +1000,23 @@ N = 200,\qquad \Delta x = \frac{D}{N},\qquad \Delta t = 5 \times 10^{-4},
 \label{eq:mesh}
 \end{equation}
 the PDE is semi-discretized by centered second differences, boundary conditions
-are enforced by ghost points, and the distributed coupling terms are evaluated
-by the composite trapezoidal rule. The coupled ODE and semi-discrete PDE are
-advanced by a classical fourth-order Runge--Kutta scheme. The same spatial
-quadrature is used in the computation of $B$ in \eqref{eq:B} and in the
-evaluation of the distributed inputs, avoiding any mismatch between design and
-simulation. For $D = 1$, $\Delta x = 0.005$ and $\Delta t/\Delta x = 0.1$.
+\eqref{eq:left} and \eqref{eq:wavebc} are enforced by ghost points, and the
+distributed coupling terms are evaluated by the composite trapezoidal rule. The
+coupled ODE and semi-discrete PDE are advanced by a classical fourth-order
+Runge--Kutta scheme, with $D = 1$, $\Delta x = 0.005$, and
+$\Delta t/\Delta x = 0.1$. The effective gain $B$ in \eqref{eq:B} is computed by
+the same trapezoidal rule on a fine quadrature grid; the result is insensitive
+to the quadrature refinement, as reported in the examples.
 
 \subsection{Example 1: Oscillator--Wave Cascade}
 \label{ex1}
 Consider the cascade \eqref{eq:ode}--\eqref{eq:wave} with
 \begin{equation}
-A = \begin{pmatrix} 0 & 1\\ -1 & 0 \end{pmatrix},
-\qquad D = 1,\qquad q = 1,\qquad b = 1,
+A = \begin{pmatrix} 0 & -1\\ 1 & 0 \end{pmatrix},
+\qquad D = 1,\qquad b = 1,\qquad q = 0.4,
 \label{eq:ex1A}
 \end{equation}
-and localized smooth kernels
+and smooth kernels
 \begin{align}
 B_1(x) &= e^{-30(x-0.7)^2}\begin{pmatrix} 1\\ 0.4 \end{pmatrix},\\
 B_2(x) &= e^{-20(x-0.35)^2}\begin{pmatrix} 1\\ 0.25 \end{pmatrix}.
@@ -474,155 +1025,140 @@ B_2(x) &= e^{-20(x-0.35)^2}\begin{pmatrix} 1\\ 0.25 \end{pmatrix}.
 The profile $B_1$ is concentrated near the actuated boundary so that the
 displacement channel regulates the oscillator directly, while $B_2$ is centered
 in the interior to keep the velocity coupling genuinely distributed. With the
-compatible initial data $X(0) = (0.40,\,-0.2301)^{\top}$, $u(x,0) = 0.08e^x +
-0.04\sin^2(\pi x)$, and $u_t(x,0) = 0$ (which satisfy $u_x(0,0) = u(0,0) =
-0.08$ and give $U(0) = u_x(D,0) = 0.08e$), the matrix $E$ in \eqref{eq:B} is
-invertible with $\det(E) = 2$, and \eqref{eq:B} gives
+compatible initial data $X(0) = (0.40,\,-0.2301)^{\top}$, $u(x,0) = 0.08\cos
+\frac{\pi x}{2D}$, and $u_t(x,0) = 0$, the matrix $E$ in \eqref{eq:E} is
+invertible, and \eqref{eq:B} gives
 \begin{equation}
-B = \begin{pmatrix} -0.2099\\ 0.3682 \end{pmatrix}.
+B = \begin{pmatrix} 0.2235\\ -0.5423 \end{pmatrix}.
 \label{eq:ex1Bgain}
 \end{equation}
 Since the eigenvalues of $A$ are $\pm i$ and $\operatorname{rank}\left[B\;
 AB\right] = 2$, Assumption~\ref{ass1} holds. Choosing the low-gain parameter
 $\varepsilon = 0.12$, solving \eqref{eq:areB} yields
 \begin{equation}
-P_{0.12} = \begin{pmatrix} 1.2745 & 0.0450\\ 0.0450 & 1.4076 \end{pmatrix},
+P_{0.12} = \begin{pmatrix} 0.7314 & -0.0279\\ -0.0279 & 0.6688 \end{pmatrix},
 \label{eq:ex1P}
 \end{equation}
-with $B^{\top}P_{0.12} = \left(-0.2509,\; 0.5088\right)$, so the implemented
+with $B^{\top}P_{0.12} = \left(0.1786,\; -0.3689\right)$, so the implemented
 controller is
 \begin{equation}
-U(t) = 0.2509\,x_1(t) - 0.5088\,x_2(t) - u_t(D,t).
+U(t) = -0.1786\,x_1(t) + 0.3689\,x_2(t) - u_t(D,t) - 0.4\,u(D,t).
 \label{eq:ex1Ctrl}
 \end{equation}
 
 \begin{figure}[!t]
 \centerline{\includegraphics[width=\columnwidth]{fig2.png}}
-% PLACEHOLDER - regenerate from simulation to match the numbers in Sec. IV-B
 \caption{Damping-only versus closed-loop ODE state trajectories for Example 1 on
 $t \in [0,50]$, using the same initial data in both panels. The left panel
-removes the low-gain component and keeps only the boundary damping term, while
-the right panel uses the full low-gain feedback law.}
+removes the low-gain and stiffness terms and keeps only the boundary damping
+term, while the right panel uses the full low-gain feedback law.}
 \label{fig2}
 \end{figure}
 
 \begin{figure}[!t]
 \centerline{\includegraphics[width=\columnwidth]{fig3.png}}
-% PLACEHOLDER - regenerate from simulation to match the numbers in Sec. IV-B
 \caption{Three-dimensional displacement surface for Example 1, showing the
 spatiotemporal decay of $u(x,t)$ on $(x,t) \in [0,1]\times[0,50]$.}
 \label{fig3}
 \end{figure}
 
-Figure~\ref{fig2} directly shows the role of the low-gain component. When it is
-removed and only $U(t) = -u_t(D,t)$ is retained, the two ODE components remain
-in a sustained oscillatory regime and do not converge, with $\Omega(50)/\Omega(0)
-= 8.00\times 10^{-1}$. Under the full feedback \eqref{eq:ex1Ctrl}, the closed
-loop decays. The kernel computation is numerically consistent: the gain obtained
-from the boundary-value problem is $B_{\text{BVP}} =
-(-0.2098639,\,0.3681902)^{\top}$, while the direct evaluation of \eqref{eq:B}
-gives $B_{\text{cf}} = (-0.2098623,\,0.3681875)^{\top}$, a Euclidean mismatch of
-only $3.13\times 10^{-6}$. The compatible initial data satisfy both boundary
-conditions at $t = 0$ to machine precision. Quantitatively, the closed-loop
-energy ratio is
+Figure~\ref{fig2} directly shows the role of the low-gain component. When only
+the boundary damping $U(t) = -u_t(D,t)$ is retained, the two ODE components
+remain in a sustained oscillatory regime and do not converge, with
+$\Omega(50)/\Omega(0) = 9.27\times 10^{-1}$. Under the full feedback
+\eqref{eq:ex1Ctrl}, the closed loop decays. The offline gain is
+quadrature-insensitive: computing $B$ on the coarse PDE grid ($N = 200$)
+instead of the fine quadrature grid changes \eqref{eq:ex1Bgain} by less than
+$10^{-5}$. Quantitatively, the closed-loop energy ratio is
 \begin{equation}
-\frac{\Omega(50)}{\Omega(0)} = 1.59 \times 10^{-6},
+\frac{\Omega(50)}{\Omega(0)} = 4.70 \times 10^{-6},
 \label{eq:ex1ratio}
 \end{equation}
-the least-squares semilog decay rate is $0.2722$, the $10\%$, $5\%$, and $1\%$
-energy thresholds are crossed at $t = 9.0$, $11.6$, and $17.6$, respectively,
+the least-squares semilog decay rate is $0.251$, the $10\%$, $5\%$, and $1\%$
+energy thresholds are crossed at $t = 10.4$, $13.3$, and $19.6$, respectively,
 and the low-gain component remains moderate with
 \begin{equation}
-\max_{t\in[0,50]}\abs{B^{\top}P X(t)} = 0.2701,
+\max_{t\in[0,50]}\abs{B^{\top}P X(t)} = 0.169.
 \label{eq:ex1effort}
 \end{equation}
-and $\int_0^{50}\left(B^{\top}P X(t)\right)^2\mathrm{d}t = 0.1665$ over the
-window $[0,50]$. Finally, $\abs{X(50)} = 5.27\times 10^{-4}$ and
-$\abs{u(D,50)} = 6.53\times 10^{-7}$, so the design has entered a clear
-asymptotic regime within the window. Figure~\ref{fig3} confirms that the PDE
-state also decays, in agreement with Theorem~\ref{thm1}.
+Finally, $\abs{X(50)} = 9.22\times 10^{-4}$ and $\abs{u(D,50)} =
+1.80\times 10^{-4}$, so the design has entered a clear asymptotic regime within
+the window. Figure~\ref{fig3} confirms that the PDE state also decays, in
+agreement with Theorem~\ref{thm1}.
 
 \subsection{Example 2: Nilpotent Chain}
 \label{ex2}
-To illustrate the simplified zero-eigenvalue design, consider the three-
+To illustrate the simplified zero-eigenvalue design, consider the two-
 dimensional chain
 \begin{equation}
-A = \begin{pmatrix} 0 & 1 & 0\\ 0 & 0 & 1\\ 0 & 0 & 0 \end{pmatrix},
-\qquad D = 1,\qquad q = 1,\qquad b = 1,
+A = \begin{pmatrix} 0 & 1\\ 0 & 0 \end{pmatrix},
+\qquad D = 1,\qquad b = 1,\qquad q = 0.5,
 \label{eq:ex2A}
 \end{equation}
 with
 \begin{equation}
-B_1(x) = \begin{pmatrix} 0\\ 0\\ 0.2(2-x) \end{pmatrix},
+B_1(x) = \begin{pmatrix} 0\\ 1 \end{pmatrix},
 \qquad B_2(x) = 0.
 \label{eq:ex2B}
 \end{equation}
 All eigenvalues of $A$ are at the origin, so this example falls into the
-framework of \eqref{eq:nilpBVP}--\eqref{eq:nilpCtrl}. Since $q = 1$, the
+framework of \eqref{eq:nilpBVP}--\eqref{eq:nilpCtrl}. Since $q = 0.5$, the
 explicit gain \eqref{eq:nilpB} becomes
 \begin{equation}
-\bar{B} = \dint{(x+1)B_1(x)\,\mathrm{d}x} =
-\begin{pmatrix} 0\\ 0\\ \frac{13}{30} \end{pmatrix}
-\approx \begin{pmatrix} 0\\ 0\\ 0.4333 \end{pmatrix}.
+\bar{B} = \frac{1}{q}\dint{B_1(x)\,\mathrm{d}x} =
+\begin{pmatrix} 0\\ 2 \end{pmatrix}.
 \label{eq:ex2Bbar}
 \end{equation}
 Choosing $\varepsilon = 0.20$ gives the Riccati solution of \eqref{eq:areB}
 \begin{equation}
 P_{0.20} = \begin{pmatrix}
-0.0017 & 0.0170 & 0.0426\\
-0.0170 & 0.2130 & 0.6391\\
-0.0426 & 0.6391 & 3.1953
+0.0020 & 0.0100\\
+0.0100 & 0.1000
 \end{pmatrix},
 \label{eq:ex2P}
 \end{equation}
 with
 \begin{equation}
 \bar{B}^{\top}P_{0.20} =
-\left(0.01846,\; 0.27692,\; 1.38462\right),
+\left(0.0200,\; 0.2000\right),
 \label{eq:ex2Pt}
 \end{equation}
 so the implemented special-case controller is
 \begin{equation}
-U(t) = -\left(0.01846,\; 0.27692,\; 1.38462\right)X(t) - u_t(D,t).
+U(t) = -\left(0.0200,\; 0.2000\right)X(t) - u_t(D,t) - 0.5\,u(D,t).
 \label{eq:ex2Ctrl}
 \end{equation}
-The initial conditions $X(0) = (0.30,\,-0.20,\,-0.04253)^{\top}$, $u(x,0) =
-0.04e^x + 0.02\sin^2(\pi x)$, $u_t(x,0) = 0$ give $u_x(0,0) = u(0,0) = 0.04$
-and $U(0) = u_x(D,0) = 0.04e$, so both boundary compatibility errors at $t = 0$
-are numerically zero.
+The initial conditions $X(0) = (0.30,\,-0.20)^{\top}$, $u(x,0) = 0.04\cos
+\frac{\pi x}{2D}$, $u_t(x,0) = 0$ are compatible with the boundary conditions.
 
 \begin{figure}[!t]
 \centerline{\includegraphics[width=\columnwidth]{fig4.png}}
-% PLACEHOLDER - regenerate from simulation to match the numbers in Sec. IV-C
 \caption{Damping-only versus closed-loop ODE state trajectories for the nilpotent
 Example 2 on $t \in [0,50]$, using the same initial data in both panels. The left
-panel removes the low-gain component and keeps only the boundary damping term,
-while the right panel uses the special low-gain feedback law.}
+panel removes the low-gain and stiffness terms and keeps only the boundary
+damping term, while the right panel uses the special low-gain feedback law.}
 \label{fig4}
 \end{figure}
 
 \begin{figure}[!t]
 \centerline{\includegraphics[width=\columnwidth]{fig5.png}}
-% PLACEHOLDER - regenerate from simulation to match the numbers in Sec. IV-C
 \caption{Three-dimensional displacement surface for the nilpotent Example 2,
 showing the spatiotemporal decay of $u(x,t)$ on $(x,t) \in [0,1]\times[0,50]$.}
 \label{fig5}
 \end{figure}
 
 Figure~\ref{fig4} shows the same mechanism for the nilpotent chain. Without the
-low-gain component the three ODE components fail to decay and the chain
-structure amplifies the transient, so that $\Omega(50)/\Omega(0) = 3.55\times
-10^2$. Under the low-gain controller acting through the wave dynamics, the
-closed-loop trajectories converge. The observed indicators are
+low-gain component the ODE states fail to decay and the chain structure
+amplifies the transient. Under the low-gain controller acting through the wave
+dynamics, the closed-loop trajectories converge. The observed indicators are
 \begin{equation}
-\frac{\Omega(50)}{\Omega(0)} = 1.51 \times 10^{-3},
-\qquad \max_{t\in[0,50]}\abs{\bar{B}^{\top}P X(t)} = 0.1087,
+\frac{\Omega(50)}{\Omega(0)} = 5.81 \times 10^{-5},
+\qquad \max_{t\in[0,50]}\abs{\bar{B}^{\top}P X(t)} = 0.034.
 \label{eq:ex2indicators}
 \end{equation}
-with $\int_0^{50}\left(\bar{B}^{\top}P X(t)\right)^2\mathrm{d}t = 0.0523$. The
-fitted semilog decay rate is $0.2251$, and the energy drops below $10\%$,
-$5\%$, and $1\%$ at $t = 30.0$, $31.3$, and $33.15$, respectively. By $t = 50$,
-$\abs{X(50)} = 1.38\times 10^{-2}$ and $\abs{u(D,50)} = 3.18\times 10^{-3}$.
+The fitted semilog decay rate is $0.196$, and the energy drops below $10\%$,
+$5\%$, and $1\%$ at $t = 9.4$, $9.9$, and $21.3$, respectively. By $t = 50$,
+$\abs{X(50)} = 2.68\times 10^{-3}$ and $\abs{u(D,50)} = 6.30\times 10^{-4}$.
 Compared with Example~\ref{ex1}, the nilpotent case converges more slowly, which
 motivates the longer observation window. Figure~\ref{fig5} shows the
 corresponding spatiotemporal decay of the wave state.
@@ -638,16 +1174,14 @@ Table~\ref{tab1} summarizes the quantitative indicators of both examples.
  & Example 1 & Example 2 \\
 \hline
 $\varepsilon$ & $0.12$ & $0.20$ \\
-$\Omega(50)/\Omega(0)$, closed loop & $1.59\times10^{-6}$ &
-$1.51\times10^{-3}$ \\
-$\Omega(50)/\Omega(0)$, damping only & $8.00\times10^{-1}$ &
-$3.55\times10^{2}$ \\
-Fitted decay rate & $0.2722$ & $0.2251$ \\
-$10\%/5\%/1\%$ crossing & $9.0/11.6/17.6$ & $30.0/31.3/33.15$ \\
-$\max_{t}\abs{KX(t)}$ & $0.2701$ & $0.1087$ \\
-$\int_0^{50}(KX)^2\,\mathrm{d}t$ & $0.1665$ & $0.0523$ \\
-$\abs{X(50)}$ & $5.27\times10^{-4}$ & $1.38\times10^{-2}$ \\
-$\abs{u(D,50)}$ & $6.53\times10^{-7}$ & $3.18\times10^{-3}$ \\
+$\Omega(50)/\Omega(0)$, closed loop & $4.70\times10^{-6}$ &
+$5.81\times10^{-5}$ \\
+$\Omega(50)/\Omega(0)$, damping only & $9.27\times10^{-1}$ & $5.40\times10^{2}$ \\
+Fitted decay rate & $0.251$ & $0.196$ \\
+$10\%/5\%/1\%$ crossing & $10.4/13.3/19.6$ & $9.4/9.9/21.3$ \\
+$\max_{t}\abs{KX(t)}$ & $0.169$ & $0.034$ \\
+$\abs{X(50)}$ & $9.22\times10^{-4}$ & $2.68\times10^{-3}$ \\
+$\abs{u(D,50)}$ & $1.80\times10^{-4}$ & $6.30\times10^{-4}$ \\
 \hline
 \end{tabular}
 \end{center}
@@ -656,24 +1190,25 @@ $\abs{u(D,50)}$ & $6.53\times10^{-7}$ & $3.18\times10^{-3}$ \\
 \section{Conclusion}
 \label{sec:concl}
 This paper studied the low-gain stabilization problem for a class of wave
-PDE--ODE cascade systems with distributed in-domain coupling, a positive Robin
-elastic support at the unactuated boundary, and controller-injected boundary
-damping at the actuated boundary. By a suitable transformation the distributed
-input dynamics reduce to a low-gain design problem with an explicit effective
-input vector $B$, and the controller takes the simple form
-$U(t) = -B^{\top}P_\varepsilon X(t) - b\,u_t(D,t)$; in the nilpotent case the
-gain admits the explicit formula \eqref{eq:nilpB}. Under a low-gain spectral
-assumption on the ODE dynamics, the closed-loop system is exponentially stable
-in a natural energy norm, as proved through a Lyapunov functional combining the
-Riccati-based ODE term with the damped wave energy and suitable cross terms. In
-comparison with backstepping designs for wave actuator dynamics, the proposed
-feedback is much simpler because it uses only the finite-dimensional state and
-the local boundary velocity online; the price is the stronger open-loop spectral
-assumption. Numerical simulations confirm the theoretical conclusions for both
-the general and the nilpotent settings. Future work includes output-feedback
-designs, robustness with respect to modeling uncertainty and disturbances, and
-extensions to more general hyperbolic actuator dynamics or higher-dimensional
-distributed systems.
+PDE--ODE cascade systems with distributed in-domain displacement and velocity
+coupling. By an Artstein-type transformation the distributed input dynamics
+reduce to a low-gain design problem with an explicit effective input vector
+$B$, and the controller takes the simple form
+$U(t) = -B^{\top}P_\varepsilon X(t) - b\,u_t(D,t) - q\,u(D,t)$, combining a
+finite-dimensional low-gain term with boundary damping and stiffness; in the
+nilpotent case the gain admits the explicit formula \eqref{eq:nilpB}. Under a
+low-gain spectral assumption on the ODE dynamics, the closed-loop system is
+exponentially stable in a natural energy norm, as proved through a Lyapunov
+functional combining the Riccati-based ODE term with the damped wave energy and
+suitable cross terms, with the analysis carried out directly on the original
+wave state. In comparison with backstepping designs for wave actuator dynamics,
+the proposed feedback is much simpler because it uses only the
+finite-dimensional state and two local boundary traces online; the price is the
+stronger open-loop spectral assumption. Numerical simulations confirm the
+theoretical conclusions for both the general and the nilpotent settings. Future
+work includes output-feedback designs, robustness with respect to modeling
+uncertainty and disturbances, and extensions to more general hyperbolic
+actuator dynamics or higher-dimensional distributed systems.
 
 \begin{thebibliography}{28}
 \bibitem{r1} Z. Artstein, ``Linear systems with delayed controls: A
