@@ -1,0 +1,604 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage{amsmath,amssymb,amsfonts,mathtools,bm,cite}
+\usepackage{amsthm}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{assumption}{Assumption}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\R}{\mathbb R}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\Bcal}{\mathfrak B}
+\newcommand{\Bbar}{\bar{\mathfrak B}}
+\newcommand{\Mcal}{\mathcal M}
+\newcommand{\Dcal}{\mathcal D}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\ip}[2]{\left\langle #1,#2\right\rangle}
+
+\begin{document}
+
+\title{Low-Gain Boundary Stabilization of Wave--ODE Cascade Systems With Finite-Measure Distributed Coupling}
+
+\author{Anonymous Authors\thanks{This manuscript is a research draft prepared in IEEE style.}}
+
+\markboth{IEEE Transactions on Automatic Control, Draft}{Low-Gain Boundary Stabilization of Wave--ODE Cascade Systems}
+
+\maketitle
+
+\begin{abstract}
+This paper studies low-gain boundary stabilization for a finite-dimensional linear system coupled with a one-dimensional wave equation through distributed displacement and velocity channels. The displacement coupling is allowed to be a finite vector-valued Radon measure. Hence the model includes both ordinary $L^1$ distributed couplings and point couplings represented by Dirac measures. A simple boundary feedback is designed by combining right-end damping, right-end stiffness, and a finite-dimensional low-gain term. An Artstein-type transformation converts the distributed PDE--ODE coupling into an effective input channel. Unlike auxiliary-variable proofs that lift the boundary input into the interior PDE, the Lyapunov analysis is carried out directly on the original wave state $u$. This avoids differentiating the ODE and removes the need for $L^2$ regularity of the displacement coupling. Two cases are treated: the general marginally stable case and the nilpotent case. Numerical examples, including a point-coupled example, illustrate the effectiveness of the proposed controllers.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Boundary control, Dirac coupling, distributed coupling, finite measure, low-gain feedback, PDE--ODE cascade, wave equation.
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Boundary control of PDE--ODE cascade systems is a central topic in control of distributed parameter systems. In many actuator and transmission problems, the finite-dimensional plant is not driven by a static input but by a distributed dynamical medium. Backstepping and predictor-type designs provide systematic compensation tools for such cascades, but the resulting feedback laws often contain distributed kernels and require full-domain state information.
+
+Low-gain feedback offers a different design philosophy. Instead of exactly cancelling the distributed dynamics, one applies a sufficiently small finite-dimensional feedback through a stable or dissipative PDE channel. This strategy can lead to simpler controllers, at the price of additional spectral restrictions on the open-loop finite-dimensional plant. For diffusion PDE--ODE cascades, low-gain compensation has been developed under the assumption that the distributed coupling has a finite absolute integral, and the proof was deliberately arranged to avoid the square integral of the coupling function so that singular couplings such as Dirac measures can be admitted in principle \cite{XuLiuKrsticFeng2023}. The same low-gain philosophy motivates the wave-equation problem considered in this paper.
+
+This paper considers a linear ODE coupled with a wave equation through two distributed channels: one involving the wave displacement and the other involving the wave velocity. The wave equation has a free Neumann condition at the left endpoint and a controlled Neumann condition at the right endpoint. Compared with a diffusion actuator, the wave actuator is conservative in the interior; hence, the boundary feedback must provide damping and stiffness at the controlled endpoint.
+
+The main technical point is that the displacement coupling is treated as a finite measure. The proof does not use an estimate of the form $\norm{B_1}_{L^2}\norm{u}_{L^2}$. Instead, it uses the trace-type estimate
+\begin{equation}
+ \left|\int_{[0,D]} u(x,t)\,dB_1(x)\right|
+ \le |B_1|([0,D])\norm{u(\cdot,t)}_{L^\infty},
+\end{equation}
+where $|B_1|([0,D])$ is the total variation of the vector measure. Since the wave energy controls $\norm{u}_{L^\infty}$ through $u(D,t)$ and $u_x$, point couplings of the form $B_d\delta_{x_0}$ are included.
+
+The rest of this paper is organized as follows. Section II formulates the problem and recalls a low-gain Riccati lemma. Section III gives the general marginally stable theorem and the nilpotent theorem. Section IV provides numerical examples. Section V concludes the paper.
+
+Notations: Throughout this paper, $\abs{\cdot}$ denotes the absolute value of real numbers, the Euclidean norm of vectors, or the induced 2-norm of matrices. The notation $\norm{\cdot}$ denotes the $L^2(0,D)$ norm for scalar functions unless otherwise specified. For a positive definite matrix $P$, $P^{1/2}$ denotes its unique positive definite square root. The symbols $I$ and $0$ denote identity and zero matrices with compatible dimensions. The space $\Mcal([0,D];\R^n)$ denotes the space of finite $\R^n$-valued Radon measures on $[0,D]$, with total variation norm $\norm{B_1}_{\Mcal}=|B_1|([0,D])$.
+
+\section{Preliminaries}
+
+\subsection{Problem Formulation}
+
+Consider the PDE--ODE cascade
+\begin{align}
+ \dot X(t)&=AX(t)+\int_{[0,D]} u(x,t)\,dB_1(x)
+ +\int_0^D B_2(x)u_t(x,t)\,dx,\label{eq:model_ode}\\
+ u_{tt}(x,t)&=u_{xx}(x,t),\qquad x\in(0,D),\label{eq:model_wave}
+\end{align}
+with boundary conditions
+\begin{align}
+ u_x(0,t)&=0,\label{eq:left_neumann}\\
+ u_x(D,t)&=U(t).\label{eq:right_control}
+\end{align}
+Here $X(t)\in\R^n$ is the ODE state, $u(x,t)\in\R$ is the wave state, $A\in\R^{n\times n}$ is a constant matrix, and $U(t)\in\R$ is the boundary control input. The displacement coupling is allowed to be a finite measure:
+\begin{equation}
+ B_1\in \Mcal([0,D];\R^n),\qquad B_2\in L^2(0,D;\R^n).\label{eq:B_regular_measure}
+\end{equation}
+When $B_1$ has a density in $L^1(0,D;\R^n)$, the measure pairing in \eqref{eq:model_ode} reduces to the usual Lebesgue integral. When $B_1=B_d\delta_{x_0}$, it reduces to the point coupling $B_du(x_0,t)$.
+
+Define the energy norm
+\begin{equation}
+ \Omega(t)=\abs{X(t)}^2+\norm{u_x(\cdot,t)}^2+\norm{u_t(\cdot,t)}^2+u^2(D,t).\label{eq:Omega}
+\end{equation}
+The control objective is to design $U(t)$ such that the closed-loop system has a unique solution and is exponentially stable in the sense of \eqref{eq:Omega}.
+
+\subsection{Low-Gain Lemma}
+
+The following standard low-gain Riccati property is used.
+
+\begin{lemma}\label{lem:riccati}
+Assume that $(A,B)$ is controllable and that all eigenvalues of $A\in\R^{n\times n}$ lie on the imaginary axis. Then, for every $\eps>0$, the algebraic Riccati equation
+\begin{equation}
+ A^\top P_\eps+P_\eps A-P_\eps BB^\top P_\eps=-\eps P_\eps\label{eq:ARE_basic}
+\end{equation}
+has a unique positive definite solution $P_\eps$. Moreover, $P_\eps=O(\eps)$ as $\eps\to0^+$. If, in addition, all eigenvalues of $A$ are at the origin, then there exists $C_A>0$ such that
+\begin{equation}
+ A^\top P_\eps A\le C_A\eps^2P_\eps.\label{eq:nilpotent_riccati_bound}
+\end{equation}
+\end{lemma}
+
+\section{Main Results}
+
+\subsection{General Marginally Stable Case}
+
+Choose
+\begin{equation}
+ b>0,
+ \qquad 0<q<\frac{1}{D}.\label{eq:bq_design}
+\end{equation}
+Let $g:[0,D]\to\R^n$ solve, in the distributional sense,
+\begin{align}
+ g''+B_1&=A(Ag-B_2),\label{eq:g_bvp_general}\\
+ g'(0)&=0,\label{eq:g_left}\\
+ -g'(D)&=(bA+qI)g(D).\label{eq:g_right}
+\end{align}
+Equivalently,
+\begin{equation}
+ dg'(x)+dB_1(x)=A(Ag(x)-B_2(x))\,dx.
+\end{equation}
+Set
+\begin{equation}
+ g_0(x)=Ag(x)-B_2(x),
+ \qquad \Bcal=g(D).\label{eq:g0_B_general}
+\end{equation}
+For a finite measure $B_1$, the solution $g$ is continuous and of bounded variation in derivative, and $g_0\in L^2(0,D;\R^n)$.
+
+To describe the solvability of \eqref{eq:g_bvp_general}--\eqref{eq:g_right}, define
+\begin{align}
+ Y(x)&=\begin{bmatrix}g(x)\\ g'(x)\end{bmatrix},
+ &
+ \mathcal A_g&=\begin{bmatrix}0&I\\ A^2&0\end{bmatrix},\label{eq:Y_Ag}\\
+ \Phi(x)&=e^{\mathcal A_gx},
+ &
+ L_{b,q}&=\begin{bmatrix}bA+qI&I\end{bmatrix}.
+\end{align}
+Writing $g(0)=\eta$ and using $g'(0)=0$ gives
+\begin{align}
+Y(D)=&\,\Phi(D)\begin{bmatrix}\eta\\0\end{bmatrix}
+-\int_0^D\Phi(D-\xi)\begin{bmatrix}0\\ AB_2(\xi)\end{bmatrix}d\xi\nonumber\\
+&-\int_{[0,D]}\Phi(D-\xi)\begin{bmatrix}0\\ I\end{bmatrix}dB_1(\xi).
+\end{align}
+Thus the right boundary condition is equivalent to
+\begin{equation}
+ M_{b,q}\eta+r_{b,q}=0,\label{eq:M_eta}
+\end{equation}
+where
+\begin{align}
+ M_{b,q}&=L_{b,q}\Phi(D)\begin{bmatrix}I\\0\end{bmatrix},\label{eq:M_bq}\\
+ r_{b,q}&=-L_{b,q}\int_0^D\Phi(D-\xi)\begin{bmatrix}0\\ AB_2(\xi)\end{bmatrix}d\xi\nonumber\\
+&\quad -L_{b,q}\int_{[0,D]}\Phi(D-\xi)\begin{bmatrix}0\\ I\end{bmatrix}dB_1(\xi).\label{eq:r_bq}
+\end{align}
+
+\begin{assumption}\label{ass:general}
+The gains $b>0$ and $0<q<1/D$ are chosen such that $M_{b,q}$ is invertible. With $g$ determined by \eqref{eq:M_eta}, the pair $(A,\Bcal)$ is controllable, where $\Bcal=g(D)$. Moreover, all eigenvalues of $A$ lie on the imaginary axis.
+\end{assumption}
+
+Under Assumption \ref{ass:general}, let $P_\eps$ be the solution of
+\begin{equation}
+ A^\top P_\eps+P_\eps A-P_\eps\Bcal\Bcal^\top P_\eps=-\eps P_\eps.\label{eq:ARE_general}
+\end{equation}
+The proposed controller is
+\begin{equation}
+ U(t)=-bu_t(D,t)-qu(D,t)-\Bcal^\top P_\eps X(t).\label{eq:controller_general}
+\end{equation}
+
+\begin{theorem}\label{thm:general}
+Consider the closed-loop system consisting of \eqref{eq:model_ode}--\eqref{eq:right_control} and the controller \eqref{eq:controller_general} under Assumption \ref{ass:general}. Then, there exists $\eps^*>0$ such that, for all $\eps\in(0,\eps^*]$, the closed-loop system has a unique solution and is exponentially stable in the sense that
+\begin{equation}
+ \Omega(t)\le \alpha e^{-\beta t}\Omega(0),\qquad t\ge0,\label{eq:theorem_general_decay}
+\end{equation}
+for some positive constants $\alpha$ and $\beta$.
+\end{theorem}
+
+\begin{proof}
+Define the Artstein-type variable
+\begin{equation}
+\begin{aligned}
+ Z(t)=&\,X(t)+\int_0^D g_0(x)u(x,t)\,dx
+ +\int_0^D g(x)u_t(x,t)\,dx\\
+ &+b\Bcal u(D,t).
+\end{aligned}\label{eq:Z_general}
+\end{equation}
+Differentiating \eqref{eq:Z_general}, using \eqref{eq:model_ode}--\eqref{eq:right_control}, and integrating by parts in the distributional sense, one obtains
+\begin{align}
+ \dot Z(t)&=AX(t)+\int_{[0,D]}u(x,t)\,dB_1(x)
+ +\int_0^D B_2(x)u_t(x,t)\,dx\nonumber\\
+&\quad +\int_0^D g_0(x)u_t(x,t)\,dx
+ +\int_0^D g(x)u_{xx}(x,t)\,dx
+ +b\Bcal u_t(D,t)\nonumber\\
+&=AX(t)+\int_0^D \big(g''(x)\,dx+dB_1(x)\big)u(x,t)\nonumber\\
+&\quad +\int_0^D\big(B_2(x)+g_0(x)\big)u_t(x,t)\,dx\nonumber\\
+&\quad +g(D)U(t)-g'(D)u(D,t)+b\Bcal u_t(D,t).
+\end{align}
+The boundary terms at $x=0$ vanish because $u_x(0,t)=0$ and $g'(0)=0$. From \eqref{eq:g_bvp_general} and \eqref{eq:g0_B_general},
+\begin{equation}
+ g''\,dx+dB_1=A g_0\,dx,
+ \qquad B_2+g_0=Ag.
+\end{equation}
+Using \eqref{eq:g_right} gives
+\begin{equation}
+ \dot Z(t)=AZ(t)+\Bcal\big(U(t)+bu_t(D,t)+qu(D,t)\big).
+ \label{eq:Ztarget_general}
+\end{equation}
+Substituting \eqref{eq:controller_general} into \eqref{eq:Ztarget_general} yields
+\begin{equation}
+ \dot Z=(A-\Bcal\Bcal^\top P_\eps)Z+
+ \Bcal\Bcal^\top P_\eps\varphi,
+ \qquad \varphi=Z-X.\label{eq:Z_closed_general}
+\end{equation}
+Let
+\begin{equation}
+ V_1(t)=Z^\top(t)P_\eps Z(t).\label{eq:V1_def}
+\end{equation}
+Using \eqref{eq:ARE_general} and \eqref{eq:Z_closed_general},
+\begin{align}
+ \dot V_1
+&=-\eps Z^\top P_\eps Z-Z^\top P_\eps\Bcal\Bcal^\top P_\eps Z
+ +2Z^\top P_\eps\Bcal\Bcal^\top P_\eps\varphi\nonumber\\
+&\le -\eps V_1+
+ \abs{\Bcal}^2\abs{P_\eps}^2\abs{\varphi}^2.
+ \label{eq:V1dot_pre}
+\end{align}
+
+The key point is to estimate $\varphi$ directly through the original wave energy. Define
+\begin{equation}
+ E_u(t)=\frac12\int_0^D\big(u_x^2(x,t)+u_t^2(x,t)\big)dx
+ +\frac q2u^2(D,t).\label{eq:Eu_def}
+\end{equation}
+Since
+\begin{equation}
+ u(x,t)=u(D,t)-\int_x^D u_y(y,t)dy,
+\end{equation}
+one has
+\begin{align}
+ \norm{u(\cdot,t)}_{L^\infty}^2&\le
+ 2u^2(D,t)+2D\norm{u_x(\cdot,t)}^2\le C_\infty E_u(t),\label{eq:Linf_Eu}\\
+ \norm{u(\cdot,t)}^2&\le C_0E_u(t),\label{eq:L2_Eu}
+\end{align}
+for positive constants $C_\infty$ and $C_0$. In particular,
+\begin{equation}
+ \left|\int_{[0,D]}u(x,t)\,dB_1(x)\right|^2
+ \le \norm{B_1}_{\Mcal}^2 C_\infty E_u(t),\label{eq:measure_pair_bound}
+\end{equation}
+which is meaningful even for $B_1=B_d\delta_{x_0}$.
+From \eqref{eq:Z_general},
+\begin{align}
+ \abs{\varphi(t)}^2
+&\le 3\norm{g_0}^2\norm{u}^2
+ +3\norm{g}^2\norm{u_t}^2+3b^2\abs{\Bcal}^2u^2(D,t)\nonumber\\
+&\le C_\varphi E_u(t),\label{eq:phi_Eu}
+\end{align}
+where $C_\varphi>0$ is independent of $\eps$. Hence
+\begin{equation}
+ \dot V_1\le -\eps V_1+C_1\abs{P_\eps}^2E_u(t),\label{eq:V1dot_Eu}
+\end{equation}
+where $C_1=\abs{\Bcal}^2C_\varphi$.
+
+We now construct a Lyapunov functional for the original wave state. Let
+\begin{equation}
+ V_2(t)=E_u(t)+\delta_1\int_0^D xu_xu_t\,dx
+ +\delta_2\int_0^D uu_t\,dx,\label{eq:V2_def}
+\end{equation}
+where
+\begin{equation}
+ \delta_2=\kappa\delta_1,
+ \qquad \frac{Dq}{2}<\kappa<\frac12.\label{eq:kappa_choice}
+\end{equation}
+Taking $\delta_1>0$ sufficiently small gives constants $m_\delta,M_\delta>0$ such that
+\begin{equation}
+ m_\delta E_u(t)\le V_2(t)\le M_\delta E_u(t).\label{eq:V2_equiv}
+\end{equation}
+Let
+\begin{equation}
+ s(t)=\Bcal^\top P_\eps X(t),
+ \qquad v(t)=u_t(D,t),
+ \qquad p(t)=u(D,t).
+\end{equation}
+Then the boundary condition is
+\begin{equation}
+ u_x(D,t)=-bv(t)-qp(t)-s(t).\label{eq:closed_boundary}
+\end{equation}
+A direct differentiation of \eqref{eq:V2_def}, using $u_{tt}=u_{xx}$, $u_x(0,t)=0$, and \eqref{eq:closed_boundary}, gives
+\begin{align}
+ \dot V_2
+=&\left[-b+\frac{\delta_1D(1+b^2)}2\right]v^2
+ +\delta_1b(Dq-\kappa)vp\nonumber\\
+&-\delta_1q\left(\kappa-\frac{Dq}{2}\right)p^2
+ -\delta_1\left(\frac12+\kappa\right)\norm{u_x}^2\nonumber\\
+&-\delta_1\left(\frac12-\kappa\right)\norm{u_t}^2
+ -(1-\delta_1Db)sv\nonumber\\
+&-\delta_1(\kappa-Dq)sp+\frac{\delta_1D}{2}s^2.
+\label{eq:V2dot_raw}
+\end{align}
+The first five terms are strictly dissipative after a Young estimate on $vp$. More precisely, by \eqref{eq:bq_design} and \eqref{eq:kappa_choice}, and by choosing $\delta_1$ sufficiently small, there exist $c_2>0$ and $c_D>0$ such that
+\begin{align}
+&\left[-b+\frac{\delta_1D(1+b^2)}2\right]v^2
+ +\delta_1b(Dq-\kappa)vp\nonumber\\
+&\quad -\delta_1q\left(\kappa-\frac{Dq}{2}\right)p^2
+ -\delta_1\left(\frac12+\kappa\right)\norm{u_x}^2
+ -\delta_1\left(\frac12-\kappa\right)\norm{u_t}^2
+\nonumber\\
+&\le -c_2E_u(t)-c_Dv^2(t).\label{eq:pure_wave_diss}
+\end{align}
+The remaining terms are boundary small-gain terms. For every fixed choice of the wave gains, Young's inequality gives
+\begin{equation}
+ \abs{sv}+\abs{sp}+s^2\le \eta\big(v^2+p^2\big)+C_\eta s^2,
+\end{equation}
+with $\eta>0$ chosen small enough so that the $v^2$ and $p^2$ terms are absorbed by \eqref{eq:pure_wave_diss}. Consequently,
+\begin{equation}
+ \dot V_2\le -c_3E_u(t)+C_2s^2(t)\label{eq:V2dot_s}
+\end{equation}
+for some $c_3,C_2>0$. Since
+\begin{equation}
+ s^2(t)\le \abs{\Bcal}^2\abs{P_\eps}\abs{P_\eps^{1/2}X(t)}^2,\label{eq:s_bound}
+\end{equation}
+and $Z=X+\varphi$, \eqref{eq:phi_Eu} gives
+\begin{align}
+ \abs{P_\eps^{1/2}X}^2
+&\le 2Z^\top P_\eps Z+2\abs{P_\eps}\abs{\varphi}^2\nonumber\\
+&\le 2V_1+2\abs{P_\eps}C_\varphi E_u.
+\label{eq:PX_by_V1_Eu}
+\end{align}
+Substituting \eqref{eq:PX_by_V1_Eu} into \eqref{eq:V2dot_s} yields
+\begin{equation}
+ \dot V_2\le -c_3E_u+C_3\abs{P_\eps}V_1+C_4\abs{P_\eps}^2E_u,
+\label{eq:V2dot_final}
+\end{equation}
+where $C_3,C_4>0$ are independent of $\eps$.
+
+Define the total Lyapunov functional
+\begin{equation}
+ V(t)=V_1(t)+\eps V_2(t).\label{eq:V_total}
+\end{equation}
+Combining \eqref{eq:V1dot_Eu} and \eqref{eq:V2dot_final} gives
+\begin{align}
+ \dot V
+&\le -\eps V_1+C_1\abs{P_\eps}^2E_u
+ -\eps c_3E_u+\eps C_3\abs{P_\eps}V_1
+ +\eps C_4\abs{P_\eps}^2E_u.\label{eq:Vdot_combine}
+\end{align}
+By Lemma \ref{lem:riccati}, $\abs{P_\eps}=O(\eps)$. Hence, for sufficiently small $\eps$,
+\begin{equation}
+ \eps C_3\abs{P_\eps}\le \frac{\eps}{2},
+ \qquad
+ C_1\abs{P_\eps}^2+\eps C_4\abs{P_\eps}^2\le \frac{\eps c_3}{2}.
+\end{equation}
+Thus
+\begin{align}
+ \dot V(t)&\le -\frac{\eps}{2}V_1(t)-\frac{\eps c_3}{2}E_u(t)
+ \le -\frac{\eps}{2}V_1(t)-\frac{\eps c_3}{2M_\delta}V_2(t)\nonumber\\
+&\le -\beta V(t),\label{eq:V_decay_final}
+\end{align}
+where
+\begin{equation}
+ \beta=\min\left\{\frac{\eps}{2},\frac{\eps c_3}{2M_\delta}\right\}.
+\end{equation}
+
+It remains to compare $V$ and $\Omega$. From \eqref{eq:phi_Eu},
+\begin{equation}
+ \abs{Z}^2\le 2\abs{X}^2+2C_\varphi E_u\le C_Z\Omega,
+\end{equation}
+and therefore
+\begin{equation}
+ V(t)\le \overline M_\eps\Omega(t)
+\end{equation}
+for some $\overline M_\eps>0$. Conversely, since $X=Z-\varphi$,
+\begin{equation}
+ \abs{X}^2\le 2\abs{Z}^2+2C_\varphi E_u.
+\end{equation}
+Together with \eqref{eq:Eu_def}, this gives
+\begin{equation}
+ \Omega(t)\le C_\Omega\left(\abs{Z(t)}^2+E_u(t)\right)
+ \le C_\Omega\left(\frac{V_1}{\lambda_{\min}(P_\eps)}+
+\frac{V_2}{m_\delta}\right).
+\end{equation}
+Since $V=V_1+\eps V_2$, there exists $\underline M_\eps>0$ such that
+\begin{equation}
+ \underline M_\eps\Omega(t)\le V(t)\le \overline M_\eps\Omega(t).\label{eq:V_Omega_equiv}
+\end{equation}
+Combining \eqref{eq:V_decay_final} and \eqref{eq:V_Omega_equiv} proves \eqref{eq:theorem_general_decay} with $\alpha=\overline M_\eps/\underline M_\eps$. The existence and uniqueness of the closed-loop solution follow from standard well-posedness of the wave equation with dissipative boundary feedback and the fact that the finite-measure displacement coupling is a bounded functional on $H^1(0,D)$ through \eqref{eq:Linf_Eu}. This completes the proof.
+\end{proof}
+
+\begin{remark}\label{rem:measure}
+The estimate \eqref{eq:measure_pair_bound} is the reason why the displacement coupling can be relaxed from $L^2$ to a finite measure. In particular, if $B_1=B_d\delta_{x_0}$, then
+\begin{equation}
+ \left|\int_{[0,D]}u(x,t)dB_1(x)\right|=\abs{B_du(x_0,t)}
+ \le \abs{B_d}\norm{u(\cdot,t)}_{L^\infty}.
+\end{equation}
+No term involving $\int_0^D\abs{B_1(x)}^2dx$ appears. The velocity coupling is kept in $L^2$ because $u_t\in L^2(0,D)$ does not have a point value in the energy space.
+\end{remark}
+
+\subsection{Nilpotent Case}
+
+We next consider the case where the finite-dimensional open-loop dynamics is nilpotent. Let $g$ solve
+\begin{align}
+ g''+B_1&=0,\label{eq:g_nil}\\
+ g'(0)&=0,\label{eq:g_nil_left}\\
+ -g'(D)&=qg(D).\label{eq:g_nil_right}
+\end{align}
+Then
+\begin{equation}
+ -g'(D)=B_1([0,D]),
+ \qquad
+ \Bbar=g(D)=\frac{1}{q}B_1([0,D]).\label{eq:Bbar_def}
+\end{equation}
+Set
+\begin{equation}
+ g_0(x)=-B_2(x).
+\end{equation}
+The corresponding Artstein variable is
+\begin{equation}
+\begin{aligned}
+ Z(t)=&\,X(t)+\int_0^D g_0(x)u(x,t)\,dx
+ +\int_0^D g(x)u_t(x,t)\,dx\\
+ &+b\Bbar u(D,t).
+\end{aligned}\label{eq:Z_nil}
+\end{equation}
+A direct calculation gives
+\begin{equation}
+ \dot Z(t)=AX(t)+\Bbar\big(U(t)+bu_t(D,t)+qu(D,t)\big).\label{eq:Z_nil_target}
+\end{equation}
+
+\begin{assumption}\label{ass:nilpotent}
+All eigenvalues of $A$ are at the origin and the pair $(A,\Bbar)$ is controllable, where $\Bbar$ is defined by \eqref{eq:Bbar_def}.
+\end{assumption}
+
+Under Assumption \ref{ass:nilpotent}, let $P_\eps$ solve
+\begin{equation}
+ A^\top P_\eps+P_\eps A-P_\eps\Bbar\Bbar^\top P_\eps=-\eps P_\eps.\label{eq:ARE_nil}
+\end{equation}
+The nilpotent low-gain controller is
+\begin{equation}
+ U(t)=-bu_t(D,t)-qu(D,t)-\Bbar^\top P_\eps X(t).\label{eq:controller_nil}
+\end{equation}
+
+\begin{theorem}\label{thm:nilpotent}
+Consider the closed-loop system consisting of \eqref{eq:model_ode}--\eqref{eq:right_control} and the controller \eqref{eq:controller_nil} under Assumption \ref{ass:nilpotent}. Then, there exists $\eps^*>0$ such that, for all $\eps\in(0,\eps^*]$, the closed-loop system has a unique solution and is exponentially stable in the sense that
+\begin{equation}
+ \Omega(t)\le \alpha e^{-\beta t}\Omega(0),\qquad t\ge0,
+\end{equation}
+for some positive constants $\alpha$ and $\beta$.
+\end{theorem}
+
+\begin{proof}
+Only the finite-dimensional estimate differs from the proof of Theorem \ref{thm:general}. Substituting \eqref{eq:controller_nil} into \eqref{eq:Z_nil_target} gives
+\begin{equation}
+ \dot Z=(A-\Bbar\Bbar^\top P_\eps)Z-(A-\Bbar\Bbar^\top P_\eps)\varphi,
+ \qquad \varphi=Z-X.
+\label{eq:Z_nil_closed}
+\end{equation}
+Let $V_1=Z^\top P_\eps Z$. By \eqref{eq:ARE_nil}, Young's inequality, and \eqref{eq:nilpotent_riccati_bound},
+\begin{align}
+ \dot V_1
+&\le -\eps V_1-Z^\top P_\eps\Bbar\Bbar^\top P_\eps Z
+ +2Z^\top P_\eps\Bbar\Bbar^\top P_\eps\varphi
+ -2Z^\top P_\eps A\varphi\nonumber\\
+&\le -\frac{\eps}{2}V_1
+ +\left(\abs{\Bbar}^2\abs{P_\eps}^2+2C_A\eps\abs{P_\eps}\right)\abs{\varphi}^2.\label{eq:nil_V1}
+\end{align}
+The estimate $\abs{\varphi}^2\le C_\varphi E_u$ remains valid, with $\Bcal$ replaced by $\Bbar$. Hence
+\begin{equation}
+ \dot V_1\le -\frac{\eps}{2}V_1+C_1^n\eps\abs{P_\eps}E_u+C_2^n\abs{P_\eps}^2E_u.
+\end{equation}
+Since $\abs{P_\eps}=O(\eps)$, the positive terms are $O(\eps^2)E_u$. The direct wave estimate \eqref{eq:V2dot_final} is unchanged, with $\Bcal$ replaced by $\Bbar$. Therefore, for the same total Lyapunov functional $V=V_1+\eps V_2$ and for all sufficiently small $\eps$, one obtains
+\begin{equation}
+ \dot V\le -\beta V.
+\end{equation}
+The norm equivalence argument in the proof of Theorem \ref{thm:general} then gives the desired exponential estimate. The proof is complete.
+\end{proof}
+
+\begin{remark}
+The general controller \eqref{eq:controller_general} and the nilpotent controller \eqref{eq:controller_nil} require only $X(t)$, $u(D,t)$, and $u_t(D,t)$. They do not require the full distributed wave state. The full-domain functions $g$ and $g_0$ are used only in the proof and in the computation of the effective input vector $\Bcal$ or $\Bbar$.
+\end{remark}
+
+\section{Simulation Examples}
+
+This section gives four numerical examples. The first two examples parallel the two cases treated in the low-gain diffusion-actuator paper \cite{XuLiuKrsticFeng2023}: a general marginally stable plant and a nilpotent plant. The third example verifies that a point displacement coupling, modeled by a Dirac measure, is covered by the same design. The fourth example illustrates the low-gain parameter tradeoff. In all simulations, the wave equation is discretized by a uniform-grid method of lines. The right Neumann boundary condition is implemented with a ghost point, and the resulting linear ODE system is propagated by matrix exponential evaluation.
+
+\subsection{Example 1: General Marginally Stable Case}
+
+Let $D=1$, $b=1$, $q=0.4$, and
+\begin{equation}
+ A=\begin{bmatrix}0&-1\\1&0\end{bmatrix},\qquad
+ B_1(x)=\begin{bmatrix}2-x\\0.6\sin(\pi x)\end{bmatrix},\qquad B_2(x)=0.
+\end{equation}
+The open-loop ODE matrix has eigenvalues $\pm i$. Solving \eqref{eq:g_bvp_general}--\eqref{eq:g_right} gives
+\begin{equation}
+ \Bcal=g(D)\approx \begin{bmatrix}-0.9324\\-1.3291\end{bmatrix},
+\end{equation}
+for which $[\Bcal,A\Bcal]$ has rank two. The initial conditions are
+\begin{equation}
+ X(0)=\begin{bmatrix}1\\1\end{bmatrix},\qquad
+ u(x,0)=0.25\cos\frac{\pi x}{2D},\qquad u_t(x,0)=0.
+\end{equation}
+With $\eps=0.12$, Fig.~\ref{fig:direct_ex1} shows that both ODE states decay to zero and the wave state is damped out.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.94\textwidth]{fig_direct_ex1.pdf}
+\caption{Responses for Example 1. Left: state response under the general low-gain controller \eqref{eq:controller_general}. Right: response of the wave state $u(x,t)$.}
+\label{fig:direct_ex1}
+\end{figure*}
+
+\subsection{Example 2: Nilpotent Case}
+
+Consider the integrator-type system with $D=1$, $b=1$, $q=0.5$, and
+\begin{equation}
+ A=\begin{bmatrix}0&1\\0&0\end{bmatrix},\qquad
+ B_1(x)=\begin{bmatrix}0\\1\end{bmatrix},\qquad B_2(x)=0.
+\end{equation}
+From \eqref{eq:Bbar_def},
+\begin{equation}
+ \Bbar=\frac{1}{q}\int_0^D B_1(x)dx=\begin{bmatrix}0\\2\end{bmatrix},
+\end{equation}
+so $(A,\Bbar)$ is controllable. The initial conditions are
+\begin{equation}
+ X(0)=\begin{bmatrix}1\\-1\end{bmatrix},\qquad
+ u(x,0)=0.25\cos\frac{\pi x}{2D},\qquad u_t(x,0)=0.
+\end{equation}
+Choosing $\eps=0.20$, Fig.~\ref{fig:direct_ex2} shows the closed-loop response generated by the nilpotent controller \eqref{eq:controller_nil}. The two ODE states and the distributed wave state converge to zero.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.94\textwidth]{fig_direct_ex2.pdf}
+\caption{Responses for Example 2. Left: state response under the nilpotent low-gain controller \eqref{eq:controller_nil}. Right: response of the wave state $u(x,t)$.}
+\label{fig:direct_ex2}
+\end{figure*}
+
+\subsection{Example 3: Point Displacement Coupling}
+
+We now test the singular displacement coupling
+\begin{equation}
+ B_1=B_d\delta_{x_0},\qquad x_0=0.5,
+ \qquad B_d=\begin{bmatrix}1\\0\end{bmatrix},
+\end{equation}
+with $D=1$, $b=1$, $q=0.4$, $B_2=0$, and
+\begin{equation}
+ A=\begin{bmatrix}0&-1\\1&0\end{bmatrix}.
+\end{equation}
+The ODE is therefore coupled to the single wave value $u(0.5,t)$:
+\begin{equation}
+ \dot X=AX+B_du(0.5,t).
+\end{equation}
+Solving the measure-valued BVP gives
+\begin{equation}
+ \Bcal=g(D)\approx\begin{bmatrix}-0.8035\\-0.6942\end{bmatrix},
+\end{equation}
+and $[\Bcal,A\Bcal]$ has rank two. With $X(0)=[1,-0.5]^\top$, $u(x,0)=0.25\cos(\pi x/(2D))$, $u_t(x,0)=0$, and $\eps=0.10$, Fig.~\ref{fig:direct_ex3} shows that the closed-loop states converge. Fig.~\ref{fig:direct_ex3_point} further plots the point value $u(0.5,t)$ directly entering the ODE, together with the controlled boundary value $u(D,t)$.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.94\textwidth]{fig_direct_ex3_surface.pdf}
+\caption{Responses for Example 3 with $B_1=B_d\delta_{0.5}$. Left: ODE states. Right: wave state.}
+\label{fig:direct_ex3}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.94\textwidth]{fig_direct_ex3_point.pdf}
+\caption{Point-coupled response for Example 3. The curve $u(0.5,t)$ is the single wave value that enters the ODE through the Dirac coupling.}
+\label{fig:direct_ex3_point}
+\end{figure*}
+
+\subsection{Example 4: Effect of the Low-Gain Parameter}
+
+Finally, the plant in Example 1 is used to illustrate the effect of $\eps$. Fig.~\ref{fig:direct_ex4} compares $\eps=0.04$, $\eps=0.12$, and $\eps=0.40$. The smallest value gives slow convergence. The middle value improves the convergence rate. The largest value violates the small-gain nature of the proof and produces a rapidly growing response. This is consistent with Theorem~\ref{thm:general}, which guarantees stability only for sufficiently small $\eps$.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.90\textwidth]{fig_direct_ex4.pdf}
+\caption{State responses for Example 1 under different low-gain parameters.}
+\label{fig:direct_ex4}
+\end{figure*}
+
+\clearpage
+\raggedbottom
+\section{Conclusion}
+
+This paper has developed a direct-$u$ low-gain boundary stabilization method for a wave--ODE cascade with distributed displacement and velocity coupling. The displacement coupling is allowed to be a finite Radon measure, which includes both $L^1$ distributed couplings and point Dirac couplings. The Artstein transformation converts the distributed PDE--ODE coupling into an effective finite-dimensional input channel, while the wave Lyapunov functional is constructed directly from the original wave state. This avoids the auxiliary interior lifting and the associated estimates of higher ODE derivatives. The resulting proof has a transparent small-gain structure: the transformed ODE is stabilized by low-gain feedback, the wave subsystem is dissipated by right-end damping and stiffness, and the two interconnection terms are absorbed for sufficiently small $\eps$. Simulations confirm the general marginally stable case, the nilpotent case, the point-coupled case, and the expected low-gain parameter tradeoff.
+
+\begin{thebibliography}{1}
+
+\bibitem{XuLiuKrsticFeng2023}
+X.~Xu, L.~Liu, M.~Krstic, and G.~Feng, ``Low-gain compensation for PDE--ODE cascade systems with distributed diffusion and counter convection,'' \emph{IEEE Transactions on Automatic Control}, vol.~68, no.~4, pp.~2360--2367, Apr. 2023.
+
+\bibitem{Krstic2009Diffusion}
+M.~Krstic, ``Compensating actuator and sensor dynamics governed by diffusion PDEs,'' \emph{Systems \& Control Letters}, vol.~58, no.~5, pp.~372--377, 2009.
+
+\bibitem{BekiarisKrstic2011Diffusion}
+N.~Bekiaris-Liberis and M.~Krstic, ``Compensating the distributed effect of diffusion and counter-convection in multi-input and multi-output LTI systems,'' \emph{IEEE Transactions on Automatic Control}, vol.~56, no.~3, pp.~637--643, Mar. 2011.
+
+\bibitem{Lin1999LowGain}
+Z.~Lin, \emph{Low Gain Feedback}. London, U.K.: Springer, 1999.
+
+\bibitem{ZhouDuan2009Riccati}
+B.~Zhou and G.-R. Duan, ``On analytical approximation of the maximal invariant ellipsoids for linear systems with bounded controls,'' \emph{IEEE Transactions on Automatic Control}, vol.~54, no.~2, pp.~346--353, Feb. 2009.
+
+\end{thebibliography}
+
+\end{document}
