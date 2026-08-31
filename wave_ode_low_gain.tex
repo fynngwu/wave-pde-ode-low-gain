@@ -1,0 +1,417 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage{amsmath,amssymb,amsfonts,mathtools,bm,cite}
+\usepackage{amsthm}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\emergencystretch=2em
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{assumption}{Assumption}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\R}{\mathbb R}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\Bcal}{\mathfrak B}
+\newcommand{\Bbar}{\bar{\mathfrak B}}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\abs}[1]{\left|#1\right|}
+
+\begin{document}
+
+\title{Low-Gain Boundary Stabilization of Wave--ODE Cascade Systems With \(L^2\) Distributed Coupling}
+
+\author{Anonymous Authors\thanks{This manuscript is a research draft prepared in IEEE style.}}
+
+\markboth{IEEE Transactions on Automatic Control, Draft}{Low-Gain Boundary Stabilization of Wave--ODE Cascade Systems}
+
+\maketitle
+
+\begin{abstract}
+This paper studies low-gain boundary stabilization of a finite-dimensional linear system coupled in cascade with a one-dimensional wave equation. The ODE is driven by distributed displacement and velocity couplings whose coefficients belong to \(L^2(0,D;\R^n)\). An offline boundary-value problem produces an effective finite-dimensional input vector, while an auxiliary state removes the distributed terms from the transformed ODE. The online feedback uses only the ODE state and the displacement and velocity at the controlled boundary. A wave multiplier functional and a low-gain Riccati functional are combined to prove global exponential stability for marginally stable ODE matrices. A separate nilpotent construction gives an explicit effective coupling vector. The proof records explicit constants, the small-gain bound, and the equivalence between the Lyapunov functional and the natural energy norm. Numerical work is formulated as a reproducible framework; no online kernel computation or full-domain wave measurement is required.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Boundary control, distributed coupling, low-gain feedback, PDE--ODE cascade, wave equation.
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+PDE--ODE cascades arise when a finite-dimensional controller or mechanical component is connected to a flexible medium, a transmission line, or an acoustic duct. The distributed medium stores energy and, for the undamped wave equation, does not dissipate it in the interior. Consequently, a boundary controller must simultaneously remove wave energy and stabilize the finite-dimensional modes.
+
+Backstepping and predictor designs can compensate distributed dynamics, but their feedback laws often require full-domain measurements or online evaluation of distributed kernels. Low-gain compensation follows a different route. A sufficiently small finite-dimensional feedback is injected through a dissipative boundary channel, and an offline kernel transformation exposes the corresponding effective input direction. The price is a spectral restriction on the open-loop ODE and a controllability requirement for that effective direction.
+
+The present paper adapts this organization to a wave--ODE cascade with two ordinary distributed channels. The displacement and velocity coefficients are both in \(L^2\), which is the natural Hilbert-space setting for the energy solution. The kernel is computed once from a finite-dimensional boundary-value problem. The proof then works directly with the original wave state and a multiplier functional, making the online controller
+\[
+ U(t)=-b u_t(D,t)-q u(D,t)-\Bcal^\top P_\eps X(t)
+\]
+finite-dimensional apart from two boundary traces.
+
+The contributions are: (i) a unified offline kernel construction for the marginally stable case; (ii) a five-step Lyapunov proof with explicit constants and an explicit sufficient upper bound on \(\eps\); (iii) a nilpotent specialization with the explicit channel \(\Bbar=q^{-1}\int_0^D B_1(x)\,dx\); and (iv) a clear statement of the theoretical and implementation boundaries.
+
+The paper is organized as follows. Section II gives the problem formulation, the Riccati lemma, and the offline kernel construction. Section III presents the general and nilpotent stability results and their proof structure. Section IV specifies a normalized numerical-illustration framework. Section V concludes the paper.
+
+Throughout, \(\abs{\cdot}\) denotes the Euclidean norm of vectors or the induced 2-norm of matrices, and \(\norm{\cdot}\) denotes the \(L^2(0,D)\) norm of scalar or vector functions. The symbols \(I\) and \(0\) have compatible dimensions.
+
+\section{Preliminaries}
+
+\subsection{Problem Formulation}
+
+Let \(D>0\), \(x\in(0,D)\), and \(t\geq0\). Consider
+\begin{align}
+ \dot X(t)&=AX(t)+\int_0^D B_1(x)u(x,t)\,dx\\
+ &\quad+\int_0^D B_2(x)u_t(x,t)\,dx, \label{eq:model_ode}\\
+ u_{tt}(x,t)&=u_{xx}(x,t), \label{eq:model_wave}
+\end{align}
+with
+\begin{equation}
+ u_x(0,t)=0,\qquad u_x(D,t)=U(t). \label{eq:model_bc}
+\end{equation}
+Here \(X(t)\in\R^n\) is the ODE state, \(u(x,t)\in\R\) is the wave displacement, \(A\in\R^{n\times n}\), and \(U(t)\in\R\) is the right-boundary input. The coupling coefficients satisfy
+\begin{equation}
+ B_1,B_2\in L^2(0,D;\R^n). \label{eq:L2_couplings}
+\end{equation}
+The initial data are
+\begin{equation}
+ X(0)=X_0,\qquad u(\cdot,0)=u_0,\qquad u_t(\cdot,0)=u_1. \label{eq:initial_data}
+\end{equation}
+The energy state space is \(\R^n\times H^1(0,D)\times L^2(0,D)\), with \(X_0\in\R^n\), \(u_0\in H^1(0,D)\), and \(u_1\in L^2(0,D)\). For a classical solution we additionally assume \(u_0\in H^2(0,D)\), \(u_1\in H^1(0,D)\), the boundary compatibility \(u_0'(0)=0\), and \(u_0'(D)=U(0)\), where \(U(0)\) is evaluated from the feedback law.
+
+Define
+\begin{align}
+ E_u(t)&=\frac12\int_0^D\big(u_x^2(x,t)+u_t^2(x,t)\big)\,dx
+       +\frac q2u^2(D,t), \label{eq:Eu_def}\\
+ \Omega(t)&=\abs{X(t)}^2+\int_0^D\big(u_x^2(x,t)+u_t^2(x,t)\big)\,dx+u^2(D,t). \label{eq:Omega}
+\end{align}
+The objective is global exponential stability: there exist \(\alpha,\beta>0\) such that
+\begin{equation}
+ \Omega(t)\leq \alpha e^{-\beta t}\Omega(0),\qquad t\geq0. \label{eq:objective}
+\end{equation}
+The trace term \(u^2(D,t)\) fixes the spatial constant mode that is not controlled by \(u_x\) alone. In applications, \(u\) represents a flexible displacement or a wave amplitude, while \(B_1\) and \(B_2\) describe distributed force and velocity channels.
+
+\subsection{Technical Lemma}
+
+\begin{lemma}[Low-gain Riccati property]\label{lem:riccati}
+Assume that \((A,B)\) is controllable and that every eigenvalue of \(A\) lies on the imaginary axis. For every \(\eps>0\), the equation
+\begin{equation}
+ A^\top P_\eps+P_\eps A-P_\eps BB^\top P_\eps=-\eps P_\eps \label{eq:ARE}
+\end{equation}
+has a unique positive definite solution. There are \(\eps_0>0\) and \(K_P>0\), depending only on \((A,B)\), such that
+\begin{equation}
+ 0<\eps\leq\eps_0\quad\Longrightarrow\quad \abs{P_\eps}\leq K_P\eps. \label{eq:P_order}
+\end{equation}
+If all eigenvalues of \(A\) are at the origin, then there is \(C_A>0\) such that
+\begin{equation}
+ A^\top P_\eps A\preceq C_A\eps^2P_\eps. \label{eq:nilpotent_P_bound}
+\end{equation}
+This standard lemma is used only as a finite-dimensional stability and order estimate; its proof is omitted.
+\end{lemma}
+
+\subsection{Offline Kernel Construction}
+
+The distributed terms in \eqref{eq:model_ode} are removed by an auxiliary variable. Choose \(b>0\) and \(0<q<1/D\). Let \(g:[0,D]\to\R^n\) solve
+\begin{align}
+ g''(x)+B_1(x)&=A\big(Ag(x)-B_2(x)\big), \label{eq:g_bvp}\\
+ g'(0)&=0, \qquad -g'(D)=(bA+qI)g(D). \label{eq:g_bc}
+\end{align}
+Set
+\begin{equation}
+ g_0(x)=Ag(x)-B_2(x),\qquad \Bcal=g(D). \label{eq:g0_Bcal}
+\end{equation}
+For \(B_1,B_2\in L^2\), the solution belongs to \(H^2(0,D;\R^n)\), and all terms below are ordinary Lebesgue integrals.
+
+For completeness, write \(Y=[g^\top\ (g')^\top]^\top\). Then
+\begin{align}
+ \mathcal A_g&=\begin{bmatrix}0&I\\A^2&0\end{bmatrix},
+ &\Phi(x)&=e^{\mathcal A_gx}, \nonumber\\
+ L_{b,q}&=\begin{bmatrix}bA+qI&I\end{bmatrix}. \label{eq:kernel_first_order}
+\end{align}
+With \(g(0)=\eta\) and \(g'(0)=0\), variation of constants gives
+\begin{align}
+ Y(D)=\Phi(D)\begin{bmatrix}\eta\\0\end{bmatrix}
+ -\int_0^D\Phi(D-\xi)\begin{bmatrix}0\\AB_2(\xi)+B_1(\xi)\end{bmatrix}d\xi. \label{eq:kernel_variation}
+\end{align}
+Consequently, the right boundary condition is
+\begin{equation}
+ M_{b,q}\eta+r_{b,q}=0, \label{eq:kernel_linear_system}
+\end{equation}
+where
+\begin{align}
+ M_{b,q}&=L_{b,q}\Phi(D)\begin{bmatrix}I\\0\end{bmatrix}, \label{eq:M_bq}\\
+ r_{b,q}&=-L_{b,q}\int_0^D\Phi(D-\xi)\begin{bmatrix}0\\AB_2(\xi)+B_1(\xi)\end{bmatrix}d\xi. \label{eq:r_bq}
+\end{align}
+Thus invertibility of \(M_{b,q}\) is the offline solvability condition, and \(\Bcal=g(D)\) is computed once. No kernel iteration or distributed state is required online.
+
+\section{Main Results}
+
+\subsection{General Marginally Stable Case}
+
+\begin{assumption}[General case]\label{ass:general}
+The parameters satisfy \(b>0\) and \(0<q<1/D\); \(M_{b,q}\) in \eqref{eq:M_bq} is invertible; the resulting pair \((A,\Bcal)\) is controllable; all eigenvalues of \(A\) lie on the imaginary axis; and the initial data satisfy \eqref{eq:initial_data} in the energy space (or the stronger classical compatibility stated after it).
+\end{assumption}
+
+Let \(P_\eps>0\) solve
+\begin{equation}
+ A^\top P_\eps+P_\eps A-P_\eps\Bcal\Bcal^\top P_\eps=-\eps P_\eps. \label{eq:ARE_general}
+\end{equation}
+The boundary feedback is
+\begin{equation}
+ U(t)=-b u_t(D,t)-q u(D,t)-\Bcal^\top P_\eps X(t). \label{eq:controller_general}
+\end{equation}
+The first two terms dissipate velocity and penalize the boundary displacement; the last term stabilizes the marginal ODE modes.
+
+\begin{theorem}[General exponential stability]\label{thm:general}
+Under Assumption~\ref{ass:general}, there exists an explicit sufficient number \(\eps^*>0\) specified in \eqref{eq:eps_star_general} such that every \(0<\eps\leq\eps^*\) yields a unique energy solution (and a unique classical solution for classical compatible data) satisfying \eqref{eq:objective}.
+\end{theorem}
+
+\begin{proof}
+The accompanying Markdown derivation records every calculation. The five steps below state the coefficient chain used for verification.
+
+\emph{Step 1 (auxiliary transformation).} Define
+\begin{equation}
+ Z=X+\int_0^D g_0u\,dx+\int_0^D gu_t\,dx+b\Bcal u(D),\qquad \varphi=Z-X. \label{eq:Z_general}
+\end{equation}
+Two integrations by parts, \eqref{eq:g_bvp}, and \eqref{eq:g_bc} give
+\begin{equation}
+ \dot Z=AZ+\Bcal\big(u_x(D)+b u_t(D)+q u(D)\big). \label{eq:Z_target}
+\end{equation}
+After \eqref{eq:controller_general},
+\begin{equation}
+ \dot Z=(A-\Bcal\Bcal^\top P_\eps)Z+\Bcal\Bcal^\top P_\eps\varphi. \label{eq:Z_closed}
+\end{equation}
+
+\emph{Step 2 (Lyapunov functional).} Set
+\begin{equation}
+ C_\infty=4(D+q^{-1}),\qquad C_0=DC_\infty. \label{eq:C_infty_C0}
+\end{equation}
+Then \(\norm{u}_{L^\infty}^2\leq C_\infty E_u\), \(\norm{u}^2\leq C_0E_u\), and
+\begin{equation}
+ C_\varphi=3\norm{g_0}^{2}C_0+6\norm{g}^{2}
+       +\frac{6b^2\abs{\Bcal}^{2}}{q},\qquad
+ \abs{\varphi}^2\leq C_\varphi E_u. \label{eq:C_phi}
+\end{equation}
+Choose \(Dq/2<\kappa<1/2\), set \(\delta_2=\kappa\delta_1\), and define
+\begin{equation}
+ K_\delta=D+\kappa(C_0/2+1),\qquad
+ 0<\delta_1\leq(2K_\delta)^{-1},
+ \end{equation}
+\begin{equation}
+ V_2=E_u+\delta_1\int_0^D xu_xu_t\,dx
+       +\delta_2\int_0^D uu_t\,dx. \label{eq:V2_general}
+\end{equation}
+Then \(m_\delta E_u\leq V_2\leq M_\delta E_u\), with \(m_\delta=1-\delta_1K_\delta\) and \(M_\delta=1+\delta_1K_\delta\). Set \(V=V_1+\eps V_2\), \(V_1=Z^\top P_\eps Z\).
+
+\emph{Step 3 (trajectory estimates).} Choose \(\delta_1\) small enough that
+\begin{equation}
+ b-\frac{\delta_1D(1+b^2)}2>0
+\end{equation}
+and
+\begin{equation}
+ \delta_1q\left(\kappa-\frac{Dq}{2}\right)
+ -\frac{\delta_1^2b^2(Dq-\kappa)^2}
+ {b-\frac{\delta_1D(1+b^2)}2}>0.
+\end{equation}
+Define
+\begin{align}
+ c_3={}&\min\left\{
+ \delta_1(1+2\kappa),\,
+ \delta_1(1-2\kappa),\right.\nonumber\\
+ &\left.
+ \frac{1}{q}\left[
+ \delta_1q\left(\kappa-\frac{Dq}{2}\right)
+ -\frac{\delta_1^2b^2(Dq-\kappa)^2}
+ {b-\frac{\delta_1D(1+b^2)}2}
+ \right]\right\}, \label{eq:c3_direct}
+\end{align}
+and
+\begin{align}
+ C_2={}&\frac{\delta_1D}{2}
+ +\frac{(1-\delta_1Db)^2}
+ {b-\frac{\delta_1D(1+b^2)}2}\nonumber\\
+ &+\frac{\delta_1^2(\kappa-Dq)^2}
+ {2\left[\delta_1q\left(\kappa-\frac{Dq}{2}\right)
+ -\frac{\delta_1^2b^2(Dq-\kappa)^2}
+ {b-\frac{\delta_1D(1+b^2)}2}\right]}. \label{eq:C2_direct}
+\end{align}
+direct differentiation and Young's inequality yield
+\begin{equation}
+ \dot V_1\leq-\eps V_1+C_1\abs{P_\eps}^2E_u,
+ \qquad C_1=\abs{\Bcal}^{2}C_\varphi. \label{eq:V1_estimate}
+\end{equation}
+\begin{equation}
+ \dot V_2\leq-c_3E_u+C_3\abs{P_\eps}V_1
+       +C_4\abs{P_\eps}^2E_u,
+\end{equation}
+\begin{equation}
+ C_3=2C_2\abs{\Bcal}^{2},\qquad
+ C_4=2C_2\abs{\Bcal}^{2}C_\varphi. \label{eq:V2_estimate}
+\end{equation}
+
+\emph{Step 4 (small-gain absorption).} Lemma~\ref{lem:riccati} gives \(\abs{P_\eps}\leq K_P\eps\) for \(\eps\leq\eps_0\). It is sufficient to choose
+\begin{equation}
+ \eps^*=\min\left\{\eps_0,\frac{1}{2C_3K_P},
+ \frac{c_3}{4C_1K_P^2},
+ \sqrt{\frac{c_3}{4C_4K_P^2}}\right\}, \label{eq:eps_star_general}
+\end{equation}
+with the last term omitted when \(C_4=0\). Then \(\eps C_3\abs{P_\eps}\leq\eps/2\) and \(C_1\abs{P_\eps}^2+\eps C_4\abs{P_\eps}^2\leq\eps c_3/2\).
+
+\emph{Step 5 (decay and norm equivalence).} Therefore
+\begin{equation}
+ \dot V\leq-\frac\eps2V_1-\frac{\eps c_3}{2}E_u
+ \leq-\beta V,\qquad
+ \beta=\min\left\{\frac\eps2,\frac{c_3}{2M_\delta}\right\}. \label{eq:V_decay_general}
+\end{equation}
+Then
+\begin{equation}
+ m_\eps\Omega\leq V\leq M_\eps\Omega,
+\end{equation}
+where
+\begin{align}
+ m_\eps&=\left[
+ \max\left\{2\lambda_{\min}(P_\eps)^{-1},
+ \frac{2C_\varphi+2(1+q^{-1})}{\eps m_\delta}
+ \right\}\right]^{-1},\\
+ M_\eps&=2\abs{P_\eps}
+ +\left(2C_\varphi\abs{P_\eps}+\eps M_\delta\right)
+ \max\left\{\frac12,\frac q2\right\}.
+ \label{eq:V_Omega_constants}
+\end{align}
+Gronwall's inequality gives \(V(t)\leq e^{-\beta t}V(0)\), hence \eqref{eq:objective} with \(\alpha=M_\eps/m_\eps\). The closed-loop operator is a bounded boundary perturbation of the wave generator coupled to a finite-dimensional ODE; standard semigroup perturbation results give existence and uniqueness.
+\end{proof}
+
+\begin{remark}[Structure and backstepping comparison]\label{rem:backstepping}
+The online law uses only \(X(t)\), \(u(D,t)\), and \(u_t(D,t)\). The functions \(g\) and \(g_0\) are used offline to compute \(\Bcal\). This is simpler than a full-domain backstepping implementation, but it requires imaginary-axis ODE spectrum and controllability of \((A,\Bcal)\).
+\end{remark}
+
+\begin{remark}[Applicability boundary]\label{rem:boundary}
+The conditions \(q<1/D\) and sufficiently small \(\eps\) are sufficient Lyapunov-design conditions, not necessary stability limits. The result includes \(B_1=0\), \(B_2=0\), and pure displacement or pure velocity coupling. An ODE with an unstable right-half-plane eigenvalue or an uncontrollable effective channel is outside this low-gain theorem and requires a different design. The present proof is an \(L^2\)-coupling result; extensions to more singular couplings require a separate trace-space argument, while an unbounded velocity coupling is not covered.
+\end{remark}
+
+\subsection{Nilpotent Case}
+
+For the nilpotent specialization, use the separate direct-cancellation kernel equations
+\begin{equation}
+ g''(x)+B_1(x)=0,\qquad g'(0)=0,\qquad -g'(D)=qg(D),
+\end{equation}
+\begin{equation}
+ g_0(x)=-B_2(x). \label{eq:nil_kernel}
+\end{equation}
+This construction cancels the two distributed integrals directly and is not obtained by substituting a nilpotent matrix into \eqref{eq:g_bvp}.
+Integrating the first equation gives
+\begin{equation}
+ \Bbar=g(D)=\frac1q\int_0^D B_1(x)\,dx. \label{eq:Bbar}
+\end{equation}
+The cancellation in \eqref{eq:nil_kernel} gives the transformed equation
+\begin{equation}
+ \dot Z=AX+\Bbar\big(u_x(D)+bu_t(D)+qu(D)\big), \label{eq:nil_Z_target}
+\end{equation}
+for the same definition of \(Z\) as in \eqref{eq:Z_general}, with \(g(D)=\Bbar\).
+
+\begin{assumption}[Nilpotent case]\label{ass:nil}
+The matrix \(A\) is nilpotent, \((A,\Bbar)\) is controllable, \(b>0\), \(0<q<1/D\), and the initial data satisfy the same energy or classical compatibility conditions as in Assumption~\ref{ass:general}.
+\end{assumption}
+
+Let \(P_\eps>0\) solve
+\begin{equation}
+ A^\top P_\eps+P_\eps A-P_\eps\Bbar\Bbar^\top P_\eps=-\eps P_\eps, \label{eq:ARE_nil}
+\end{equation}
+and apply
+\begin{equation}
+ U=-bu_t(D)-qu(D)-\Bbar^\top P_\eps X. \label{eq:controller_nil}
+\end{equation}
+
+\begin{theorem}[Nilpotent exponential stability]\label{thm:nil}
+Under Assumption~\ref{ass:nil}, there exists a positive sufficient bound \(\eps_n^*\) in \eqref{eq:eps_star_nil} such that every \(0<\eps\leq\eps_n^*\) gives a unique exponentially stable closed-loop solution satisfying \eqref{eq:objective}.
+\end{theorem}
+
+\begin{proof}[Proof of Theorem~\ref{thm:nil}]
+Use the same \(V_2\), \(C_\varphi\), \(c_3\), \(C_2\), \(C_3\), and \(C_4\), with \(\Bcal\) replaced by \(\Bbar\). Writing \(\varphi=Z-X\), \eqref{eq:nil_Z_target} and \eqref{eq:controller_nil} give
+\begin{equation}
+ \dot Z=(A-\Bbar\Bbar^\top P_\eps)(Z-\varphi). \label{eq:nil_Z_closed}
+\end{equation}
+The Riccati identity, together with
+\begin{equation*}
+ -\bigl(\Bbar^\top P_\eps Z\bigr)^2
+ +2\bigl(\Bbar^\top P_\eps Z\bigr)
+      \bigl(\Bbar^\top P_\eps\varphi\bigr)
+ \leq \bigl(\Bbar^\top P_\eps\varphi\bigr)^2,
+\end{equation*}
+and \eqref{eq:nilpotent_P_bound} imply
+\begin{equation}
+ \dot V_1\leq-\frac\eps2V_1
+ +\left(\abs{\Bbar}^{2}\abs{P_\eps}^2
+ +2C_A\eps\abs{P_\eps}\right)\abs{\varphi}^2,
+ \label{eq:nil_V1_est}
+\end{equation}
+\begin{align}
+ \dot V\leq{}&-\frac\eps2V_1+\eps C_3\abs{P_\eps}V_1
+ +\Big(2C_AC_\varphi\eps\abs{P_\eps}
+ +\abs{\Bbar}^{2}C_\varphi\abs{P_\eps}^2\nonumber\\
+ &\qquad +\eps C_4\abs{P_\eps}^2
+ -\eps c_3\Big)E_u. \label{eq:nil_V_combine}
+\end{align}
+For \(\abs{P_\eps}\leq K_P\eps\), it is sufficient to set
+\begin{align}
+ \eps_n^*=\min\Bigg\{&\eps_0,\frac{1}{4C_3K_P},
+ \frac{c_3}{12C_AC_\varphi K_P}, \nonumber\\
+ &\frac{c_3}{6\abs{\Bbar}^{2}C_\varphi K_P^2},
+ \sqrt{\frac{c_3}{6C_4K_P^2}}\Bigg\}, \label{eq:eps_star_nil}
+\end{align}
+again omitting a term with zero denominator. Then
+\begin{equation}
+ \dot V\leq-\frac{\eps}{4}V_1-\frac{\eps c_3}{2}E_u.
+\end{equation}
+Consequently,
+\begin{equation}
+ \dot V\leq-\beta_nV,qquad
+ \beta_n=\min\left\{\frac{\eps}{4},\frac{c_3}{2M_\delta}\right\}.
+\end{equation}
+The constants \(m_\eps,M_\eps\) and the Gronwall argument are unchanged.
+The nilpotent estimate \eqref{eq:nilpotent_P_bound} is precisely what makes
+the additional \(A\varphi\) term an \(O(\eps^2)\) perturbation.
+\end{proof}
+
+\subsection{Theoretical Boundary and Implementation Remarks}
+
+The stability restrictions have the following interpretation. First, \(q<1/D\) is imposed by the multiplier construction and is not a necessary condition for every possible boundary controller. Second, \(\eps^*\) and \(\eps_n^*\) are conservative sufficient bounds obtained by absorbing the explicit cross terms; they should not be interpreted as the largest experimentally usable gain. Third, the kernel and \(\Bcal\) (or \(\Bbar\)) are computed offline, whereas online operation needs only \(X\), \(u(D)\), and \(u_t(D)\). Finally, the theorem is formulated in the bounded \(L^2\) coupling setting. The method's main advantage is the clear offline/online split; its intrinsic limitations are the ODE spectral assumption and the need for two boundary traces.
+
+\section{Numerical Illustration Framework}
+
+This section records a normalized framework for later numerical verification; it does not introduce additional theoretical assumptions or new figures. For the general case one may take \(D=1\), \(b=1\), \(q=0.4\),
+\begin{align}
+ A&=\begin{bmatrix}0&-1\\1&0\end{bmatrix},
+ &B_1(x)&=\begin{bmatrix}2-x\\0.6\sin(\pi x)\end{bmatrix}, \nonumber\\
+ &&B_2(x)=0,
+\end{align}
+and compute \(g\), \(\Bcal\), and \(P_\eps\) from \eqref{eq:kernel_linear_system} and \eqref{eq:ARE_general}. For a nilpotent example use \(D=1\), \(b=1\), \(q=0.5\),
+\begin{equation}
+ A=\begin{bmatrix}0&1\\0&0\end{bmatrix},\qquad B_1(x)=\begin{bmatrix}0\\1\end{bmatrix},\qquad B_2(x)=0,
+\end{equation}
+so that \(\Bbar=[0\ \ 2]^\top\). A method-of-lines discretization with a uniform grid and a ghost point at \(x=D\) implements the Neumann boundary input. The simulation should report \(X(t)\), \(u(D,t)\), \(u_t(D,t)\), and the energy \(\Omega(t)\) for several small values of \(\eps\). The expected trend is slower decay for very small gains and loss of the theorem's guarantee once the selected gain exceeds the conservative bound.
+
+\section{Conclusion}
+
+A low-gain boundary controller has been constructed for a wave--ODE cascade with ordinary \(L^2\) distributed displacement and velocity couplings. An offline kernel converts the distributed interaction into an effective finite-dimensional channel. The five-step proof combines a Riccati functional for the transformed ODE with a multiplier functional for the wave, gives explicit constants and a sufficient gain bound, and establishes exponential decay in the natural state metric. A nilpotent specialization yields the explicit channel \(q^{-1}\int B_1\). The controller is online-simple but relies on imaginary-axis ODE spectrum, effective-channel controllability, and boundary measurements.
+
+\begin{thebibliography}{1}
+
+\bibitem{XuLiuKrsticFeng2023}
+X.~Xu, L.~Liu, M.~Krstic, and G.~Feng, ``Low-gain compensation for PDE--ODE cascade systems with distributed diffusion and counter convection,'' \emph{IEEE Transactions on Automatic Control}, vol.~68, no.~4, pp.~2360--2367, Apr. 2023.
+
+\bibitem{Krstic2009Diffusion}
+M.~Krstic, ``Compensating actuator and sensor dynamics governed by diffusion PDEs,'' \emph{Systems \& Control Letters}, vol.~58, no.~5, pp.~372--377, 2009.
+
+\bibitem{BekiarisKrstic2011Diffusion}
+N.~Bekiaris-Liberis and M.~Krstic, ``Compensating the distributed effect of diffusion and counter-convection in multi-input and multi-output LTI systems,'' \emph{IEEE Transactions on Automatic Control}, vol.~56, no.~3, pp.~637--643, Mar. 2011.
+
+\bibitem{Lin1999LowGain}
+Z.~Lin, \emph{Low Gain Feedback}. London, U.K.: Springer, 1999.
+
+\end{thebibliography}
+
+\end{document}
