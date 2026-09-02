@@ -3,12 +3,18 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
 \usepackage{graphicx}
+\usepackage{placeins}
 \usepackage{textcomp}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \usepackage{bm}
 \usepackage{tikz}
 \usepackage{amsthm}
+\makeatletter
+\setlength{\@dblfptop}{0pt}
+\setlength{\@dblfpsep}{10pt}
+\setlength{\@dblfpbot}{0pt plus 1fil}
+\makeatother
 \newcommand{\Av}{\mathcal{A}}
 \newcommand{\dint}[1]{\int_0^D #1}
 \newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
@@ -1284,7 +1290,7 @@ $\Delta t/\Delta x = 0.1$. The effective gain $B$ in \eqref{eq:B} is computed by
 the same trapezoidal rule on a fine quadrature grid; the result is insensitive
 to the quadrature refinement, as reported in the examples.
 
-\subsection{Example 1: Oscillator--Wave Cascade}
+\subsection{Example 1: General Marginally Stable Case}
 \label{ex1}
 Consider the cascade \eqref{eq:ode}--\eqref{eq:wave} with
 \begin{equation}
@@ -1301,7 +1307,7 @@ B_2(x) &= e^{-20(x-0.35)^2}\begin{pmatrix} 1\\ 0.25 \end{pmatrix}.
 The profile $B_1$ is concentrated near the actuated boundary so that the
 displacement channel regulates the oscillator directly, while $B_2$ is centered
 in the interior to keep the velocity coupling genuinely distributed. With the
-compatible initial data $X(0) = (0.40,\,-0.2301)^{\top}$, $u(x,0) = 0.08\cos
+initial data $X(0) = (0.40,\,-0.2301)^{\top}$, $u(x,0) = 0.08\cos
 \frac{\pi x}{2D}$, and $u_t(x,0) = 0$, the matrix $E$ in \eqref{eq:E} is
 invertible, and \eqref{eq:B} gives
 \begin{equation}
@@ -1322,45 +1328,18 @@ U(t) = -0.1786\,x_1(t) + 0.3689\,x_2(t) - u_t(D,t) - 0.4\,u(D,t).
 \label{eq:ex1Ctrl}
 \end{equation}
 
-\begin{figure}[!t]
-\centerline{\includegraphics[width=\columnwidth]{fig2.png}}
-\caption{Damping-only versus closed-loop ODE state trajectories for Example 1 on
-$t \in [0,50]$, using the same initial data in both panels. The left panel
-removes the low-gain and stiffness terms and keeps only the boundary damping
-term, while the right panel uses the full low-gain feedback law.}
-\label{fig2}
-\end{figure}
+\begin{figure*}[!t]
+\centerline{\includegraphics[width=0.92\textwidth]{fig2.png}}
+\caption{Closed-loop response for Example~\ref{ex1}: (a) ODE state trajectories
+and (b) three-dimensional response of the wave displacement $u(x,t)$.}
+\label{fig:ex1}
+\end{figure*}
 
-\begin{figure}[!t]
-\centerline{\includegraphics[width=\columnwidth]{fig3.png}}
-\caption{Three-dimensional displacement surface for Example 1, showing the
-spatiotemporal decay of $u(x,t)$ on $(x,t) \in [0,1]\times[0,50]$.}
-\label{fig3}
-\end{figure}
-
-Figure~\ref{fig2} directly shows the role of the low-gain component. When only
-the boundary damping $U(t) = -u_t(D,t)$ is retained, the two ODE components
-remain in a sustained oscillatory regime and do not converge, with
-$\Omega(50)/\Omega(0) = 9.27\times 10^{-1}$. Under the full feedback
-\eqref{eq:ex1Ctrl}, the closed loop decays. The offline gain is
-quadrature-insensitive: computing $B$ on the coarse PDE grid ($N = 200$)
-instead of the fine quadrature grid changes \eqref{eq:ex1Bgain} by less than
-$10^{-5}$. Quantitatively, the closed-loop energy ratio is
-\begin{equation}
-\frac{\Omega(50)}{\Omega(0)} = 4.70 \times 10^{-6},
-\label{eq:ex1ratio}
-\end{equation}
-the least-squares semilog decay rate is $0.251$, the $10\%$, $5\%$, and $1\%$
-energy thresholds are crossed at $t = 10.4$, $13.3$, and $19.6$, respectively,
-and the low-gain component remains moderate with
-\begin{equation}
-\max_{t\in[0,50]}\abs{B^{\top}P X(t)} = 0.169.
-\label{eq:ex1effort}
-\end{equation}
-Finally, $\abs{X(50)} = 9.22\times 10^{-4}$ and $\abs{u(D,50)} =
-1.80\times 10^{-4}$, so the design has entered a clear asymptotic regime within
-the window. Figure~\ref{fig3} confirms that the PDE state also decays, in
-agreement with Theorem~\ref{thm1}.
+Figure~\ref{fig:ex1}(a) shows that both ODE states converge to the origin under
+the controller \eqref{eq:ex1Ctrl}. Figure~\ref{fig:ex1}(b) further shows the
+decay of the distributed actuator state. Hence, the complete PDE--ODE cascade is
+stabilized in the general marginally stable case, in agreement with
+Theorem~\ref{thm1}.
 
 \subsection{Example 2: Nilpotent Chain}
 \label{ex2}
@@ -1404,65 +1383,52 @@ so the implemented special-case controller is
 U(t) = -\left(0.0200,\; 0.2000\right)X(t) - u_t(D,t) - 0.5\,u(D,t).
 \label{eq:ex2Ctrl}
 \end{equation}
-The initial conditions $X(0) = (0.30,\,-0.20)^{\top}$, $u(x,0) = 0.04\cos
-\frac{\pi x}{2D}$, $u_t(x,0) = 0$ are compatible with the boundary conditions.
+The initial conditions are $X(0) = (0.30,\,-0.20)^{\top}$, $u(x,0) = 0.04\cos
+\frac{\pi x}{2D}$, and $u_t(x,0) = 0$.
 
-\begin{figure}[!t]
-\centerline{\includegraphics[width=\columnwidth]{fig4.png}}
-\caption{Damping-only versus closed-loop ODE state trajectories for the nilpotent
-Example 2 on $t \in [0,50]$, using the same initial data in both panels. The left
-panel removes the low-gain and stiffness terms and keeps only the boundary
-damping term, while the right panel uses the special low-gain feedback law.}
-\label{fig4}
-\end{figure}
+\begin{figure*}[!t]
+\centerline{\includegraphics[width=0.92\textwidth]{fig3.png}}
+\caption{Comparison for the nilpotent Example~\ref{ex2}: (a)--(b) ODE and wave
+responses with boundary damping only; (c)--(d) ODE and three-dimensional wave
+responses under the proposed low-gain controller.}
+\label{fig:ex2}
+\end{figure*}
 
-\begin{figure}[!t]
-\centerline{\includegraphics[width=\columnwidth]{fig5.png}}
-\caption{Three-dimensional displacement surface for the nilpotent Example 2,
-showing the spatiotemporal decay of $u(x,t)$ on $(x,t) \in [0,1]\times[0,50]$.}
-\label{fig5}
-\end{figure}
+Figure~\ref{fig:ex2} compares both the ODE and PDE responses with and without
+the low-gain feedback term. Boundary damping alone cannot stabilize the
+nilpotent ODE chain, whereas the proposed controller drives the ODE states and
+the wave displacement to the origin. This confirms the effectiveness of the
+simplified controller \eqref{eq:nilpCtrl} in the nilpotent case.
 
-Figure~\ref{fig4} shows the same mechanism for the nilpotent chain. Without the
-low-gain component the ODE states fail to decay and the chain structure
-amplifies the transient. Under the low-gain controller acting through the wave
-dynamics, the closed-loop trajectories converge. The observed indicators are
+\subsection{Example 3: Effect of the Low-Gain Parameter}
+\label{ex3}
+We next use the general marginally stable plant and the initial data of
+Example~\ref{ex1}, while varying the low-gain parameter as
 \begin{equation}
-\frac{\Omega(50)}{\Omega(0)} = 5.81 \times 10^{-5},
-\qquad \max_{t\in[0,50]}\abs{\bar{B}^{\top}P X(t)} = 0.034.
-\label{eq:ex2indicators}
+\varepsilon\in\{0.2,\,0.5,\,0.9\}.
+\label{eq:ex3eps}
 \end{equation}
-The fitted semilog decay rate is $0.196$, and the energy drops below $10\%$,
-$5\%$, and $1\%$ at $t = 9.4$, $9.9$, and $21.3$, respectively. By $t = 50$,
-$\abs{X(50)} = 2.68\times 10^{-3}$ and $\abs{u(D,50)} = 6.30\times 10^{-4}$.
-Compared with Example~\ref{ex1}, the nilpotent case converges more slowly, which
-motivates the longer observation window. Figure~\ref{fig5} shows the
-corresponding spatiotemporal decay of the wave state.
+All remaining controller and discretization parameters are unchanged.
 
-Table~\ref{tab1} summarizes the quantitative indicators of both examples.
+\begin{figure*}[!t]
+\centerline{\includegraphics[width=0.92\textwidth]{fig4.png}}
+\caption{Effect of the low-gain parameter in Example~\ref{ex3}. Each row
+contains the ODE response (left) and the three-dimensional PDE response (right)
+for (a)--(b) $\varepsilon=0.2$, (c)--(d) $\varepsilon=0.5$, and (e)--(f)
+$\varepsilon=0.9$.}
+\label{fig:ex3}
+\end{figure*}
 
-\begin{table}[!t]
-\caption{Simulation indicators for Examples 1 and 2.}
-\label{tab1}
-\begin{center}
-\begin{tabular}{|l|c|c|}
-\hline
- & Example 1 & Example 2 \\
-\hline
-$\varepsilon$ & $0.12$ & $0.20$ \\
-$\Omega(50)/\Omega(0)$, closed loop & $4.70\times10^{-6}$ &
-$5.81\times10^{-5}$ \\
-$\Omega(50)/\Omega(0)$, damping only & $9.27\times10^{-1}$ & $5.40\times10^{2}$ \\
-Fitted decay rate & $0.251$ & $0.196$ \\
-$10\%/5\%/1\%$ crossing & $10.4/13.3/19.6$ & $9.4/9.9/21.3$ \\
-$\max_{t}\abs{KX(t)}$ & $0.169$ & $0.034$ \\
-$\abs{X(50)}$ & $9.22\times10^{-4}$ & $2.68\times10^{-3}$ \\
-$\abs{u(D,50)}$ & $1.80\times10^{-4}$ & $6.30\times10^{-4}$ \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
+Figure~\ref{fig:ex3} illustrates the need to retain a sufficiently small
+low-gain parameter. For this plant, $\varepsilon=0.2$ stabilizes both the ODE
+states and the wave state, whereas the responses for $\varepsilon=0.5$ and
+$\varepsilon=0.9$ grow. The more pronounced growth at $\varepsilon=0.9$ shows
+that increasing $\varepsilon$ is not an unrestricted performance-tuning
+mechanism. This behavior is consistent with the small-gain requirement in
+Theorem~\ref{thm1}.
 
+\FloatBarrier
+\twocolumn
 \section{Conclusion}
 \label{sec:concl}
 This paper studied the low-gain stabilization problem for a class of wave
