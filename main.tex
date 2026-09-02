@@ -273,7 +273,7 @@ estimate used in the stability analysis.
 Assume $(A,B)$ is controllable and all eigenvalues of $A$ lie on the imaginary
 axis. Then the parametric algebraic Riccati equation (ARE)
 \begin{equation}
-A^{\top}P + PA - PBB^{\top}P = -\varepsilon P
+A^{\top}P + PA-PBB^{\top}P = -\varepsilon P
 \label{eq:are}
 \end{equation}
 has a unique positive definite solution $P=P_\varepsilon$. Moreover,
@@ -281,8 +281,8 @@ has a unique positive definite solution $P=P_\varepsilon$. Moreover,
 \item $\lim_{\varepsilon \to 0^+} P_\varepsilon = 0$ and
 $\frac{\mathrm{d}P_\varepsilon}{\mathrm{d}\varepsilon} > 0$ for all
 $\varepsilon > 0$;
-\item there exists $\vartheta > 0$ such that $\lim_{\varepsilon \to 0^+}
-\varepsilon^{-1}P_\varepsilon = \vartheta$;
+\item there exists $\vartheta_c>0$ such that $\lim_{\varepsilon \to 0^+}
+\varepsilon^{-1}P_\varepsilon = \vartheta_c$;
 \item if all eigenvalues of $A$ are at the origin, then $A^{\top}P_\varepsilon A
 \preceq 3n^2\varepsilon^2 P_\varepsilon$.
 \end{enumerate}
@@ -431,6 +431,31 @@ The following conditions hold:
 \end{enumerate}
 \end{assumption}
 
+For the more general nonexpansive case, let $T$ be a real similarity
+transformation that separates the stable and critical spectral subspaces:
+\begin{equation}
+\begin{aligned}
+T^{-1}AT&=\begin{pmatrix}A_s&0\\0&A_c\end{pmatrix},
+&T^{-1}B&=\begin{pmatrix}B_s\\B_c\end{pmatrix},\\
+\widetilde X:=T^{-1}X&=\begin{pmatrix}
+\widetilde X_s\\\widetilde X_c
+\end{pmatrix}.
+\end{aligned}
+\label{eq:spectral_split}
+\end{equation}
+where $A_s$ is Hurwitz and all eigenvalues of $A_c$ lie on the imaginary
+axis. The decomposition is understood in terms of real generalized spectral
+subspaces, so it does not require $A$ to be diagonalizable.
+
+\begin{assumption}
+\label{ass3}
+The conditions $b>0$, $0<q<1/D$, and invertibility of $E$ in
+Assumption~\ref{ass1} hold, $\sigma(A)\subset\{s:\operatorname{Re}s\leq0\}$,
+and the critical pair $(A_c,B_c)$ in \eqref{eq:spectral_split} is
+controllable. No controllability condition is imposed on the Hurwitz pair
+$(A_s,B_s)$.
+\end{assumption}
+
 \paragraph{Feedback.}
 By Lemma~\ref{lem:lowgain}, let $P=P_\varepsilon>0$ denote the solution of
 \eqref{eq:are}.
@@ -443,6 +468,21 @@ The term $-b\,u_t(D,t)$ injects boundary damping. The term
 $-q\,u(D,t)$ controls the displacement mode associated with the Neumann
 boundary condition. The term $-B^\top P_\varepsilon X(t)$ provides low-gain
 stabilization of the finite-dimensional subsystem.
+
+For Assumption~\ref{ass3}, replace the finite-dimensional term by the
+critical-subspace feedback
+\begin{equation}
+U_c(t)=-B_c^\top P_{c,\varepsilon}\widetilde X_c(t)
+-b\,u_t(D,t)-q\,u(D,t),
+\label{eq:critical_controller}
+\end{equation}
+where $P_{c,\varepsilon}>0$ solves
+\begin{equation}
+A_c^\top P_{c,\varepsilon}+P_{c,\varepsilon}A_c
+-P_{c,\varepsilon}B_cB_c^\top P_{c,\varepsilon}
+=-\varepsilon P_{c,\varepsilon}.
+\label{eq:critical_are}
+\end{equation}
 
 \section{Main Results}
 \label{sec:stab}
@@ -933,6 +973,77 @@ existence and uniqueness of the stated energy solution. The higher-regularity
 compatibility conditions in the theorem yield the corresponding classical
 solution. This completes the proof.
 \end{proof}
+\subsection{Nonexpansive ODE Extension}
+\begin{theorem}
+\label{thm3}
+Under Assumption~\ref{ass3}, the closed-loop system with controller
+\eqref{eq:critical_controller} is exponentially stable for all sufficiently
+small $\varepsilon>0$ in the energy norm $\Omega$.
+\end{theorem}
+
+\begin{proof}
+The forwarding calculation \eqref{eq:Ztarget} is unchanged. In the
+coordinates \eqref{eq:spectral_split}, write
+$\widetilde Z=T^{-1}Z=(\widetilde Z_s,\widetilde Z_c)$ and
+$\widetilde\varphi=T^{-1}\varphi=(\widetilde\varphi_s,\widetilde\varphi_c)$.
+The closed-loop transformed equations are
+\begin{align}
+\dot{\widetilde Z}_c&=(A_c-B_cB_c^\top P_{c,\varepsilon})\widetilde Z_c
+ +B_cB_c^\top P_{c,\varepsilon}\widetilde\varphi_c,
+\label{eq:split_Zc}\\
+\dot{\widetilde Z}_s&=A_s\widetilde Z_s
+ -B_sB_c^\top P_{c,\varepsilon}
+ (\widetilde Z_c-\widetilde\varphi_c).
+\label{eq:split_Zs}
+\end{align}
+
+Let $P_s>0$ solve
+$A_s^\top P_s+P_sA_s=-Q_s$ for any $Q_s>0$, and set
+\begin{equation}
+V_c=\widetilde Z_c^\top P_{c,\varepsilon}\widetilde Z_c,
+\qquad
+V_s=\widetilde Z_s^\top P_s\widetilde Z_s.
+\label{eq:split_lyap}
+\end{equation}
+The proof of Theorem~\ref{thm1}, applied to the critical equation, gives
+\begin{equation}
+\dot V_c\leq-\varepsilon V_c
+ +C_c\abs{P_{c,\varepsilon}}^2E_u.
+\label{eq:split_Vc}
+\end{equation}
+Since $A_s$ is Hurwitz, Young's inequality applied to
+\eqref{eq:split_Zs} gives constants $\lambda_s,C_s>0$ independent of
+$\varepsilon$ such that
+\begin{equation}
+\dot V_s\leq-\lambda_sV_s
+ +C_s\abs{P_{c,\varepsilon}}^2
+ \left(\abs{\widetilde Z_c}^2+E_u\right).
+\label{eq:split_Vs}
+\end{equation}
+The transformation estimate \eqref{eq:phi_Eu} remains valid because $T$ is
+fixed. The wave estimate \eqref{eq:V2dot3} is also unchanged after replacing
+$B^\top P_\varepsilon X$ by
+$B_c^\top P_{c,\varepsilon}\widetilde X_c$.
+
+Moreover, $P_{c,\varepsilon}/\varepsilon$ converges to a positive definite
+matrix, so $\abs{P_{c,\varepsilon}}^2\abs{\widetilde Z_c}^2$ is bounded by a
+constant times $\varepsilon V_c$. Consequently, for sufficiently small
+$\varepsilon$, the composite functional
+\begin{equation}
+V=V_c+V_s+\varepsilon V_2
+\label{eq:split_V}
+\end{equation}
+is equivalent to $\Omega$ and satisfies
+\begin{equation}
+\dot V\leq-c\left(\varepsilon V_c+V_s+\varepsilon E_u\right)
+\leq-\beta V
+\label{eq:split_decay}
+\end{equation}
+for some $c,\beta>0$. The norm-equivalence and well-posedness arguments are
+the same as those following \eqref{eq:equi}. Hence
+$\Omega(t)\leq\alpha e^{-\beta t}\Omega(0)$.
+\end{proof}
+
 \subsection{Nilpotent Case}
 When all eigenvalues of $A$ are at the origin, the kernel problem simplifies and
 an explicit endpoint gain is available. Let $g$ solve
@@ -1135,8 +1246,8 @@ for some $\alpha_n>0$. This proves exponential stability.
 Compared with backstepping designs for wave PDE--ODE cascades, the proposed
 feedback uses only $X(t)$, $u(D,t)$, and $u_t(D,t)$ online. The full-domain
 kernel is used offline to compute $B$ or $\bar{B}$. The price of this simpler
-online structure is the imaginary-axis spectral restriction and the
-controllability requirement in the assumptions.
+online structure is the spectral decomposition and the controllability
+requirement on the critical pair in Assumption~\ref{ass3}.
 \end{remark}
 
 \begin{remark}
@@ -1147,8 +1258,8 @@ small-gain bound. The analysis is carried out on the original wave state and
 requires only the square-integrability assumption \eqref{eq:reg}; it can be
 extended to other integral-bounded displacement couplings, including pointwise
 coupling approximations, but not to unbounded velocity couplings. If $A$ has
-right-half-plane eigenvalues or $(A,B)$ is not controllable, this low-gain
-design does not apply.
+right-half-plane eigenvalues, or if the critical pair $(A_c,B_c)$ is not
+controllable, this low-gain design does not apply.
 \end{remark}
 
 \section{Numerical Simulation}
