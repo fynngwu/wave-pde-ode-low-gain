@@ -24,11 +24,11 @@
 
 \title{Low-Gain Compensation for Wave PDE--ODE Systems with Distributed Coupling}
 
-\author{Fengyang~Wu
-\thanks{F. Wu is with the School of System Design and Intelligent Manufacturing
-(now the Department of Automation and Intelligent Manufacturing), Southern
-University of Science and Technology, Shenzhen, China (e-mail:
-12210634@mail.sustech.edu.cn). This work was supervised by Prof. Xiang~Xu.}}
+\author{Fengyang~Wu and Xiang~Xu
+\thanks{F. Wu and X. Xu are with the School of System Design and Intelligent
+Manufacturing (now the Department of Automation and Intelligent Manufacturing),
+Southern University of Science and Technology, Shenzhen, China (e-mail:
+12210634@mail.sustech.edu.cn).}}
 
 \maketitle
 
@@ -104,10 +104,13 @@ $\dint{B_2(x)u_t(x,t)\,\mathrm{d}x}$. The plant is therefore coupled
 to the whole actuator profile rather than to a single boundary trace.
 Because the wave equation is conservative in the interior, the
 boundary feedback must simultaneously inject damping and stiffness at
-the controlled endpoint; the proposed controller
-$U(t) = -B^{\top}P X(t) - b\,u_t(D,t) - q\,u(D,t)$ combines a
-finite-dimensional low-gain term with a boundary velocity damping
-term and a boundary stiffness term.
+the controlled endpoint. The proposed controller is
+\begin{equation}
+U(t)=-B^{\top}P_\varepsilon X(t)-b\,u_t(D,t)-q\,u(D,t).
+\label{eq:introcontroller}
+\end{equation}
+The first term provides low-gain finite-dimensional stabilization, while
+the latter two terms provide boundary damping and stiffness.
 
 % \begin{figure*}[!t]
 % \centering
@@ -191,7 +194,8 @@ the additional spectral restriction in Assumption~\ref{ass1}.
 \end{enumerate}
 
 The rest of the paper is organized as follows. Section~\ref{sec:prob} formulates
-the problem, recalls the low-gain Riccati framework, and derives the controller.
+the problem, recalls the low-gain Riccati framework, and constructs the offline
+kernel.
 Section~\ref{sec:stab} states the main stability theorem and gives its proof.
 Section~\ref{sec:num} reports numerical simulations, and
 Section~\ref{sec:concl} concludes.
@@ -209,10 +213,10 @@ variables, we write $u_x$ and $u_{xx}$ for its first- and second-order
 partial derivatives with respect to $x$, and $u_t$ for its first-order
 partial derivative with respect to $t$.
 
-\section{Problem Formulation and Preliminaries}
+\section{Preliminaries}
 \label{sec:prob}
 
-\subsection{System Description}
+\subsection{Problem Formulation}
 Consider $x \in [0, D]$ and $t \geq 0$, and the system
 \begin{equation}
 \begin{aligned}
@@ -226,33 +230,39 @@ u_{tt}(x,t) = u_{xx}(x,t),
 \label{eq:wave}
 \end{equation}
 \begin{equation}
-u_x(0,t) = 0,
-\label{eq:left}
-\end{equation}
-\begin{equation}
-u_x(D,t) = U(t),
-\label{eq:wavebc}
+u_x(0,t)=0,
+\qquad
+u_x(D,t)=U(t),
+\label{eq:boundary}
 \end{equation}
 where $X(t) \in \mathbb{R}^n$ is the plant state, $A \in
 \mathbb{R}^{n \times n}$, $U(t) \in \mathbb{R}$ is the boundary control applied
 at $x = D$, and $u \colon [0,D]\times[0,\infty) \to \mathbb{R}$ is the wave
 state. The coupling kernels satisfy
 \begin{equation}
-B_1 \in L^2(0,D;\mathbb{R}^n),\qquad B_2 \in L^2(0,D;\mathbb{R}^n).
+B_1,B_2\in L^2(0,D;\mathbb{R}^n).
 \label{eq:reg}
 \end{equation}
+The initial data are
+\begin{equation}
+X(0)=X_0,\qquad u(\cdot,0)=u_0,\qquad u_t(\cdot,0)=u_1,
+\label{eq:initial}
+\end{equation}
+with $X_0\in\mathbb{R}^n$, $u_0\in H^1(0,D)$, and
+$u_1\in L^2(0,D)$ for energy solutions. Higher-regularity data are
+required to satisfy the corresponding boundary compatibility conditions
+when a classical solution is considered.
 Equation~\eqref{eq:ode} is an $n$-dimensional linear ODE driven by the
 distributed effects of the wave displacement and velocity; the wave equation
-\eqref{eq:wave} models the actuator dynamics, with a free boundary
-\eqref{eq:left} at the unactuated end and the physical input entering through
-$u_x(D,t) = U(t)$. The control objective is to design $U(t)$ using only
-$X(t)$, $u(D,t)$, and $u_t(D,t)$ so that the closed-loop energy
+\eqref{eq:wave} models the actuator dynamics, with the boundary conditions
+in \eqref{eq:boundary}. The control objective is to design $U(t)$ using only
+$X(t)$, $u(D,t)$, and $u_t(D,t)$. Define the closed-loop energy
 \begin{equation}
 \Omega(t) := \abs{X(t)}^2 + \dint{\left(u_x^2(x,t) + u_t^2(x,t)\right)
 \,\mathrm{d}x} + u^2(D,t)
 \label{eq:energy}
 \end{equation}
-decays exponentially.
+The control objective is to establish exponential decay of $\Omega$.
 
 \subsection{Technical Lemmas}
 This section recalls the low-gain Riccati properties and the Poincar\'e-type
@@ -266,14 +276,7 @@ axis. Then the parametric algebraic Riccati equation (ARE)
 A^{\top}P + PA - PBB^{\top}P = -\varepsilon P
 \label{eq:are}
 \end{equation}
-has a unique positive definite solution $P = P_\varepsilon$, which can be
-obtained from the Lyapunov equation
-\begin{equation}
-\left(A + \tfrac{\varepsilon I_n}{2}\right)P^{-1}
-+ P^{-1}\!\left(A + \tfrac{\varepsilon I_n}{2}\right)^{\!\top} = BB^{\top}.
-\label{eq:lyap}
-\end{equation}
-Moreover,
+has a unique positive definite solution $P=P_\varepsilon$. Moreover,
 \begin{enumerate}
 \item $\lim_{\varepsilon \to 0^+} P_\varepsilon = 0$ and
 $\frac{\mathrm{d}P_\varepsilon}{\mathrm{d}\varepsilon} > 0$ for all
@@ -283,28 +286,34 @@ $\varepsilon > 0$;
 \item if all eigenvalues of $A$ are at the origin, then $A^{\top}P_\varepsilon A
 \preceq 3n^2\varepsilon^2 P_\varepsilon$.
 \end{enumerate}
-These are the standard low-gain properties of the parametric Riccati equation;
-proofs are given in \cite{lin_low-gain_1999} and \cite{xu_stabilization_2018},
-and the nilpotent estimate of item 3 in \cite{xu_semi-global_2019}.
+In particular, $P_\varepsilon=O(\varepsilon)$ as
+$\varepsilon\to0^+$. This estimate is the key small-gain property used
+below.
+These standard properties are stated without proof; see
+\cite{lin_low-gain_1999,xu_stabilization_2018}, and, for item 3,
+\cite{xu_semi-global_2019}.
 \end{lemma}
 
 \begin{lemma}
 \label{lem:poincare}
-For every $y \in H^1(0,D)$, with $p := y(D)$,
+For every $y\in H^1(0,D)$,
 \begin{equation}
-\norm{y}_2^2 \leq 2D\,p^2 + D^2\norm{y_x}_2^2,
+\norm{y}_2^2
+\leq 2D\,y^2(D)+D^2\norm{y_x}_2^2,
 \label{eq:poincare}
 \end{equation}
 and
 \begin{equation}
-\norm{y}_{L^\infty}^2 \leq 2p^2 + 2D\norm{y_x}_2^2.
+\norm{y}_{L^\infty}^2
+\leq 2y^2(D)+2D\norm{y_x}_2^2.
 \label{eq:poincare_inf}
 \end{equation}
-The estimates are classical; see, e.g., \cite{krstic_smyshlyaev_boundary_2008}.
+These classical estimates are stated without proof; see, e.g.,
+\cite{krstic_smyshlyaev_boundary_2008}.
 \end{lemma}
 
-\subsection{Controller Design}
-\paragraph{Forwarding.}
+\subsection{Offline Kernel Construction}
+\paragraph{Forwarding transformation.}
 Following \cite{tsubakino_forwarding-based_2024}, define the compensated state
 \begin{equation}
 \begin{aligned}
@@ -313,18 +322,26 @@ Z(t)={}&X(t)+\dint{g_0(x)u(x,t)\,\mathrm{d}x}\\
 \end{aligned}
 \label{eq:Z}
 \end{equation}
-
-The coupling terms cancel after integration by parts if
+The kernels are selected so that the distributed coupling is transformed
+into an equivalent boundary channel. Their defining identities are
 \begin{equation}
-g''(x) + B_1(x) = A\bigl(Ag(x) - B_2(x)\bigr),
+g_0(x)=Ag(x)-B_2(x),
 \label{eq:kernel}
 \end{equation}
-with $g_0(x):=Ag(x)-B_2(x)$ and
 \begin{equation}
-g'(0) = 0,\qquad -g'(D) = \bigl(bA + qI\bigr)g(D),
+g''(x)+B_1(x)=Ag_0(x).
+\label{eq:kernel_identity}
+\end{equation}
+
+\paragraph{Kernel boundary conditions.}
+The boundary conditions for the kernel are
+\begin{equation}
+g'(0)=0,
+\qquad
+-g'(D)=(bA+qI)g(D),
 \label{eq:kernelbc}
 \end{equation}
-where the gains satisfy
+with design parameters
 \begin{equation}
 b>0,\qquad 0<q<\frac{1}{D}.
 \label{eq:gains}
@@ -334,7 +351,12 @@ Set
 B:=g(D).
 \label{eq:Bdef}
 \end{equation}
-The transformed dynamics are
+The vector $B$ acts as the effective finite-dimensional input channel
+induced by the distributed PDE coupling.
+
+\paragraph{Transformation result.}
+Using the kernel identities and the plant and wave boundary conditions, the
+transformed dynamics reduce to
 \begin{equation}
 \begin{aligned}
 \dot Z(t)={}&AZ(t)+B\bigl(u_x(D,t)+b\,u_t(D,t)\\
@@ -342,27 +364,34 @@ The transformed dynamics are
 \end{aligned}
 \label{eq:Ztarget}
 \end{equation}
-so the distributed coupling is represented by the effective boundary channel
-$B$.
+Thus, the distributed PDE--ODE interconnection is represented by the
+finite-dimensional boundary channel $B$.
 
-\paragraph{Offline gain.}
-For offline computation, write \eqref{eq:kernel} as
+\paragraph{Offline gain computation.}
+For offline computation, write the kernel equations as
 \begin{equation}
-\zeta'(x) = \Av\,\zeta(x) + \eta(x),
+\zeta(x)=\begin{pmatrix}g(x)\\g'(x)\end{pmatrix},
+\qquad
+\zeta'(x)=\Av\,\zeta(x)+\eta(x),
 \label{eq:zeta}
 \end{equation}
-for $\zeta=(g,g')^{\top}$, $\Av=\bigl(\begin{smallmatrix}0&I\\A^2&0\end{smallmatrix}\bigr)$,
-and $\eta=(0,-AB_2-B_1)^{\top}$. Define
+where
+\begin{equation}
+\Av=\begin{pmatrix}0&I\\A^2&0\end{pmatrix},
+\qquad
+\eta(x)=\begin{pmatrix}0\\-AB_2(x)-B_1(x)\end{pmatrix}.
+\label{eq:zeta_data}
+\end{equation}
+Define
 \begin{equation}
 \Xi:=\dint{e^{\Av(D-s)}\eta(s)\,\mathrm{d}s},
 \label{eq:Xi}
 \end{equation}
-and
 \begin{equation}
 E := \bigl(bA + qI\;\; I\bigr)e^{\Av D}\binom{I}{0},
 \label{eq:E}
 \end{equation}
-The endpoint gain is given by the following proposition.
+The endpoint gain can then be computed from the following proposition.
 
 \begin{proposition}
 \label{prop1}
@@ -378,16 +407,28 @@ B={}&-\bigl(I\;\;0\bigr)e^{\Av D}\binom{I}{0}E^{-1}\\
 \end{proposition}
 
 \begin{proof}[Proof of Proposition~\ref{prop1}]
-Variation of constants and \eqref{eq:kernelbc} give
-$g(0)=-E^{-1}(bA+qI\;\;I)\Xi$; substituting this into
-$B=(I\;\;0)\zeta(D)$ yields \eqref{eq:B}.
+Variation of constants gives
+\begin{equation}
+\zeta(D)=e^{\Av D}\binom{I}{0}g(0)+\Xi.
+\label{eq:zeta_endpoint}
+\end{equation}
+Using the second condition in \eqref{eq:kernelbc} gives
+\begin{equation}
+g(0)=-E^{-1}\bigl(bA+qI\;\;I\bigr)\Xi.
+\label{eq:g0_endpoint}
+\end{equation}
+Substitution into $B=(I\;\;0)\zeta(D)$ yields \eqref{eq:B}.
 \end{proof}
 
 \begin{assumption}
 \label{ass1}
-The matrix $A$ has all its eigenvalues on the imaginary axis, the gains in
-\eqref{eq:gains} make $E$ in \eqref{eq:E} invertible, and the pair $(A,B)$ with
-$B$ given by \eqref{eq:B} is controllable.
+The following conditions hold:
+\begin{enumerate}
+\item $b>0$ and $0<q<1/D$;
+\item $E$ in \eqref{eq:E} is invertible;
+\item the pair $(A,B)$, with $B$ given by \eqref{eq:B}, is controllable;
+\item all eigenvalues of $A$ lie on the imaginary axis.
+\end{enumerate}
 \end{assumption}
 
 \paragraph{Feedback.}
@@ -395,482 +436,719 @@ By Lemma~\ref{lem:lowgain}, let $P=P_\varepsilon>0$ denote the solution of
 \eqref{eq:are}.
 The boundary controller is
 \begin{equation}
-U(t) = -B^{\top}P X(t) - b\,u_t(D,t) - q\,u(D,t).
+U(t) = -B^{\top}P_\varepsilon X(t) - b\,u_t(D,t) - q\,u(D,t).
 \label{eq:controller}
 \end{equation}
-Here $-b\,u_t(D,t)$ dissipates wave energy, $-q\,u(D,t)$ anchors the constant
-Neumann mode and controls displacement, and $-B^\top PX(t)$ stabilizes the
-marginal ODE modes. Since $P=O(\varepsilon)$, the last term is low gain.
-
-\begin{remark}
-The kernel is used offline to obtain $B$; online, only $X(t)$ and the two
-boundary traces in \eqref{eq:controller} are required. The restriction
-$q<1/D$ is the sufficient condition used by the Lyapunov estimate.
-\end{remark}
+The term $-b\,u_t(D,t)$ injects boundary damping. The term
+$-q\,u(D,t)$ controls the displacement mode associated with the Neumann
+boundary condition. The term $-B^\top P_\varepsilon X(t)$ provides low-gain
+stabilization of the finite-dimensional subsystem.
 
 \section{Main Results}
 \label{sec:stab}
 
-\subsection{General Case}
+\subsection{General Marginally Stable Case}
 \begin{theorem}
 \label{thm1}
-Consider the closed-loop system consisting of \eqref{eq:ode}--\eqref{eq:wave},
-the boundary conditions \eqref{eq:left}--\eqref{eq:wavebc}, and the controller
+Consider the closed-loop system consisting of \eqref{eq:ode}, \eqref{eq:wave},
+the boundary conditions \eqref{eq:boundary}, and the controller
 \eqref{eq:controller}, under Assumption~\ref{ass1}. Then there exists
 $\varepsilon^*>0$ such that, for every $\varepsilon\in(0,\varepsilon^*]$ and
 every initial state $(X(0),u(\cdot,0),u_t(\cdot,0))\in
 \mathbb{R}^n\times H^1(0,D)\times L^2(0,D)$, the closed-loop system admits a
 unique solution
 $(X(t),u(\cdot,t),u_t(\cdot,t))\in
-C([0,\infty),\mathbb{R}^n\times H^1(0,D)\times L^2(0,D))$,
-which is exponentially stable in the sense that
+C([0,\infty),\mathbb{R}^n\times H^1(0,D)\times L^2(0,D))$ satisfying
 \begin{equation}
-\Omega(t)\leq \alpha e^{-\beta t}\Omega(0),
+\Omega(t)\leq\alpha e^{-\beta t}\Omega(0),
 \label{eq:stab}
 \end{equation}
 for some positive constants $\alpha$ and $\beta$.
 
 Moreover, if $u(\cdot,0)\in H^2(0,D)$ and $u_t(\cdot,0)\in H^1(0,D)$, and the
 initial data are compatible with the boundary conditions and the controller,
-then the corresponding solution is a classical solution of the closed-loop
-system.
+then the corresponding solution is classical.
 \end{theorem}
 
-
-
-
-\subsection{Proof}
+\begin{proof}
 Let $g$, $g_0$, $B$, and $Z$ be defined by
-\eqref{eq:kernel}--\eqref{eq:Bdef} and \eqref{eq:Z}, respectively.
+\eqref{eq:kernel}--\eqref{eq:Bdef} and \eqref{eq:Z}, respectively. Define
+\begin{equation}
+\varphi(t):=Z(t)-X(t).
+\label{eq:phi_def}
+\end{equation}
 
-\emph{Forwarding transformation.} Differentiating \eqref{eq:Z} and using
-\eqref{eq:ode}--\eqref{eq:wavebc},
+\emph{Forwarding transformation.}
+Differentiating the forwarding transformation and substituting the plant and
+wave dynamics give
 \begin{align}
 \dot Z(t)
 &= AX(t) + \dint{B_1(x)u(x,t)\,\mathrm{d}x}\nonumber\\
-&\quad + \dint{B_2(x)u_t(x,t)\,\mathrm{d}x}\nonumber\\
-&\quad + \dint{g_0(x)u_t(x,t)\,\mathrm{d}x}\nonumber\\
-&\quad + \dint{g(x)u_{xx}(x,t)\,\mathrm{d}x} + bB\,u_t(D,t).
+&\quad + \dint{B_2(x)u_t(x,t)\,\mathrm{d}x}
+ + \dint{g_0(x)u_t(x,t)\,\mathrm{d}x}\nonumber\\
+&\quad + \dint{g(x)u_{xx}(x,t)\,\mathrm{d}x}
+ + bB\,u_t(D,t).
 \label{eq:Zdot}
 \end{align}
-Integrating $\dint{g u_{xx}\,\mathrm{d}x}$ by parts twice and using
-$u_x(0,t) = 0$ and $g'(0) = 0$,
+Integrating the wave term by parts twice yields
 \begin{equation}
-\begin{split}
+\begin{aligned}
 \dint{g(x)u_{xx}(x,t)\,\mathrm{d}x}
-&= g(D)u_x(D,t) - g'(D)u(D,t)\\
-&\quad + \dint{g''(x)u(x,t)\,\mathrm{d}x}.
-\end{split}
+={}&B\,u_x(D,t)-g'(D)u(D,t)\\
+&+\dint{g''(x)u(x,t)\,\mathrm{d}x}.
+\end{aligned}
 \label{eq:ibp}
 \end{equation}
-Substituting \eqref{eq:ibp}, the kernel identity $g''+B_1=Ag_0$ from
-\eqref{eq:kernel}, the definition $g_0+B_2=Ag$, and
-$-g'(D)=(bA+qI)B$
-from \eqref{eq:kernelbc} gives
-\begin{align}
-\dot Z(t)
-&= AX(t) + \dint{(B_1(x)+g''(x))u(x,t)\,\mathrm{d}x}\nonumber\\
-&\quad + \dint{(B_2(x)+g_0(x))u_t(x,t)\,\mathrm{d}x}\nonumber\\
-&\quad + B\,u_x(D,t) - g'(D)u(D,t) + bB\,u_t(D,t)\nonumber\\
-&= AX(t) + \dint{Ag_0(x)u(x,t)\,\mathrm{d}x}\nonumber\\
-&\quad + \dint{Ag(x)u_t(x,t)\,\mathrm{d}x}\nonumber\\
-&\quad + B\,u_x(D,t) + (bA+qI)B\,u(D,t) + bB\,u_t(D,t)\nonumber\\
-&= AZ(t) + B\bigl(u_x(D,t) + b\,u_t(D,t) + q\,u(D,t)\bigr),
-\label{eq:Zdot_final}
-\end{align}
-where in the last step we used
-$AZ(t) = AX(t) + \dint{Ag_0u\,\mathrm{d}x} + \dint{Agu_t\,\mathrm{d}x}
-+ bAB\,u(D,t)$ and cancelled the $bAB\,u(D,t)$ terms. Since the controller
-\eqref{eq:controller} reads $u_x(D,t) = -B^\top PX(t) - b\,u_t(D,t) -
-q\,u(D,t)$, we obtain, with $\varphi(t) := Z(t) - X(t)$,
+Using the kernel identities in \eqref{eq:kernel}--\eqref{eq:kernel_identity}
+and the boundary conditions in \eqref{eq:boundary} and \eqref{eq:kernelbc},
+the distributed coupling terms cancel and the transformed dynamics reduce to
 \begin{equation}
-\dot Z(t) = \bigl(A - BB^\top P\bigr)Z(t) + BB^\top P\,\varphi(t).
+\dot Z(t)
+=
+AZ(t)+B\bigl(u_x(D,t)+b\,u_t(D,t)+q\,u(D,t)\bigr).
+\label{eq:Zdot_final}
+\end{equation}
+Under the feedback law,
+\begin{equation}
+u_x(D,t)
+=
+-B^\top P_\varepsilon X(t)-b\,u_t(D,t)-q\,u(D,t),
+\label{eq:bc_cl}
+\end{equation}
+and therefore
+\begin{equation}
+\dot Z(t)=AZ(t)-BB^\top P_\varepsilon X(t).
+\label{eq:Zdot_feedback}
+\end{equation}
+Since $X=Z-\varphi$,
+\begin{equation}
+\dot Z(t)
+=
+(A-BB^\top P_\varepsilon)Z(t)
++
+BB^\top P_\varepsilon\varphi(t).
 \label{eq:Zdot2}
 \end{equation}
-Thus the low-gain Riccati term decouples the ODE from the wave up to the small
-perturbation $\varphi$.
+Thus, after the forwarding transformation, the distributed coupling enters the
+finite-dimensional dynamics only through the perturbation $\varphi$.
 
-\emph{The finite-dimensional Lyapunov function.} Let
-$V_1(t) := Z^\top(t)P\,Z(t)$ and define the wave energy
+\emph{Transformation-error estimate.}
+Define the wave energy
 \begin{equation}
-E_u(t) := \frac{1}{2}\norm{u_x(\cdot,t)}_2^2
-  + \frac{1}{2}\norm{u_t(\cdot,t)}_2^2
-  + \frac{q}{2}u^2(D,t).
+E_u(t)
+=
+\frac{1}{2}\dint{u_x^2(x,t)\,\mathrm{d}x}
++
+\frac{1}{2}\dint{u_t^2(x,t)\,\mathrm{d}x}
++
+\frac{q}{2}u^2(D,t).
 \label{eq:Eu}
 \end{equation}
-Along \eqref{eq:Zdot2}, the Riccati identity \eqref{eq:are} yields
-\begin{align}
-\dot V_1(t)
-&= -\varepsilon Z^\top PZ - Z^\top PBB^\top PZ
-  + 2Z^\top PBB^\top P\varphi\nonumber\\
-&\leq -\varepsilon V_1 + \varphi^\top PBB^\top P\varphi
- \leq -\varepsilon V_1 + \abs{B}^2\abs{P}^2\abs{\varphi}^2.
-\label{eq:V1dot}
-\end{align}
-It remains to estimate $\varphi$ through the original wave energy. Since
+For $u\in H^1(0,D)$,
 \begin{equation}
-u(x,t) = u(D,t) - \int_x^D u_y(y,t)\,\mathrm{d}y,
+u(x,t)=u(D,t)-\int_x^D u_x(\zeta,t)\,\mathrm{d}\zeta.
+\label{eq:trace_representation}
 \end{equation}
-Lemma~\ref{lem:poincare} gives, for positive constants $C_\infty$ and $C_0$
-independent of $\varepsilon$,
+Consequently, Lemma~\ref{lem:poincare} gives
 \begin{equation}
-\norm{u(\cdot,t)}_{L^\infty}^2 \leq C_\infty E_u(t),
+\norm{u(\cdot,t)}_{L^\infty}^2
+\leq C_\infty E_u(t),
 \qquad
-\norm{u(\cdot,t)}_2^2 \leq C_0 E_u(t).
+\norm{u(\cdot,t)}_2^2
+\leq C_0 E_u(t),
 \label{eq:ubounds}
 \end{equation}
-From \eqref{eq:Z}--\eqref{eq:Bdef},
-\begin{align}
-\varphi(t) &= \dint{g_0(x)u(x,t)\,\mathrm{d}x}\nonumber\\
-&\quad + \dint{g(x)u_t(x,t)\,\mathrm{d}x}\nonumber\\
-&\quad + bB\,u(D,t),
-\label{eq:phi}
-\end{align}
-so that
-\begin{align}
-\abs{\varphi(t)}^2
-&\leq 3\norm{g_0}_2^2\norm{u}_2^2 + 3\norm{g}_2^2\norm{u_t}_2^2\nonumber\\
-&\quad + 3b^2\abs{B}^2 u^2(D,t) \leq C_\varphi E_u(t)
-\label{eq:phi_Eu}
-\end{align}
-for a constant $C_\varphi > 0$ independent of $\varepsilon$. Hence
+where, for example, $C_\infty=4(D+q^{-1})$ and
+$C_0=4D(D+q^{-1})$ are independent of $\varepsilon$.
+From the definition of $\varphi$,
 \begin{equation}
-\dot V_1 \leq -\varepsilon V_1 + C_1\abs{P}^2 E_u,
-\qquad C_1 := \abs{B}^2 C_\varphi.
+\begin{aligned}
+\varphi(t)={}&\dint{g_0(x)u(x,t)\,\mathrm{d}x}
+ +\dint{g(x)u_t(x,t)\,\mathrm{d}x}\\
+&+bB\,u(D,t).
+\end{aligned}
+\label{eq:phi}
+\end{equation}
+Cauchy--Schwarz and the three-term square inequality yield
+\begin{equation}
+\abs{\varphi(t)}^2
+\leq
+C_\varphi E_u(t),
+\label{eq:phi_Eu}
+\end{equation}
+where one may take
+\begin{equation}
+C_\varphi
+=
+3\norm{g_0}_2^2C_0
++
+6\norm{g}_2^2
++
+\frac{6b^2\abs{B}^2}{q}.
+\label{eq:Cphi}
+\end{equation}
+
+\emph{Finite-dimensional Lyapunov estimate.}
+Let
+\begin{equation}
+V_1(t)=Z^\top(t)P_\varepsilon Z(t).
+\label{eq:V1}
+\end{equation}
+Using \eqref{eq:are} and \eqref{eq:Zdot2} gives
+\begin{equation}
+\begin{aligned}
+\dot V_1
+={}&-\varepsilon V_1
+-\bigl(B^\top P_\varepsilon Z\bigr)^2\\
+&+2\bigl(B^\top P_\varepsilon Z\bigr)
+\bigl(B^\top P_\varepsilon\varphi\bigr).
+\end{aligned}
+\label{eq:V1dot}
+\end{equation}
+Completing the square and using \eqref{eq:phi_Eu} gives
+\begin{equation}
+\dot V_1
+\leq
+-\varepsilon V_1
++
+C_1\abs{P_\varepsilon}^2E_u,
+\qquad
+C_1:=\abs{B}^2C_\varphi.
 \label{eq:V1dot2}
 \end{equation}
 
-\emph{The wave Lyapunov function.} Consider
-\begin{multline}
-V_2(t) = E_u(t) + \delta_1\dint{x\,u_x(x,t)u_t(x,t)\,\mathrm{d}x}\\
-+ \delta_2\dint{u(x,t)u_t(x,t)\,\mathrm{d}x},
-\label{eq:V2}
-\end{multline}
-where
+\emph{Wave Lyapunov estimate.}
+Choose
 \begin{equation}
-\delta_2 = \kappa \delta_1,
-\qquad \frac{Dq}{2} < \kappa < \frac{1}{2}.
+\frac{Dq}{2}<\kappa<\frac{1}{2},
+\qquad
+\delta_2=\kappa\delta_1,
 \label{eq:kappa}
 \end{equation}
-Since $\kappa > Dq/2$ and $q < 1/D$, the interval in \eqref{eq:kappa} is
-nonempty. Taking $\delta_1 > 0$ sufficiently small gives constants
-$m_\delta, M_\delta > 0$ such that
+and define
 \begin{equation}
-m_\delta E_u(t) \leq V_2(t) \leq M_\delta E_u(t).
+\begin{aligned}
+V_2(t)={}&E_u(t)
+ +\delta_1\dint{x\,u_x(x,t)u_t(x,t)\,\mathrm{d}x}\\
+&+\delta_2\dint{u(x,t)u_t(x,t)\,\mathrm{d}x}.
+\end{aligned}
+\label{eq:V2}
+\end{equation}
+The interval in \eqref{eq:kappa} is nonempty because $q<1/D$. For
+sufficiently small $\delta_1>0$, there exist constants $m_\delta,M_\delta>0$
+such that
+\begin{equation}
+m_\delta E_u(t)\leq V_2(t)\leq M_\delta E_u(t).
 \label{eq:V2_equiv}
 \end{equation}
-
-We compute $\dot V_2$ step by step. Differentiating $E_u$ and using
-$u_{tt} = u_{xx}$ together with
-$\dint{u_xu_{xt}\,\mathrm{d}x} = u_t(D,t)u_x(D,t)
- - \dint{u_{xx}u_t\,\mathrm{d}x}$ (integration by parts; the term at $x=0$
-vanishes because $u_x(0,t)=0$),
-\begin{align}
-\dot E_u(t)
-&= u_t(D,t)u_x(D,t) - \dint{u_{xx}u_t\,\mathrm{d}x}\nonumber\\
-&\quad + \dint{u_{xx}u_t\,\mathrm{d}x} + q\,u(D,t)u_t(D,t)\nonumber\\
-&= u_t(D,t)u_x(D,t) + q\,u(D,t)u_t(D,t).
-\label{eq:energy_der}
-\end{align}
-Substituting the closed-loop boundary condition
+Indeed, Cauchy--Schwarz and Young's inequality give
 \begin{equation}
-u_x(D,t) = -b\,u_t(D,t) - q\,u(D,t) - B^\top PX(t),
-\label{eq:bc_cl}
+\left|\delta_1\dint{x\,u_xu_t\,\mathrm{d}x}
+ +\delta_2\dint{u\,u_t\,\mathrm{d}x}\right|
+\leq \delta_1K_\delta E_u(t),
+\label{eq:V2_cross_bound}
 \end{equation}
-the two $q\,u(D,t)u_t(D,t)$ terms in \eqref{eq:energy_der} cancel, giving
+where
 \begin{equation}
-\dot E_u(t) = -b\,u_t^2(D,t) - u_t(D,t)B^\top PX(t).
+K_\delta=D+\kappa\left(\frac{C_0}{2}+1\right).
+\label{eq:Kdelta}
+\end{equation}
+Thus, for $0<\delta_1\leq(2K_\delta)^{-1}$, one may take
+\begin{equation}
+m_\delta=1-\delta_1K_\delta,
+\qquad
+M_\delta=1+\delta_1K_\delta.
+\label{eq:mdelta_Mdelta}
+\end{equation}
+Differentiating the wave energy and using the boundary feedback gives
+\begin{equation}
+\dot E_u(t)
+=
+-bu_t^2(D,t)
+-u_t(D,t)B^\top P_\varepsilon X(t).
 \label{eq:energy_der2}
 \end{equation}
-For the multiplier term,
+The two multiplier derivatives are
 \begin{align}
 \frac{\mathrm{d}}{\mathrm{d}t}\dint{x\,u_xu_t\,\mathrm{d}x}
-&= \dint{x\,u_{xt}u_t\,\mathrm{d}x}\nonumber\\
-&\quad + \dint{x\,u_xu_{tt}\,\mathrm{d}x}\nonumber\\
-&= \frac{1}{2}\dint{x\,\partial_x\big(u_t^2\big)\,\mathrm{d}x}\nonumber\\
-&\quad + \frac{1}{2}\dint{x\,\partial_x\big(u_x^2\big)\,\mathrm{d}x}\nonumber\\
-&= \frac{D}{2}u_t^2(D,t) + \frac{D}{2}u_x^2(D,t)\nonumber\\
-&\quad - \frac{1}{2}\norm{u_x}_2^2 - \frac{1}{2}\norm{u_t}_2^2,
-\label{eq:mult_der}
-\end{align}
-where the boundary terms at $x=0$ vanish. Finally,
-\begin{align}
+&=
+\frac{D}{2}\bigl(u_x^2(D,t)+u_t^2(D,t)\bigr)\nonumber\\
+&\quad-\frac{1}{2}\dint{(u_x^2+u_t^2)\,\mathrm{d}x},
+\label{eq:mult_der}\\
 \frac{\mathrm{d}}{\mathrm{d}t}\dint{u\,u_t\,\mathrm{d}x}
-&= \dint{u_t^2\,\mathrm{d}x}
- + \dint{u\,u_{xx}\,\mathrm{d}x}\nonumber\\
-&= \dint{u_t^2\,\mathrm{d}x} + u(D,t)u_x(D,t)\nonumber\\
-&\quad - \dint{u_x^2\,\mathrm{d}x}.
+&=
+\dint{(u_t^2-u_x^2)\,\mathrm{d}x}\nonumber\\
+&\quad+u(D,t)u_x(D,t).
 \label{eq:mix_der}
 \end{align}
-To collect the coefficients, square the boundary condition \eqref{eq:bc_cl}:
-\begin{equation}
-\begin{split}
-u_x^2(D,t) &= b^2u_t^2(D,t) + q^2u^2(D,t) + \big(B^\top PX(t)\big)^2\\
-&\quad + 2bq\,u_t(D,t)u(D,t) + 2b\,u_t(D,t)B^\top PX(t)\\
-&\quad + 2q\,u(D,t)B^\top PX(t).
-\end{split}
-\label{eq:ux2D}
-\end{equation}
-Each coefficient below is the sum of its contributions from \eqref{eq:energy_der2},
-\eqref{eq:mult_der}, and \eqref{eq:mix_der} (the latter two multiplied by
-$\delta_1$ and $\delta_2 = \kappa\delta_1$), with $u_x(D,t)$ and $u_x^2(D,t)$
-substituted from \eqref{eq:bc_cl} and \eqref{eq:ux2D}. Collecting all terms,
-the coefficient of each monomial is
+Substituting the boundary condition into these identities and collecting the
+terms gives
 \begin{align}
-u_t^2(D,t) &: -b + \tfrac{\delta_1D}{2} + \tfrac{\delta_1D}{2}b^2,\nonumber\\
-u_t(D,t)u(D,t) &: \delta_1Dbq - \kappa\delta_1b,\nonumber\\
-u^2(D,t) &: \tfrac{\delta_1D}{2}q^2 - \kappa\delta_1q,\nonumber\\
-\norm{u_x}_2^2 &: -\tfrac{\delta_1}{2} - \kappa\delta_1,\nonumber\\
-\norm{u_t}_2^2 &: -\tfrac{\delta_1}{2} + \kappa\delta_1,\nonumber\\
-u_t(D,t)B^\top PX(t) &: -1 + \delta_1Db,\nonumber\\
-u(D,t)B^\top PX(t) &: \delta_1Dq - \kappa\delta_1,\nonumber\\
-\big(B^\top PX(t)\big)^2 &: \tfrac{\delta_1D}{2}.
-\label{eq:coeff}
-\end{align}
-To see where each summand comes from: in every row they appear, in order, as the
-contributions of \eqref{eq:energy_der2} (weight $1$), of the first line of
-\eqref{eq:mult_der} (weight $\delta_1$), of the square \eqref{eq:ux2D} entering
-through the second line of \eqref{eq:mult_der} (weight $\delta_1$), and of
-\eqref{eq:mix_der} (weight $\delta_2=\kappa\delta_1$). For example, the
-coefficient of $u_t^2(D,t)$ is $-b$ (from \eqref{eq:energy_der2})
-$+ \frac{\delta_1D}{2}$ (from \eqref{eq:mult_der})
-$+ \frac{\delta_1D}{2}b^2$ (from $b^2u_t^2(D,t)$ in \eqref{eq:ux2D}); and the
-coefficient of $u(D,t)B^\top PX(t)$ is $\delta_1Dq$ (from
-$2q\,u(D,t)B^\top PX(t)$ in \eqref{eq:ux2D}) $-\kappa\delta_1$ (from
-$-u(D,t)B^\top PX(t)$ in \eqref{eq:mix_der}). Collecting the coefficients of
-\eqref{eq:coeff} into a single expression gives
-\begin{align}
-\dot V_2(t)
-&= \Big[-b + \frac{\delta_1 D(1+b^2)}{2}\Big]u_t^2(D,t)\nonumber\\
-&\quad + \delta_1 b(Dq - \kappa)\,u_t(D,t)u(D,t)\nonumber\\
-&\quad - \delta_1 q\Big(\kappa - \frac{Dq}{2}\Big)u^2(D,t)\nonumber\\
-&\quad - \delta_1\Big(\frac{1}{2} + \kappa\Big)\norm{u_x}_2^2
- - \delta_1\Big(\frac{1}{2} - \kappa\Big)\norm{u_t}_2^2\nonumber\\
-&\quad - \big(1 - \delta_1 D b\big)u_t(D,t)B^\top PX(t)\nonumber\\
-&\quad - \delta_1(\kappa - Dq)u(D,t)B^\top PX(t)\nonumber\\
-&\quad + \frac{\delta_1 D}{2}\big(B^\top PX(t)\big)^2.
+\dot V_2
+={}&
+-\frac{\delta_1(1+2\kappa)}{2}\norm{u_x}_2^2\nonumber\\
+&-\frac{\delta_1(1-2\kappa)}{2}\norm{u_t}_2^2\nonumber\\
+&-\left[b-\frac{\delta_1D(1+b^2)}{2}\right]u_t^2(D,t)\nonumber\\
+&-\delta_1q\left(\kappa-\frac{Dq}{2}\right)u^2(D,t)\nonumber\\
+&+\delta_1b(Dq-\kappa)u(D,t)u_t(D,t)\nonumber\\
+&-(1-\delta_1Db)u_t(D,t)B^\top P_\varepsilon X(t)\nonumber\\
+&-\delta_1(\kappa-Dq)u(D,t)B^\top P_\varepsilon X(t)\nonumber\\
+&+\frac{\delta_1D}{2}
+\bigl(B^\top P_\varepsilon X(t)\bigr)^2.
 \label{eq:V2dot}
 \end{align}
-
-\emph{Dissipativity of the pure wave part.} The first five terms of
-\eqref{eq:V2dot} are strictly dissipative after a Young estimate on
-$u_t(D,t)u(D,t)$. Indeed, for any $\eta>0$,
+The first five terms are strictly dissipative after applying Young's
+inequality to $u(D,t)u_t(D,t)$ and choosing $\delta_1$ sufficiently small.
+Applying Young's inequality to the two remaining mixed boundary terms gives
+the following explicit sufficient constants. Choose $\delta_1>0$ such that
 \begin{equation}
-\big|u_t(D,t)u(D,t)\big|
- \leq \frac{\eta}{2}u_t^2(D,t) + \frac{1}{2\eta}u^2(D,t),
+b-\frac{\delta_1D(1+b^2)}{2}>0,
+\label{eq:delta_condition}
 \end{equation}
-and the $u^2(D)$-part is absorbed by $-\delta_1q(\kappa-Dq/2)u^2(D,t)$, which is
-negative because $\kappa>Dq/2$, while the $u_t^2(D)$-part is absorbed by the
-damping term $-bu_t^2(D,t)$ after taking $\delta_1$ sufficiently small. Hence,
-by \eqref{eq:gains}, \eqref{eq:kappa}, there exist $c_2>0$ and $c_D>0$ such
-that
+and
 \begin{equation}
-\text{the first five terms of \eqref{eq:V2dot}}
- \leq -c_2E_u(t) - c_D u_t^2(D,t).
-\label{eq:diss}
+\delta_1q\left(\kappa-\frac{Dq}{2}\right)
+-\frac{\delta_1^2b^2(Dq-\kappa)^2}
+{b-\frac{\delta_1D(1+b^2)}{2}}>0.
+\label{eq:delta_displacement}
 \end{equation}
-The remaining three terms of \eqref{eq:V2dot} are boundary small-gain terms.
-For every fixed choice of the wave gains, Young's inequality gives
+Define
 \begin{equation}
-\big|u_t(D,t)B^\top PX(t)\big|
- \leq \eta_1u_t^2(D,t) + \frac{1}{4\eta_1}\big(B^\top PX(t)\big)^2,
+\begin{aligned}
+c_3:=\min\Biggl\{&\delta_1(1+2\kappa),\quad
+\delta_1(1-2\kappa),\\
+&\frac{1}{q}\left[\delta_1q\left(\kappa-\frac{Dq}{2}\right)
+-\frac{\delta_1^2b^2(Dq-\kappa)^2}
+{b-\frac{\delta_1D(1+b^2)}{2}}\right]\Biggr\}>0,
+\end{aligned}
+\label{eq:c3}
 \end{equation}
+and
 \begin{equation}
-\big|u(D,t)B^\top PX(t)\big|
- \leq \eta_2u^2(D,t) + \frac{1}{4\eta_2}\big(B^\top PX(t)\big)^2,
+\begin{aligned}
+C_2:={}&\frac{\delta_1D}{2}
++\frac{(1-\delta_1Db)^2}
+{b-\frac{\delta_1D(1+b^2)}{2}}\\
+&+\frac{\delta_1^2(\kappa-Dq)^2}
+{2\left[\delta_1q\left(\kappa-\frac{Dq}{2}\right)
+-\frac{\delta_1^2b^2(Dq-\kappa)^2}
+{b-\frac{\delta_1D(1+b^2)}{2}}\right]}.
+\end{aligned}
+\label{eq:C2}
 \end{equation}
-and choosing $\eta_1,\eta_2>0$ small enough so that the $u_t^2(D)$- and
-$u^2(D)$-terms are absorbed by the margins left in \eqref{eq:diss}, we obtain
+Then
 \begin{equation}
-\dot V_2(t) \leq -c_3E_u(t) + C_2\big(B^\top PX(t)\big)^2
+\dot V_2(t)
+\leq
+-c_3E_u(t)
++
+C_2\bigl(B^\top P_\varepsilon X(t)\bigr)^2,
 \label{eq:V2dot2}
 \end{equation}
-for some $c_3, C_2 > 0$ independent of $\varepsilon$.
+where $c_3$ and $C_2$ are independent of $\varepsilon$.
 
-\emph{Interconnection.} Since
-\begin{equation}
-\big(B^\top PX(t)\big)^2
- \leq \abs{B}^2\abs{P}\abs{P^{1/2}X(t)}^2
+Since $X=Z-\varphi$,
+\begin{align}
+\bigl(B^\top P_\varepsilon X\bigr)^2
+&\leq 2\bigl(B^\top P_\varepsilon Z\bigr)^2
+ +2\bigl(B^\top P_\varepsilon\varphi\bigr)^2\nonumber\\
+&\leq 2\abs{B}^2\abs{P_\varepsilon}V_1
+ +2\abs{B}^2\abs{P_\varepsilon}^2\abs{\varphi}^2\nonumber\\
+&\leq C_3\abs{P_\varepsilon}V_1
+ +C_4\abs{P_\varepsilon}^2E_u,
 \label{eq:sbound}
-\end{equation}
-and $X = Z - \varphi$, \eqref{eq:phi_Eu} gives
-\begin{align}
-\abs{P^{1/2}X(t)}^2
-&\leq 2Z^\top PZ + 2\abs{P}\abs{\varphi}^2\nonumber\\
-&\leq 2V_1(t) + 2\abs{P}C_\varphi E_u(t).
-\label{eq:PX}
 \end{align}
-Substituting \eqref{eq:PX} into \eqref{eq:V2dot2} yields
-\begin{align}
-\dot V_2(t) &\leq -c_3E_u(t) + C_3\abs{P}V_1(t)\nonumber\\
-&\quad + C_4\abs{P}^2E_u(t)
-\label{eq:V2dot3}
-\end{align}
-for constants $C_3, C_4 > 0$ independent of $\varepsilon$.
-
-\emph{Combination.} Define the total Lyapunov functional
+where
 \begin{equation}
-V(t) = V_1(t) + \varepsilon V_2(t).
+C_3=2C_2\abs{B}^2,
+\qquad
+C_4=2C_2\abs{B}^2C_\varphi.
+\label{eq:C34}
+\end{equation}
+Therefore,
+\begin{equation}
+\dot V_2
+\leq
+-c_3E_u
++
+C_3\abs{P_\varepsilon}V_1
++
+C_4\abs{P_\varepsilon}^2E_u.
+\label{eq:V2dot3}
+\end{equation}
+
+\emph{Small-gain combination.}
+Define
+\begin{equation}
+V(t)=V_1(t)+\varepsilon V_2(t).
 \label{eq:V}
 \end{equation}
 Combining \eqref{eq:V1dot2} and \eqref{eq:V2dot3} gives
 \begin{equation}
-\begin{split}
-\dot V(t) \leq {}& -\varepsilon V_1 + C_1\abs{P}^2E_u
- - \varepsilon c_3 E_u\\
-&+ \varepsilon C_3\abs{P}V_1 + \varepsilon C_4\abs{P}^2E_u.
-\end{split}
+\dot V
+\leq
+-\varepsilon\bigl(1-C_3\abs{P_\varepsilon}\bigr)V_1
+-
+\left[
+\varepsilon c_3
+-(C_1+\varepsilon C_4)\abs{P_\varepsilon}^2
+\right]E_u.
 \label{eq:Vdot}
 \end{equation}
-By Lemma~\ref{lem:lowgain}, $\abs{P} = O(\varepsilon)$ as $\varepsilon \to 0^+$.
-Hence, for all sufficiently small $\varepsilon$,
+By the low-gain property, there are $K_P>0$ and $\varepsilon_0>0$ such that
 \begin{equation}
-\varepsilon C_3\abs{P} \leq \frac{\varepsilon}{2},
+\abs{P_\varepsilon}\leq K_P\varepsilon,
 \qquad
-C_1\abs{P}^2 + \varepsilon C_4\abs{P}^2 \leq \frac{\varepsilon c_3}{2},
+0<\varepsilon\leq\varepsilon_0.
+\label{eq:Pgain}
 \end{equation}
-and therefore, using \eqref{eq:V2_equiv},
+It is sufficient to choose
 \begin{equation}
-\dot V(t) \leq -\frac{\varepsilon}{2}V_1 - \frac{\varepsilon c_3}{2}E_u
- \leq -\frac{\varepsilon}{2}V_1 - \frac{\varepsilon c_3}{2M_\delta}V_2
- \leq -\beta V(t)
+\varepsilon^*
+=
+\min\left\{
+\varepsilon_0,\,
+\frac{1}{2C_3K_P},\,
+\frac{c_3}{4C_1K_P^2},\,
+\sqrt{\frac{c_3}{4C_4K_P^2}}
+\right\},
+\label{eq:epsilon_star}
+\end{equation}
+with any zero-denominator restriction omitted. Then, for
+$0<\varepsilon\leq\varepsilon^*$,
+\begin{equation}
+\dot V
+\leq
+-\frac{\varepsilon}{2}V_1
+-\frac{\varepsilon c_3}{2}E_u.
+\label{eq:Vdecay_pre}
+\end{equation}
+Using \eqref{eq:V2_equiv},
+\begin{equation}
+\dot V
+\leq
+-\beta V,
+\qquad
+\beta
+=
+\min\left\{
+\frac{\varepsilon}{2},
+\frac{c_3}{2M_\delta}
+\right\}>0.
 \label{eq:Vdecay}
 \end{equation}
-with $\beta = \min\left\{\frac{\varepsilon}{2},
-\frac{c_3}{2M_\delta}\right\}$.
 
-\emph{Norm equivalence and conclusion.} From \eqref{eq:phi_Eu},
+\emph{Norm equivalence and well-posedness.}
+From $X=Z-\varphi$ and \eqref{eq:phi_Eu}, there exist constants
+$m_\varepsilon,M_\varepsilon>0$ such that
 \begin{equation}
-\abs{Z}^2 \leq 2\abs{X}^2 + 2C_\varphi E_u,
-\end{equation}
-so, with $\Omega$ in \eqref{eq:energy} and $E_u$ in \eqref{eq:Eu} (equivalent
-to $\norm{u_x}_2^2 + \norm{u_t}_2^2 + u^2(D,t)$ for fixed $q>0$), there exists a
-constant $\overline{M}_\varepsilon > 0$ such that
-\begin{equation}
-V(t) \leq \overline{M}_\varepsilon \Omega(t).
-\end{equation}
-Conversely, since $X = Z - \varphi$,
-\begin{equation}
-\abs{X}^2 \leq 2\abs{Z}^2 + 2C_\varphi E_u,
-\end{equation}
-and together with \eqref{eq:Eu} this gives a constant $\underline{M}_\varepsilon
-> 0$ such that
-\begin{equation}
-\underline{M}_\varepsilon \Omega(t) \leq V(t)
- \leq \overline{M}_\varepsilon \Omega(t).
+m_\varepsilon\Omega(t)
+\leq
+V(t)
+\leq
+M_\varepsilon\Omega(t).
 \label{eq:equi}
 \end{equation}
-Combining \eqref{eq:Vdecay} and \eqref{eq:equi} proves \eqref{eq:stab} with
-$\alpha = \overline{M}_\varepsilon/\underline{M}_\varepsilon$ via Gr\"onwall's
-lemma. The existence and uniqueness of the closed-loop solution follow from
-standard well-posedness of the wave equation with dissipative boundary feedback
-and the fact that the distributed couplings in \eqref{eq:ode} are bounded
-functionals on the wave state space through \eqref{eq:ubounds}. This completes
-the proof. $\blacksquare$
+To make these bounds explicit, first note that
+\begin{equation}
+\abs{X}^2\leq 2\abs{Z}^2+2C_\varphi E_u,
+\qquad
+\abs{Z}^2\leq 2\abs{X}^2+2C_\varphi E_u,
+\label{eq:norm_components}
+\end{equation}
+and
+\begin{equation}
+\dint{\left(u_x^2(x,t)+u_t^2(x,t)\right)\,\mathrm{d}x}+u^2(D,t)
+\leq 2(1+q^{-1})E_u(t).
+\label{eq:wave_energy_upper}
+\end{equation}
+Since $V_1\geq\lambda_{\min}(P_\varepsilon)\abs{Z}^2$, these estimates give
+\begin{equation}
+\Omega(t)
+\leq 2\lambda_{\min}(P_\varepsilon)^{-1}V_1(t)
+ +\left[2C_\varphi+2(1+q^{-1})\right]E_u(t).
+\label{eq:Omega_upper_V}
+\end{equation}
+As $V_1\leq V$ and $E_u\leq V_2/m_\delta\leq V/(\varepsilon m_\delta)$,
+\begin{equation}
+m_\varepsilon
+=\left[2\lambda_{\min}(P_\varepsilon)^{-1}
++\frac{2C_\varphi+2(1+q^{-1})}{\varepsilon m_\delta}\right]^{-1}
+\label{eq:m_epsilon}
+\end{equation}
+ensures $m_\varepsilon\Omega\leq V$.
 
-\begin{remark}
-The key point of the proof is that the displacement coupling $B_1$ enters only
-through the kernel boundary-value problem \eqref{eq:kernel}; no estimate of the
-form $\norm{B_1}_2\norm{u}_2$ is required in the Lyapunov analysis. Moreover,
-the boundary value $u(D,t)$ is controlled through the trace-type estimate
-\eqref{eq:poincare_inf}, which is the single place where the endpoint value
-enters. Since the analysis is carried out directly on the original wave state
-$u$, no derivative of the ODE state is ever differentiated, and the coupling
-kernels are only required to be square integrable, as in \eqref{eq:reg}.
-\end{remark}
+Conversely, $V_1\leq\abs{P_\varepsilon}\abs{Z}^2$ and \eqref{eq:norm_components}
+give
+\begin{equation}
+V_1\leq 2\abs{P_\varepsilon}\abs{X}^2
+ +2C_\varphi\abs{P_\varepsilon}E_u,
+\qquad
+\varepsilon V_2\leq\varepsilon M_\delta E_u.
+\label{eq:V_upper_components}
+\end{equation}
+Moreover,
+\begin{equation}
+\begin{aligned}
+E_u(t)&\leq\max\left\{\frac12,\frac q2\right\}
+\left(\norm{u_x}_2^2+\norm{u_t}_2^2+u^2(D,t)\right)
+\\
+&\leq\max\left\{\frac12,\frac q2\right\}\Omega(t).
+\end{aligned}
+\label{eq:Eu_Omega}
+\end{equation}
+Hence $V\leq M_\varepsilon\Omega$, where
+\begin{equation}
+M_\varepsilon
+=2\abs{P_\varepsilon}
+ +\left(2C_\varphi\abs{P_\varepsilon}+\varepsilon M_\delta\right)
+\max\left\{\frac12,\frac q2\right\}.
+\label{eq:M_epsilon}
+\end{equation}
+Thus \eqref{eq:equi} holds with the explicit constants in
+\eqref{eq:m_epsilon} and \eqref{eq:M_epsilon}.
+Gronwall's inequality applied to \eqref{eq:Vdecay} therefore gives
+\begin{equation}
+\Omega(t)
+\leq
+\frac{M_\varepsilon}{m_\varepsilon}
+e^{-\beta t}\Omega(0),
+\label{eq:stab_proof}
+\end{equation}
+which is \eqref{eq:stab} with
+$\alpha=M_\varepsilon/m_\varepsilon$.
 
-
+Finally, the distributed maps
+\begin{equation}
+\begin{aligned}
+u&\longmapsto\dint{B_1(x)u(x,t)\,\mathrm{d}x},\\
+u_t&\longmapsto\dint{B_2(x)u_t(x,t)\,\mathrm{d}x}
+\end{aligned}
+\label{eq:bounded_couplings}
+\end{equation}
+are bounded from $H^1(0,D)$ and $L^2(0,D)$, respectively, into
+$\mathbb{R}^n$. Together with the dissipative boundary feedback, this gives
+the standard well-posedness of the closed-loop wave--ODE system and hence
+existence and uniqueness of the stated energy solution. The higher-regularity
+compatibility conditions in the theorem yield the corresponding classical
+solution. This completes the proof.
+\end{proof}
 \subsection{Nilpotent Case}
 When all eigenvalues of $A$ are at the origin, the kernel problem simplifies and
-an explicit gain is available. Let $g$ solve
+an explicit endpoint gain is available. Let $g$ solve
 \begin{equation}
-g''(x) + B_1(x) = 0,\qquad g'(0) = 0,\qquad -g'(D) = q\,g(D).
+g''(x)+B_1(x)=0,
+\qquad
+g'(0)=0,
+\qquad
+-g'(D)=qg(D),
 \label{eq:nilpBVP}
 \end{equation}
-Integrating $g'' = -B_1$ with $g'(0) = 0$ gives $-g'(D) = \int_0^D B_1(x)
-\,\mathrm{d}x$, so that the endpoint gain admits the explicit expression
+and set $g_0(x)=-B_2(x)$. Integrating the kernel equation gives
 \begin{equation}
-\bar{B} = \frac{1}{q}\dint{B_1(x)\,\mathrm{d}x},
+g'(x)=-\int_0^xB_1(\zeta)\,\mathrm{d}\zeta.
+\label{eq:nilp_gprime}
+\end{equation}
+Evaluating at $x=D$ and using the right boundary condition yields
+\begin{equation}
+qg(D)=\dint{B_1(x)\,\mathrm{d}x}.
+\label{eq:nilp_endpoint}
+\end{equation}
+Thus the effective endpoint gain is
+\begin{equation}
+\bar{B}=g(D)=\frac{1}{q}\dint{B_1(x)\,\mathrm{d}x}.
 \label{eq:nilpB}
 \end{equation}
-which requires no matrix-valued boundary-value solve. Setting
-$\bar{g}_0(x) := -B_2(x)$ and defining
-\begin{align}
-\bar{Z}(t) &= X(t) - \dint{B_2(x)u(x,t)\,\mathrm{d}x}\nonumber\\
-&\quad + \dint{g(x)u_t(x,t)\,\mathrm{d}x} + b\bar{B}u(D,t)
-\label{eq:nilpZ}
-\end{align}
-gives, by the same integration by parts as in the general case,
+Unlike the general case, this gain is obtained by direct integration and does
+not require a matrix-valued boundary-value solve.
+
+Define the nilpotent compensated state by
 \begin{equation}
-\dot{\bar{Z}}(t) = AX(t) + \bar{B}\bigl(U(t) + b\,u_t(D,t) + q\,u(D,t)\bigr).
+\begin{aligned}
+\bar{Z}(t)={}&X(t)-\dint{B_2(x)u(x,t)\,\mathrm{d}x}\\
+&+\dint{g(x)u_t(x,t)\,\mathrm{d}x}+b\bar{B}u(D,t).
+\end{aligned}
+\label{eq:nilpZ}
+\end{equation}
+Using $g''+B_1=0$ and $B_2+g_0=0$ in the same integration-by-parts
+calculation as above gives
+\begin{equation}
+\dot{\bar{Z}}(t)
+=AX(t)+\bar{B}\bigl(u_x(D,t)+b\,u_t(D,t)+q\,u(D,t)\bigr).
 \label{eq:nilpZdot}
 \end{equation}
-Hence the low-gain controller is
+The corresponding controller is
 \begin{equation}
-U(t) = -\bar{B}^{\top}P X(t) - b\,u_t(D,t) - q\,u(D,t),
+U(t)=-\bar{B}^{\top}P_\varepsilon X(t)-b\,u_t(D,t)-q\,u(D,t),
 \label{eq:nilpCtrl}
 \end{equation}
-where $P = P_\varepsilon$ solves the ARE \eqref{eq:are} with $\bar{B}$ in place
-of $B$.
+where $P_\varepsilon$ is the positive definite solution of
+\begin{equation}
+A^\top P_\varepsilon+P_\varepsilon A
+-P_\varepsilon\bar{B}\bar{B}^\top P_\varepsilon
+=-\varepsilon P_\varepsilon.
+\label{eq:nilp_are}
+\end{equation}
 
 \begin{assumption}
 \label{ass2}
-All eigenvalues of $A$ are at the origin and the pair $(A, \bar{B})$ is
+All eigenvalues of $A$ are at the origin and the pair $(A,\bar{B})$ is
 controllable, where $\bar{B}$ is given by \eqref{eq:nilpB}.
 \end{assumption}
 
 \begin{theorem}
 \label{thm2}
-Consider the closed-loop system consisting of \eqref{eq:ode}--\eqref{eq:wavebc}
-and the controller \eqref{eq:nilpCtrl} under Assumption~\ref{ass2}. Then there
-exists $\varepsilon^* > 0$ such that for every $\varepsilon \in (0,\varepsilon^*]$,
-the closed-loop system has a unique solution and is exponentially stable in the
-sense of \eqref{eq:stab}.
+Consider the closed-loop system consisting of \eqref{eq:ode},
+\eqref{eq:wave}, \eqref{eq:boundary}, and the controller
+\eqref{eq:nilpCtrl} under Assumption~\ref{ass2}. Then there exists
+$\varepsilon^*>0$ such that, for every $\varepsilon\in(0,\varepsilon^*]$ and
+every initial state $(X(0),u(\cdot,0),u_t(\cdot,0))\in
+\mathbb{R}^n\times H^1(0,D)\times L^2(0,D)$, the closed-loop system admits a
+unique solution in
+$C([0,\infty),\mathbb{R}^n\times H^1(0,D)\times L^2(0,D))$ satisfying
+\eqref{eq:stab}. If the initial data have the higher regularity and compatibility
+properties stated in Theorem~\ref{thm1}, the corresponding solution is classical.
 \end{theorem}
 
 \begin{proof}
-Only the finite-dimensional estimate differs from the proof of
-Theorem~\ref{thm1}. Substituting \eqref{eq:nilpCtrl} into \eqref{eq:nilpZdot}
-gives
+The proof follows the same Lyapunov construction as in Theorem~\ref{thm1};
+the difference is the finite-dimensional estimate generated by the nilpotent
+structure of $A$. From \eqref{eq:nilpZdot} and \eqref{eq:nilpCtrl},
 \begin{equation}
-\dot{\bar{Z}} = \bigl(A - \bar{B}\bar{B}^{\top}P\bigr)\bar{Z}
- - \bigl(A - \bar{B}\bar{B}^{\top}P\bigr)\varphi,
-\qquad \varphi = \bar{Z} - X.
+\dot{\bar{Z}}
+=\bigl(A-\bar{B}\bar{B}^{\top}P_\varepsilon\bigr)X.
+\label{eq:nilpZdot_feedback}
+\end{equation}
+Define
+\begin{equation}
+\varphi:=\bar{Z}-X,
+\qquad
+V_1:=\bar{Z}^{\top}P_\varepsilon\bar{Z}.
+\label{eq:nilp_vars}
+\end{equation}
+Since $X=\bar{Z}-\varphi$,
+\begin{equation}
+\dot{\bar{Z}}
+=\bigl(A-\bar{B}\bar{B}^{\top}P_\varepsilon\bigr)\bar{Z}
+-\bigl(A-\bar{B}\bar{B}^{\top}P_\varepsilon\bigr)\varphi.
 \label{eq:nilpZdot2}
 \end{equation}
-Let $V_1 = \bar{Z}^{\top}P\bar{Z}$. By \eqref{eq:are}, Young's inequality, and
-Lemma~\ref{lem:lowgain}(3) (all eigenvalues of $A$ at the origin,
-$A^{\top}PA \preceq 3n^2\varepsilon^2P$),
-\begin{align}
-\dot{V}_1
-&\leq -\varepsilon V_1 - \bar{Z}^{\top}P\bar{B}\bar{B}^{\top}P\bar{Z}
- + 2\bar{Z}^{\top}P\bar{B}\bar{B}^{\top}P\varphi
- - 2\bar{Z}^{\top}PA\varphi\nonumber\\
-&\leq -\frac{\varepsilon}{2}V_1
- + \bigl(\abs{\bar{B}}^2\abs{P}^2 + 6n^2\varepsilon\abs{P}\bigr)\abs{\varphi}^2.
-\label{eq:nilV1}
-\end{align}
-The estimate $\abs{\varphi}^2 \leq C_\varphi E_u$ of \eqref{eq:phi_Eu} remains
-valid with $B$ replaced by $\bar{B}$. Hence
+Using the Riccati equation gives
 \begin{equation}
-\dot{V}_1 \leq -\frac{\varepsilon}{2}V_1
- + C_\varphi\bigl(\abs{\bar{B}}^2\abs{P}^2
-   + 6n^2\varepsilon\abs{P}\bigr)E_u.
+\begin{aligned}
+\dot V_1={}&-\varepsilon V_1
+-\bigl(\bar{B}^{\top}P_\varepsilon\bar{Z}\bigr)^2\\
+&+2\bigl(\bar{B}^{\top}P_\varepsilon\bar{Z}\bigr)
+\bigl(\bar{B}^{\top}P_\varepsilon\varphi\bigr)
+-2\bar{Z}^{\top}P_\varepsilon A\varphi.
+\end{aligned}
+\label{eq:nilV1_identity}
 \end{equation}
-Since $\abs{P} = O(\varepsilon)$, the positive terms are $O(\varepsilon^2)E_u$.
-The wave estimate \eqref{eq:V2dot3} is unchanged, with $B$ replaced by
-$\bar{B}$. Therefore, for the same total Lyapunov functional
-$V = V_1 + \varepsilon V_2$ and all sufficiently small $\varepsilon$, one
-obtains $\dot{V} \leq -\beta V$, and the norm equivalence argument in the proof
-of Theorem~\ref{thm1} gives the desired exponential estimate. The proof is
-complete. $\blacksquare$
+The first three terms are handled by completing the square. For the last term,
+Lemma~\ref{lem:lowgain}(3) gives
+\begin{equation}
+A^{\top}P_\varepsilon A
+\preceq 3n^2\varepsilon^2P_\varepsilon.
+\label{eq:nilp_riccati_bound}
+\end{equation}
+Young's inequality therefore yields
+\begin{equation}
+\dot V_1
+\leq -\frac{\varepsilon}{2}V_1
++\left(\abs{\bar{B}}^2\abs{P_\varepsilon}^2
++6n^2\varepsilon\abs{P_\varepsilon}\right)\abs{\varphi}^2.
+\label{eq:nilV1}
+\end{equation}
+The transformation error satisfies the same estimate as in the general case,
+\begin{equation}
+\abs{\varphi}^2\leq \bar C_\varphi E_u,
+\label{eq:nilp_phi_Eu}
+\end{equation}
+where
+\begin{equation}
+\bar C_\varphi
+=3\norm{B_2}_2^2C_0+6\norm{g}_2^2
+ +\frac{6b^2\abs{\bar B}^2}{q}.
+\label{eq:nilp_Cphi}
+\end{equation}
+Hence
+\begin{equation}
+\dot V_1
+\leq -\frac{\varepsilon}{2}V_1
++\bar C_\varphi\left(\abs{\bar{B}}^2\abs{P_\varepsilon}^2
++6n^2\varepsilon\abs{P_\varepsilon}\right)E_u.
+\label{eq:nilV1_Eu}
+\end{equation}
+By $\abs{P_\varepsilon}=O(\varepsilon)$, the positive coefficient in
+\eqref{eq:nilV1_Eu} is $O(\varepsilon^2)$.
+
+The wave functional $V_2$ in \eqref{eq:V2} and its equivalence estimate
+\eqref{eq:V2_equiv} are unchanged, with $B$ replaced by $\bar B$ in the
+boundary terms. The same calculation gives
+\begin{equation}
+\dot V_2
+\leq -c_3E_u+\bar C_3\abs{P_\varepsilon}V_1
++\bar C_4\abs{P_\varepsilon}^2E_u,
+\label{eq:nilV2}
+\end{equation}
+where
+\begin{equation}
+\bar C_3=2C_2\abs{\bar B}^2,
+\qquad
+\bar C_4=2C_2\abs{\bar B}^2\bar C_\varphi,
+\label{eq:nilp_C34}
+\end{equation}
+and the constants are independent of $\varepsilon$.
+Define
+\begin{equation}
+V=V_1+\varepsilon V_2.
+\label{eq:nilV}
+\end{equation}
+Combining \eqref{eq:nilV1_Eu} and \eqref{eq:nilV2}, and using
+$\abs{P_\varepsilon}\leq K_P\varepsilon$, gives, for sufficiently small
+$\varepsilon$,
+\begin{equation}
+\dot V
+\leq -\frac{\varepsilon}{4}V_1
+-\frac{\varepsilon c_3}{2}E_u.
+\label{eq:nilVdecay_pre}
+\end{equation}
+Since $V_2\leq M_\delta E_u$,
+\begin{equation}
+\dot V\leq-\beta_nV,
+\qquad
+\beta_n=\min\left\{\frac{\varepsilon}{4},
+\frac{c_3}{2M_\delta}\right\}>0.
+\label{eq:nilVdecay}
+\end{equation}
+The norm-equivalence and well-posedness arguments are identical to those in
+Theorem~\ref{thm1}, with $B$ replaced by $\bar B$. Therefore,
+\begin{equation}
+\Omega(t)\leq\alpha_n e^{-\beta_n t}\Omega(0)
+\label{eq:nilp_stab}
+\end{equation}
+for some $\alpha_n>0$. This proves exponential stability.
 \end{proof}
 
+\subsection{Theoretical Boundary and Implementation Remarks}
 \begin{remark}
-Both the general controller \eqref{eq:controller} and the nilpotent controller
-\eqref{eq:nilpCtrl} require only $X(t)$, $u(D,t)$, and $u_t(D,t)$ online; the
-full-domain kernel $g$ is used only offline in the computation of the effective
-input vector $B$ or $\bar{B}$.
+Compared with backstepping designs for wave PDE--ODE cascades, the proposed
+feedback uses only $X(t)$, $u(D,t)$, and $u_t(D,t)$ online. The full-domain
+kernel is used offline to compute $B$ or $\bar{B}$. The price of this simpler
+online structure is the imaginary-axis spectral restriction and the
+controllability requirement in the assumptions.
+\end{remark}
+
+\begin{remark}
+The condition $q<1/D$ is sufficient for the Lyapunov multiplier construction,
+not a necessary condition for closed-loop stability. Likewise, the value
+$\varepsilon^*$ in \eqref{eq:epsilon_star} is only a sufficient theoretical
+small-gain bound. The analysis is carried out on the original wave state and
+requires only the square-integrability assumption \eqref{eq:reg}; it can be
+extended to other integral-bounded displacement couplings, including pointwise
+coupling approximations, but not to unbounded velocity couplings. If $A$ has
+right-half-plane eigenvalues or $(A,B)$ is not controllable, this low-gain
+design does not apply.
 \end{remark}
 
 \section{Numerical Simulation}
@@ -886,8 +1164,8 @@ On the uniform mesh $x_j = j\Delta x$, $j = 0, \ldots, N$, with
 N = 200,\qquad \Delta x = \frac{D}{N},\qquad \Delta t = 5 \times 10^{-4},
 \label{eq:mesh}
 \end{equation}
-the PDE is semi-discretized by centered second differences, boundary conditions
-\eqref{eq:left} and \eqref{eq:wavebc} are enforced by ghost points, and the
+the PDE is semi-discretized by centered second differences, the boundary
+conditions \eqref{eq:boundary} are enforced by ghost points, and the
 distributed coupling terms are evaluated by the composite trapezoidal rule. The
 coupled ODE and semi-discrete PDE are advanced by a classical fourth-order
 Runge--Kutta scheme, with $D = 1$, $\Delta x = 0.005$, and
