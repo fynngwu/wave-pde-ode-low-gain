@@ -39,26 +39,12 @@ Southern University of Science and Technology, Shenzhen, China (e-mail:
 \maketitle
 
 \begin{abstract}
-This article proposes two low-gain boundary controllers for wave PDE--ODE
-cascade systems with distributed displacement and velocity coupling. The
-boundary feedback combines a low-gain finite-dimensional term with boundary
-damping and stiffness injected at the actuated endpoint. The closed-loop system
-is shown to be exponentially stable as long as the open-loop ODE plant is not
-exponentially unstable. The design follows the forwarding method: the wave
-equation is first stabilized by boundary damping, the stable manifold of the
-damped system is then determined, and the state transformation built on it
-recasts the ODE as a new finite-dimensional system, which lets the damping
-controller be extended to stabilize the ODE part. The Lyapunov analysis is
-carried out directly on the original wave state, so that the coupling kernels
-are only required to be square integrable and no
-derivative of the plant state is involved. An even simpler controller is
-constructed for the nilpotent case. Several numerical examples illustrate the
-effectiveness of the proposed controllers.
+This article proposes two low-gain boundary controllers for wave PDE--ODE cascade systems with distributed displacement and velocity coupling. It is shown that the closed-loop system can be exponentially stabilized under suitable spectral conditions on the open-loop ODE plant. The proposed controllers are developed using a forwarding-based design, which transforms the distributed PDE--ODE interconnection into an equivalent finite-dimensional boundary channel and enables a low-gain stabilization strategy. Compared with existing backstepping-based designs, the proposed controllers have a much simpler structure and require only the finite-dimensional plant state and local boundary measurements for online implementation. This simplicity is achieved at the cost of additional spectral restrictions on the open-loop plant. An even simpler controller is obtained for the nilpotent case. The proposed approach also accommodates distributed coupling kernels with square-integrable regularity. Several numerical simulations are provided to demonstrate the effectiveness of the proposed controllers.
+
 \end{abstract}
 
 \begin{IEEEkeywords}
-Boundary control, distributed coupling, low-gain feedback, PDE--ODE cascade,
-wave equation.
+Boundary control, wave equation, distributed parameter systems, low-gain compensation, PDE--ODE cascade systems.
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -237,9 +223,11 @@ u_{tt}(x,t) = u_{xx}(x,t),
 \end{equation}
 \begin{equation}
 u_x(0,t)=0,
-\qquad
+\label{eq:left_boundary}
+\end{equation}
+\begin{equation}
 u_x(D,t)=U(t),
-\label{eq:boundary}
+\label{eq:right_boundary}
 \end{equation}
 where $X(t) \in \mathbb{R}^n$ is the plant state, $A \in
 \mathbb{R}^{n \times n}$, $U(t) \in \mathbb{R}$ is the boundary control applied
@@ -261,7 +249,7 @@ when a classical solution is considered.
 Equation~\eqref{eq:ode} is an $n$-dimensional linear ODE driven by the
 distributed effects of the wave displacement and velocity; the wave equation
 \eqref{eq:wave} models the actuator dynamics, with the boundary conditions
-in \eqref{eq:boundary}. The control objective is to design $U(t)$ using only
+in \eqref{eq:left_boundary} and \eqref{eq:right_boundary}. The control objective is to design $U(t)$ using only
 $X(t)$, $u(D,t)$, and $u_t(D,t)$. Define the closed-loop energy
 \begin{equation}
 \Omega(t) := \abs{X(t)}^2 + \dint{\left(u_x^2(x,t) + u_t^2(x,t)\right)
@@ -497,7 +485,7 @@ A_c^\top P_{c,\varepsilon}+P_{c,\varepsilon}A_c
 \begin{theorem}
 \label{thm1}
 Consider the closed-loop system consisting of \eqref{eq:ode}, \eqref{eq:wave},
-the boundary conditions \eqref{eq:boundary}, and the controller
+the boundary conditions \eqref{eq:left_boundary} and \eqref{eq:right_boundary}, and the controller
 \eqref{eq:controller}, under Assumption~\ref{ass1}. Then there exists
 $\varepsilon^*>0$ such that, for every $\varepsilon\in(0,\varepsilon^*]$ and
 every initial state $(X(0),u(\cdot,0),u_t(\cdot,0))\in
@@ -546,7 +534,7 @@ Integrating the wave term by parts twice yields
 \label{eq:ibp}
 \end{equation}
 Using the kernel identities in \eqref{eq:kernel}--\eqref{eq:kernel_identity}
-and the boundary conditions in \eqref{eq:boundary} and \eqref{eq:kernelbc},
+and the boundary conditions in \eqref{eq:left_boundary}, \eqref{eq:right_boundary}, and \eqref{eq:kernelbc},
 the distributed coupling terms cancel and the transformed dynamics reduce to
 \begin{equation}
 \dot Z(t)
@@ -1116,7 +1104,7 @@ controllable, where $\bar{B}$ is given by \eqref{eq:nilpB}.
 \begin{theorem}
 \label{thm2}
 Consider the closed-loop system consisting of \eqref{eq:ode},
-\eqref{eq:wave}, \eqref{eq:boundary}, and the controller
+\eqref{eq:wave}, \eqref{eq:left_boundary} and \eqref{eq:right_boundary}, and the controller
 \eqref{eq:nilpCtrl} under Assumption~\ref{ass2}. Then there exists
 $\varepsilon^*>0$ such that, for every $\varepsilon\in(0,\varepsilon^*]$ and
 every initial state $(X(0),u(\cdot,0),u_t(\cdot,0))\in
@@ -1282,7 +1270,7 @@ N = 200,\qquad \Delta x = \frac{D}{N},\qquad \Delta t = 5 \times 10^{-4},
 \label{eq:mesh}
 \end{equation}
 the PDE is semi-discretized by centered second differences, the boundary
-conditions \eqref{eq:boundary} are enforced by ghost points, and the
+conditions \eqref{eq:left_boundary} and \eqref{eq:right_boundary} are enforced by ghost points, and the
 distributed coupling terms are evaluated by the composite trapezoidal rule. The
 coupled ODE and semi-discrete PDE are advanced by a classical fourth-order
 Runge--Kutta scheme, with $D = 1$, $\Delta x = 0.005$, and
