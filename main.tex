@@ -271,20 +271,22 @@ A^{\top}P + PA-PBB^{\top}P = -\varepsilon P
 \label{eq:are}
 \end{equation}
 has a unique positive definite solution $P=P_\varepsilon$. Moreover,
-\begin{enumerate}
-\item $\lim_{\varepsilon \to 0^+} P_\varepsilon = 0$ and
-$\frac{\mathrm{d}P_\varepsilon}{\mathrm{d}\varepsilon} > 0$ for all
-$\varepsilon > 0$;
-\item there exists $\vartheta_c>0$ such that $\lim_{\varepsilon \to 0^+}
-\varepsilon^{-1}P_\varepsilon = \vartheta_c$;
-\item if all eigenvalues of $A$ are at the origin, then $A^{\top}P_\varepsilon A
-\preceq 3n^2\varepsilon^2 P_\varepsilon$.
-\end{enumerate}
+there exist constants $K_P>0$ and $\varepsilon_0>0$ such that
+\begin{equation}
+\|P_\varepsilon\|\leq K_P\varepsilon,
+\qquad
+0<\varepsilon\leq\varepsilon_0.
+\end{equation}
+If all eigenvalues of $A$ are at the origin, then, in addition,
+\begin{equation}
+A^{\top}P_\varepsilon A
+\preceq 3n^2\varepsilon^2 P_\varepsilon.
+\end{equation}
 In particular, $P_\varepsilon=O(\varepsilon)$ as
 $\varepsilon\to0^+$. This estimate is the key small-gain property used
 below.
 These standard properties are stated without proof; see
-\cite{lin_low-gain_1999,xu_stabilization_2018}, and, for item 3,
+\cite{lin_low-gain_1999,xu_stabilization_2018}, and, for the nilpotent estimate,
 \cite{xu_semi-global_2019}.
 \end{lemma}
 
@@ -794,9 +796,9 @@ Since $X=Z-\varphi$,
 \end{align}
 where
 \begin{equation}
-C_3=2C_2\abs{B}^2,
+C_3:=2\abs{B}^2,
 \qquad
-C_4=2C_2\abs{B}^2C_\varphi.
+C_4:=2\abs{B}^2C_\varphi.
 \label{eq:C34}
 \end{equation}
 Therefore,
@@ -804,10 +806,8 @@ Therefore,
 \dot V_2
 \leq
 -c_3E_u
-+
-C_3\abs{P_\varepsilon}V_1
-+
-C_4\abs{P_\varepsilon}^2E_u.
+ +C_2C_3\abs{P_\varepsilon}V_1
+ +C_2C_4\abs{P_\varepsilon}^2E_u.
 \label{eq:V2dot3}
 \end{equation}
 
@@ -821,11 +821,11 @@ Combining \eqref{eq:V1dot2} and \eqref{eq:V2dot3} gives
 \begin{equation}
 \dot V
 \leq
--\varepsilon\bigl(1-C_3\abs{P_\varepsilon}\bigr)V_1
+-\varepsilon\bigl(1-C_2C_3\abs{P_\varepsilon}\bigr)V_1
 -
 \left[
 \varepsilon c_3
--(C_1+\varepsilon C_4)\abs{P_\varepsilon}^2
+-(C_1+\varepsilon C_2C_4)\abs{P_\varepsilon}^2
 \right]E_u.
 \label{eq:Vdot}
 \end{equation}
@@ -842,9 +842,9 @@ It is sufficient to choose
 =
 \min\left\{
 \varepsilon_0,\,
-\frac{1}{2C_3K_P},\,
+\frac{1}{2C_2C_3K_P},\,
 \frac{c_3}{4C_1K_P^2},\,
-\sqrt{\frac{c_3}{4C_4K_P^2}}
+\sqrt{\frac{c_3}{4C_2C_4K_P^2}}
 \right\},
 \label{eq:epsilon_star}
 \end{equation}
@@ -1006,41 +1006,100 @@ The proof of Theorem~\ref{thm1}, applied to the critical equation, gives
 \label{eq:split_Vc}
 \end{equation}
 Since $A_s$ is Hurwitz, Young's inequality applied to
-\eqref{eq:split_Zs} gives constants $\lambda_s,C_s>0$ independent of
+\eqref{eq:split_Zs} gives constants $\lambda_s,D_s>0$ independent of
 $\varepsilon$ such that
 \begin{equation}
-\dot V_s\leq-\lambda_sV_s
- +C_s\abs{P_{c,\varepsilon}}^2
- \left(\abs{\widetilde Z_c}^2+E_u\right).
+\begin{aligned}
+\dot V_s
+={}&-\widetilde Z_s^\top Q_s\widetilde Z_s\\
+&-2\widetilde Z_s^\top P_sB_sB_c^\top P_{c,\varepsilon}
+(\widetilde Z_c-\widetilde\varphi_c)\\
+&\leq-\lambda_sV_s
++D_s\bigl[B_c^\top P_{c,\varepsilon}
+(\widetilde Z_c-\widetilde\varphi_c)\bigr]^2.
+\end{aligned}
 \label{eq:split_Vs}
 \end{equation}
-The transformation estimate \eqref{eq:phi_Eu} remains valid because $T$ is
-fixed. The wave estimate \eqref{eq:V2dot3} is also unchanged after replacing
-$B^\top P_\varepsilon X$ by
-$B_c^\top P_{c,\varepsilon}\widetilde X_c$.
-
-Moreover, $P_{c,\varepsilon}/\varepsilon$ converges to a positive definite
-matrix, so $\abs{P_{c,\varepsilon}}^2\abs{\widetilde Z_c}^2$ is bounded by a
-constant times $\varepsilon V_c$. Consequently, for sufficiently small
-$\varepsilon$, the composite functional
+The transformation estimate \eqref{eq:phi_Eu} remains valid after enlarging
+$C_\varphi$ by a fixed factor to account for $T^{-1}$. Hence
 \begin{equation}
-V=V_c+V_s+\varepsilon V_2
+\begin{aligned}
+\bigl[B_c^\top P_{c,\varepsilon}
+(\widetilde Z_c-\widetilde\varphi_c)\bigr]^2
+&\leq 2\bigl(B_c^\top P_{c,\varepsilon}\widetilde Z_c\bigr)^2\\
+&\quad{}+2\bigl(B_c^\top P_{c,\varepsilon}\widetilde\varphi_c\bigr)^2\\
+&\leq 2\abs{B_c}^2\abs{P_{c,\varepsilon}}V_c\\
+&\quad{}+2\abs{B_c}^2\abs{P_{c,\varepsilon}}^2C_\varphi E_u.
+\end{aligned}
+\label{eq:split_feedback_bound}
+\end{equation}
+Consequently, for some $C_s>0$ independent of $\varepsilon$,
+\begin{equation}
+\dot V_s\leq-\lambda_sV_s
+ +C_s\abs{P_{c,\varepsilon}}V_c
+ +C_s\abs{P_{c,\varepsilon}}^2E_u.
+\label{eq:split_Vs_bound}
+\end{equation}
+The wave estimate remains of the form
+\begin{equation}
+\dot V_2
+\leq
+-c_3E_u
+ +C_3\abs{P_{c,\varepsilon}}V_c
+ +C_4\abs{P_{c,\varepsilon}}^2E_u,
+\label{eq:split_V2}
+\end{equation}
+where $C_3,C_4>0$ are independent of $\varepsilon$.
+
+Define
+\begin{equation}
+V=V_c+\varepsilon V_s+\varepsilon V_2.
 \label{eq:split_V}
 \end{equation}
-is equivalent to $\Omega$ and satisfies
+Combining \eqref{eq:split_Vc}, \eqref{eq:split_Vs_bound}, and
+\eqref{eq:split_V2}, we obtain
 \begin{equation}
-\dot V\leq-c\left(\varepsilon V_c+V_s+\varepsilon E_u\right)
-\leq-\beta V
-\label{eq:split_decay}
+\begin{aligned}
+\dot V
+&\leq
+-\varepsilon[1-(C_s+C_3)\abs{P_{c,\varepsilon}}]V_c
+-\varepsilon\lambda_sV_s\\
+&\quad
+-\bigl[\varepsilon c_3
+-(C_c+\varepsilon C_s+\varepsilon C_4)\abs{P_{c,\varepsilon}}^2\bigr]E_u,
+\end{aligned}
+\label{eq:split_Vdot}
 \end{equation}
-for some $c,\beta>0$. The norm-equivalence and well-posedness arguments are
-the same as those following \eqref{eq:equi}. Hence
-$\Omega(t)\leq\alpha e^{-\beta t}\Omega(0)$.
+By Lemma~\ref{lem:lowgain}, $\abs{P_{c,\varepsilon}}\leq K_P\varepsilon$.
+Hence, for sufficiently small $\varepsilon>0$,
+\begin{equation}
+(C_s+C_3)\abs{P_{c,\varepsilon}}\leq\frac12,
+\qquad
+(C_c+\varepsilon C_s+\varepsilon C_4)\abs{P_{c,\varepsilon}}^2
+\leq\frac{\varepsilon c_3}{2}.
+\end{equation}
+Thus,
+\begin{equation}
+\dot V
+\leq
+-\frac{\varepsilon}{2}V_c
+-\varepsilon\lambda_sV_s
+-\frac{\varepsilon c_3}{2}E_u.
+\label{eq:split_Vdecay}
+\end{equation}
+Since $V_2\leq M_\delta E_u$, there exists $\beta>0$ such that
+\begin{equation}
+\dot V\leq-\beta V.
+\end{equation}
+The equivalence between $V$ and $\Omega$ then gives
+\[
+\Omega(t)\leq\alpha e^{-\beta t}\Omega(0).
+\]
 \end{proof}
 
 \subsection{Nilpotent Case}
-When all eigenvalues of $A$ are at the origin, the kernel problem simplifies and
-an explicit endpoint gain is available. Let $g$ solve
+When all eigenvalues of $A$ are at the origin, we use the following
+simplified kernel construction. Let $g$ solve
 \begin{equation}
 g''(x)+B_1(x)=0,
 \qquad
@@ -1150,7 +1209,7 @@ Using the Riccati equation gives
 \label{eq:nilV1_identity}
 \end{equation}
 The first three terms are handled by completing the square. For the last term,
-Lemma~\ref{lem:lowgain}(3) gives
+the nilpotent estimate in Lemma~\ref{lem:lowgain} gives
 \begin{equation}
 A^{\top}P_\varepsilon A
 \preceq 3n^2\varepsilon^2P_\varepsilon.
