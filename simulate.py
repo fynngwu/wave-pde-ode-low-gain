@@ -226,16 +226,32 @@ def fig_comparison(times, xg, Xcl, ucl, Xdmp, udmp, path):
     plt.close(fig)
 
 
-def fig_epsilon(times, xg, responses, path):
-    """Example 3: one ODE/PDE comparison figure for all epsilon values."""
-    fig = plt.figure(figsize=(7.1, 8.7))
-    grid = fig.add_gridspec(3, 2, wspace=0.25, hspace=0.36)
-    for row, (eps, X, u) in enumerate(responses):
-        plot_states(fig.add_subplot(grid[row, 0]), times, X,
-                    fr"({chr(ord('a') + 2 * row)}) ODE response, $\varepsilon={eps:.1f}$")
-        plot_surface(fig.add_subplot(grid[row, 1], projection="3d"), times, xg, u,
-                     fr"({chr(ord('b') + 2 * row)}) Wave response, $\varepsilon={eps:.1f}$")
-    fig.subplots_adjust(left=0.07, right=0.97, bottom=0.04, top=0.96)
+def fig_lowgain(times, curves, sweep, path):
+    """Example 3: decay speed and terminal norm versus the low-gain parameter."""
+    fig = plt.figure(figsize=(7.1, 2.6))
+    grid = fig.add_gridspec(1, 2, wspace=0.26)
+
+    axis = fig.add_subplot(grid[0, 0])
+    for eps, norm in curves.items():
+        axis.semilogy(times, norm, lw=1.2, label=fr"$\varepsilon={eps:.2f}$")
+    axis.set_title(r"(a) State norm $\|X(t)\|$", fontsize=9)
+    axis.set_xlabel("Time (s)", fontsize=8)
+    axis.set_ylabel(r"$\|X(t)\|$", fontsize=8)
+    axis.grid(alpha=0.3, which="both")
+    axis.tick_params(labelsize=7)
+    axis.legend(fontsize=7, frameon=False, loc="best")
+
+    axis = fig.add_subplot(grid[0, 1])
+    eps = np.array([e for e, _ in sweep])
+    terminal = np.array([v for _, v in sweep])
+    axis.semilogy(eps, terminal, "o-", lw=1.2, ms=4, color="tab:red")
+    axis.set_title(r"(b) Terminal norm $\|X(50)\|$ vs. $\varepsilon$", fontsize=9)
+    axis.set_xlabel(r"Low-gain parameter $\varepsilon$", fontsize=8)
+    axis.set_ylabel(r"$\|X(50)\|$", fontsize=8)
+    axis.grid(alpha=0.3, which="both")
+    axis.tick_params(labelsize=7)
+
+    fig.subplots_adjust(left=0.09, right=0.97, bottom=0.19, top=0.86)
     fig.savefig(path, dpi=180)
     plt.close(fig)
 
@@ -308,21 +324,30 @@ def ex2():
 
 
 # ----------------------------------------------------------------------------
-# Example 3 : effect of the low-gain parameter
+# Example 3 : convergence speed versus the low-gain parameter
 # ----------------------------------------------------------------------------
+EPS_SWEEP = (0.02, 0.05, 0.08, 0.12, 0.20, 0.30)
+EPS_SHOWN = (0.05, 0.12, 0.20)
 def ex3():
+    """Convergence speed versus the low-gain parameter, on the Example 1 plant."""
     D, b, q, _, A, B1fn, B2fn, xg, X0, u0, v0 = general_case()
     B, _ = solve_kernel(A, B1fn, B2fn, b, q, D)
-    responses = []
-    for eps in (0.2, 0.5, 0.9):
-        P, residual = solve_are_lowgain(A, B.reshape(-1, 1), eps)
-        K = (B.reshape(1, -1) @ P).reshape(-1)
+    Bb = B.reshape(-1, 1)
+
+    curves, sweep = {}, []
+    for eps in EPS_SWEEP:
+        P, residual = solve_are_lowgain(A, Bb, eps)
+        K = (Bb.reshape(1, -1) @ P).reshape(-1)
         times, rec = simulate(n=2, A=A, B1mat=B1fn(xg), B2mat=B2fn(xg), K=K,
                               b=b, q=q, D=D, X0=X0, u0=u0, v0=v0,
                               N=xg.size - 1)
-        responses.append((eps, rec[:, :2], rec[:, 2:]))
-        print(f"EX3 eps = {eps:.1f}: K = {K}, ARE-resid = {residual}")
-    fig_epsilon(times, xg, responses, os.path.join(HERE, "fig4.png"))
+        norm = np.linalg.norm(rec[:, :2], axis=1)
+        sweep.append((eps, norm[-1]))
+        if eps in EPS_SHOWN:
+            curves[eps] = norm
+        print(f"EX3 eps = {eps:.2f}: K = {np.round(K, 4)}, "
+              f"|X(50)| = {norm[-1]:.3e}, ARE-resid = {residual}")
+    fig_lowgain(times, curves, sweep, os.path.join(HERE, "fig4.png"))
 
 
 def main():
