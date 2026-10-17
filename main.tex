@@ -23,7 +23,7 @@
 
 \begin{document}
 
-\title{Finite-Dimensional Boundary Control for Wave PDE--ODE Systems with Distributed Coupling}
+\title{Finite-Dimensional Control for Wave PDE--ODE Systems with Distributed Effect}
 
 \author{Fengyang~Wu and Xiang~Xu
 \thanks{F. Wu and X. Xu are with the School of System Design and Intelligent
@@ -34,7 +34,7 @@ Southern University of Science and Technology, Shenzhen, China (e-mail:
 \maketitle
 
 \begin{abstract}
-This article proposes two finite-dimensional boundary controllers for wave PDE--ODE cascade systems with distributed displacement and velocity coupling. It is shown that the closed-loop system can be exponentially stabilized under suitable spectral conditions on the open-loop ODE plant. The proposed controllers are developed using a forwarding-based design, which transforms the distributed PDE--ODE interconnection into an equivalent finite-dimensional boundary channel and enables a finite-dimensional stabilization strategy. Compared with existing backstepping-based designs, the proposed controllers have a much simpler structure and require only the finite-dimensional plant state and local boundary measurements for online implementation. This simplicity is achieved at the cost of additional spectral restrictions on the open-loop plant. An even simpler controller is obtained for the nilpotent case. The proposed approach also accommodates distributed coupling kernels with square-integrable regularity. Several numerical simulations are provided to demonstrate the effectiveness of the proposed controllers.
+This article proposes two finite-dimensional controllers for wave PDE--ODE cascade systems with distributed displacement and velocity coupling. It is shown that the closed-loop system can be exponentially stabilized under suitable spectral and controllability conditions on the open-loop ODE plant. The proposed controllers are constructed using a forwarding transformation that converts the distributed coupling into an equivalent finite-dimensional boundary input channel. Compared with existing backstepping-based designs, the proposed controllers have a much simpler structure and require only the ODE state and local boundary measurements, rather than the full distributed wave state. However, additional spectral restrictions on the open-loop plant are imposed to achieve this simplification. Moreover, an even simpler controller is obtained when the eigenvalues of the ODE plant are all at the origin. Several numerical examples are provided to illustrate the effectiveness of the proposed controllers.
 
 \end{abstract}
 
@@ -42,107 +42,66 @@ This article proposes two finite-dimensional boundary controllers for wave PDE--
 Boundary control, wave equation, distributed parameter systems, finite-dimensional control, PDE--ODE cascade systems.
 \end{IEEEkeywords}
 
+
+
 \section{Introduction}
-Many control systems deliver the controller command to the ODE
-plant through a non-ideal actuator path, whose finite length,
-elasticity, or inertia cannot be neglected. The command must first
-propagate through the actuator, and hence acts on the plant through a
-distributed state rather than at a single point. Wave equations
-provide a natural model for such actuator dynamics, since
-propagation and energy storage are dominant
-\cite{evans_pde_2010, curtain_zwart_introduction_1995}. This viewpoint
-is closely related to the classical compensation of input delays
-\cite{artstein_linear-systems_1982, richard_time-delay_2003,
-krstic_lyapunov_2008, krstic_lyapunov_2010,
-bekiaris-liberis_lyapunov_2011}, but it retains more of the physical
-actuator dynamics than a pure delay representation.
 
-Boundary control of wave equations and PDE backstepping have been
-extensively studied \cite{krstic_output-feedback_2008,
-krstic_smyshlyaev_boundary_2008, vazquez_backstepping_2026,
-krstic_backstepping_2008}. For a wave PDE entering the plant, an
-explicit compensator was first constructed in
-\cite{krstic_compensating_2009} for a pointwise interconnection and
-extended in \cite{bekiaris-liberis_compensating_2010,
-bekiaris-liberis_compensating_2011} to distributed in-domain couplings.
-Such backstepping controllers, however, tend to be algebraically
-involved and typically require full distributed-state information,
-since the cascade is not in strict-feedback form and the wave subsystem
-has infinitely many imaginary-axis modes; recent work has moved toward
-output feedback, disturbances, and delays
-\cite{than_output-feedback_2021, mei_infinite-dimensional_2023,
-feng_output-feedback_2024, wang_delay-adaptive_2024}, usually at the
-price of adding observer, disturbance-estimator, or adaptive modules.
-A related line of work keeps a parametric Riccati gain deliberately
-small, which gives equally simple controllers under additional spectral
-assumptions on the open-loop plant
-\cite{lin_asymptotic_2007, zhou_stabilization_2012,
-lin_semiglobal_1993, teel_semiglobal_1995, lin_low-gain_1999,
-xu_stabilization_2018, xu_semi-global_2019, xu_stability_2020}. Most
-relevant here, such a finite-dimensional compensation was established
-in \cite{xu_low-gain_2023} for diffusion--convection PDE--ODE cascades,
-whose actuator dynamics are parabolic, and
-\cite{xu_backstepping-forwarding_2024} shows how distributed
-interconnections increase the complexity of both the controller and the
-proof. Whether a similarly simple finite-dimensional design exists for a
-\emph{conservative wave} actuator with distributed displacement and
-velocity coupling, whose hyperbolic nature and infinitely many
-imaginary-axis modes preclude a direct extension of the parabolic
-results, has remained open.
 
-In the cascade considered here, the boundary input $U(t)$ is applied
-at the right endpoint $x = D$ of a one-dimensional wave actuator
-$u(x,t)$, the left endpoint $x = 0$ carries a free (Neumann)
-boundary condition $u_x(0,t) = 0$, and the plant state $X(t)$ is
-driven by the spatially integrated effects of the wave displacement
-and velocity. The plant is therefore coupled to the whole actuator
-profile rather than to a single boundary trace. Because the wave
-equation is conservative in the interior, the boundary feedback must
-simultaneously inject damping and stiffness at the controlled
-endpoint. A forwarding-based transformation converts the distributed
-coupling into an equivalent finite-dimensional boundary channel with an
-effective input vector $B$ computed offline, and the resulting
-controller is
+Interconnections between ordinary differential equations (ODEs) and partial differential equations (PDEs) arise in various engineering systems involving flexible structures and mechanical vibrations \cite{krstic_compensating_2009,susto_control_2010,bekiaris-liberis_compensating_2010}. In particular, when the vibrations of a flexible structure are described by a wave equation and its distributed displacement and velocity affect a finite-dimensional subsystem, the resulting dynamics can be modeled as a wave PDE--ODE cascade with distributed coupling. In such systems, the control input may be applied at the boundary of the wave equation, whereas the ODE is driven by the wave state distributed over the spatial domain. In this context, we are concerned with the boundary stabilization of wave PDE--ODE cascades with distributed coupling.
+
+
+
+
+Various approaches have been developed for the stabilization of PDE--ODE cascades. Backstepping has been widely employed to stabilize coupled PDE--ODE systems through infinite-dimensional transformations and boundary feedback design \cite{krstic_backstepping_2008,krstic_compensating_2009,susto_control_2010,bekiaris-liberis_compensating_2010}. More recently, Tsubakino and Krstic \cite{tsubakino_forwarding-based_2024} developed a forwarding-based controller for general linear ODE--wave cascades with distributed interconnections, allowing unstable ODE dynamics. However, these designs may require distributed PDE-state measurements and spatial integral terms in the feedback law. To overcome limitations in state availability, output-feedback controllers have also been developed using state observers and disturbance estimators \cite{than_output-feedback_2021,mei_infinite-dimensional_2023,feng_output-feedback_2024}. Although these methods reduce direct state-measurement requirements, the additional observer dynamics, particularly for infinite-dimensional systems, may increase the complexity of real-time implementation. These considerations motivate the development of stabilizing controllers with simpler online feedback structures.
+
+
+
+To simplify the feedback implementation, Xu et al. \cite{xu_low-gain_2023} proposed a finite-dimensional feedback design for PDE--ODE cascades with distributed diffusion and counter convection. Their approach achieves exponential stabilization without requiring the full PDE state in the feedback law, at the expense of additional spectral restrictions on the ODE subsystem. This result motivates us to investigate whether a similar finite-dimensional control structure can be developed for wave PDE--ODE cascades. However, unlike diffusion equations, wave equations generally lack intrinsic energy dissipation and may possess nondecaying modes under certain boundary conditions. As a result, the stability analysis developed for diffusion PDE--ODE cascades cannot be directly applied to wave PDE--ODE cascades, since the dissipative properties underlying the original analysis are no longer available.
+
+
+
+Motivated by these observations, this paper investigates low-gain compensation for a linear ODE coupled to a one-dimensional wave equation through spatially distributed displacement and velocity terms. The wave equation is subject to a homogeneous Neumann boundary condition at $x=0$ and a boundary control input at $x=D$. We combine boundary damping and stiffness feedback with a low-gain compensation term to stabilize the overall cascade. The boundary feedback dissipates wave energy and suppresses the nondecaying displacement mode associated with the Neumann boundary configuration. To account for the distributed coupling, an effective finite-dimensional input vector is constructed through an auxiliary boundary-value problem. This vector is then used to design the low-gain feedback without requiring online integration of the distributed wave state. Specifically, the proposed controller takes the form
 \begin{equation}
-U(t)=-B^{\top}P_\varepsilon X(t)-b\,u_t(D,t)-q\,u(D,t).
+U(t)=-B^{\top}P_\varepsilon X(t)
+     -b\,u_t(D,t)-q\,u(D,t),
 \label{eq:introcontroller}
 \end{equation}
-The first term provides finite-dimensional stabilization, while
-the latter two terms provide boundary damping and stiffness.
+where $P_\varepsilon$ is the positive definite solution of a parametric algebraic Riccati equation, and $B$ is the effective input vector determined offline. The boundary terms provide wave damping and stiffness, while the low-gain term stabilizes the finite-dimensional subsystem. Consequently, the controller requires only the ODE state and the wave displacement and velocity at the controlled boundary.
 
-Main contributions of this work, compared with relevant existing works,
-can be summarized as follows.
+The main contributions of this paper are summarized as follows.
 \begin{enumerate}
-\item To the best of the authors' knowledge, this is the first
-application of the finite-dimensional feedback approach to boundary control
-problems with wave PDE actuator dynamics and distributed displacement
-and velocity coupling. An even simpler controller, whose gain admits a
-closed-form integral expression, is obtained for the nilpotent case.
-\item Compared with the backstepping designs
-\cite{krstic_compensating_2009, bekiaris-liberis_compensating_2010},
-the proposed controller is structurally simpler: online it uses only
-$X(t)$, $u(D,t)$, and $u_t(D,t)$, while the effective gain comes from
-an offline kernel boundary-value problem. The price is the additional
-spectral restriction in Assumption~\ref{ass:marginal}.
-\item A composite Lyapunov functional is constructed for the full
-PDE--ODE cascade by combining the Riccati energy with a damped wave
-energy, using explicit constants to dominate the cross-terms.
-This directly yields exponential stability in the natural norm $\Omega$
-with only square-integrable coupling kernels.
+\item A low-gain compensation framework is developed for wave PDE--ODE cascades with spatially distributed displacement and velocity coupling. Under suitable spectral and controllability conditions, the proposed feedback achieves exponential stabilization using only the finite-dimensional state and two boundary measurements. Unlike observer-based output-feedback designs \cite{than_output-feedback_2021,mei_infinite-dimensional_2023,feng_output-feedback_2024}, the proposed controller does not introduce additional observer or estimator dynamics. Compared with the forwarding-based design in \cite{tsubakino_forwarding-based_2024}, it also avoids distributed wave-state integration in the online feedback, at the expense of more restrictive assumptions on the ODE subsystem.
+
+\item A compensation mechanism combining wave boundary dissipation and finite-dimensional low-gain feedback is established. An auxiliary boundary-value problem is employed to construct an effective input vector that captures the influence of the distributed wave coupling. This enables the low-gain design without requiring a distributed-state feedback transformation in the controller implementation. Furthermore, when the ODE matrix is nilpotent, a simplified expression for the effective input vector is obtained, leading to a more convenient offline controller design.
+
+\item Exponential stability of the coupled closed-loop system is established through a composite Lyapunov functional combining the Riccati-based finite-dimensional energy and the boundary-damped wave energy. The analysis accounts for the interaction between the ODE and wave subsystems under square-integrable distributed coupling kernels, thereby extending the low-gain compensation principle from dissipative parabolic cascades \cite{xu_low-gain_2023} to the considered wave PDE--ODE setting.
 \end{enumerate}
 
-The rest of the paper is organized as follows. Section~\ref{sec:prob}
-formulates the problem, recalls the parametric Riccati framework, and
-constructs the offline kernel.
-Section~\ref{sec:stab} states the main stability theorems and gives their
-proofs. Section~\ref{sec:num} reports numerical simulations, and
-Section~\ref{sec:concl} concludes.
+The remainder of this paper is organized as follows. Section~\ref{sec:prob} presents the problem formulation and preliminary results. Section~\ref{sec:stab} develops the proposed controllers and establishes exponential stability. Numerical examples are provided in Section~\ref{sec:num}, followed by conclusions in Section~\ref{sec:concl}.
 
-\textbf{Notations:} According to context, $\abs{\cdot}$ denotes absolute
-value, complex magnitude, Euclidean length, or the matrix 2-norm;
-$\norm{\cdot}_2$ is the $L^2(0,D)$ norm and $\dint{\cdot}$ abbreviates
-$\int_0^D$. $I$ and $0$ are identity and zero matrices of compatible size,
-and $P\preceq Q$ means that $Q-P$ is positive semidefinite.
+\textbf{Notations:}
+The notation $\abs{\cdot}$ denotes the absolute value, complex modulus, Euclidean norm, or induced matrix 2-norm, as appropriate. The notation $\norm{\cdot}_2$ denotes the $L^2(0,D)$ norm, and $\dint{\cdot}$ abbreviates $\int_0^D$. The symbols $I$ and $0$ denote identity and zero matrices of compatible dimensions, respectively. For symmetric matrices $P$ and $Q$, $P\preceq Q$ means that $Q-P$ is positive semidefinite.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \section{Preliminaries}
 \label{sec:prob}
