@@ -60,65 +60,45 @@ To simplify the feedback implementation, Xu et al. \cite{xu_low-gain_2023} propo
 
 
 
-Motivated by these observations, this paper investigates low-gain compensation for a linear ODE coupled to a one-dimensional wave equation through spatially distributed displacement and velocity terms. The wave equation is subject to a homogeneous Neumann boundary condition at $x=0$ and a boundary control input at $x=D$. We combine boundary damping and stiffness feedback with a low-gain compensation term to stabilize the overall cascade. The boundary feedback dissipates wave energy and suppresses the nondecaying displacement mode associated with the Neumann boundary configuration. To account for the distributed coupling, an effective finite-dimensional input vector is constructed through an auxiliary boundary-value problem. This vector is then used to design the low-gain feedback without requiring online integration of the distributed wave state. Specifically, the proposed controller takes the form
+To address these challenges, this paper develops a finite-dimensional feedback controller for a linear ODE coupled with a one-dimensional wave equation through spatially distributed displacement and velocity terms. The wave equation satisfies a homogeneous Neumann boundary condition at $x=0$, with the control input applied at $x=D$. Motivated by existing boundary stabilization methods for wave equations \cite{krstic_output-feedback_2008,tsubakino_forwarding-based_2024}, we introduce boundary damping together with an additional stiffness feedback term to eliminate the nondecaying displacement mode and stabilize the wave subsystem. Following the finite-dimensional compensation idea in \cite{xu_low-gain_2023}, an auxiliary boundary-value problem is constructed to account for the distributed displacement and velocity coupling and determine an effective input vector $B$. The resulting controller takes the form
 \begin{equation}
-U(t)=-B^{\top}P_\varepsilon X(t)
-     -b\,u_t(D,t)-q\,u(D,t),
+U(t)=-B^\top P_\varepsilon X(t)-b\,u_t(D,t)-q\,u(D,t),
 \label{eq:introcontroller}
 \end{equation}
-where $P_\varepsilon$ is the positive definite solution of a parametric algebraic Riccati equation, and $B$ is the effective input vector determined offline. The boundary terms provide wave damping and stiffness, while the low-gain term stabilizes the finite-dimensional subsystem. Consequently, the controller requires only the ODE state and the wave displacement and velocity at the controlled boundary.
+where $P_\varepsilon$ is the positive definite solution of a parametric algebraic Riccati equation. Unlike feedback designs requiring distributed wave-state information, the proposed controller uses only the ODE state and the wave displacement and velocity at the controlled boundary.
 
-The main contributions of this paper are summarized as follows.
+The main contributions of this paper, compared with relevant existing works, are summarized as follows.
 \begin{enumerate}
-\item A low-gain compensation framework is developed for wave PDE--ODE cascades with spatially distributed displacement and velocity coupling. Under suitable spectral and controllability conditions, the proposed feedback achieves exponential stabilization using only the finite-dimensional state and two boundary measurements. Unlike observer-based output-feedback designs \cite{than_output-feedback_2021,mei_infinite-dimensional_2023,feng_output-feedback_2024}, the proposed controller does not introduce additional observer or estimator dynamics. Compared with the forwarding-based design in \cite{tsubakino_forwarding-based_2024}, it also avoids distributed wave-state integration in the online feedback, at the expense of more restrictive assumptions on the ODE subsystem.
+\item To the best of our knowledge, this is the first attempt to develop a finite-dimensional feedback controller of the proposed structure for wave PDE--ODE cascades with spatially distributed displacement and velocity coupling. Compared with the forwarding-based design in \cite{tsubakino_forwarding-based_2024}, the proposed controller has a simpler form and does not require distributed wave-state integration in the online feedback. Unlike observer-based approaches \cite{than_output-feedback_2021,mei_infinite-dimensional_2023,feng_output-feedback_2024}, it introduces no additional observer dynamics. These advantages are obtained at the expense of more restrictive spectral conditions on the ODE subsystem.
 
-\item A compensation mechanism combining wave boundary dissipation and finite-dimensional low-gain feedback is established. An auxiliary boundary-value problem is employed to construct an effective input vector that captures the influence of the distributed wave coupling. This enables the low-gain design without requiring a distributed-state feedback transformation in the controller implementation. Furthermore, when the ODE matrix is nilpotent, a simplified expression for the effective input vector is obtained, leading to a more convenient offline controller design.
+\item A composite Lyapunov functional is developed to establish exponential stability under the proposed finite-dimensional feedback. The main difficulty lies in handling the multiple residual coupling terms arising from the distributed displacement and velocity interactions. To overcome this difficulty, the Riccati-based ODE energy is combined with the boundary-damped wave energy and suitable auxiliary terms. Through a careful selection of the functional weights and feedback parameters, the resulting cross terms are systematically estimated and absorbed into the dissipative terms, yielding a strict decay estimate for the coupled closed-loop system.
 
-\item Exponential stability of the coupled closed-loop system is established through a composite Lyapunov functional combining the Riccati-based finite-dimensional energy and the boundary-damped wave energy. The analysis accounts for the interaction between the ODE and wave subsystems under square-integrable distributed coupling kernels, thereby extending the low-gain compensation principle from dissipative parabolic cascades \cite{xu_low-gain_2023} to the considered wave PDE--ODE setting.
+\item For the special case where the ODE matrix is nilpotent, the proposed controller admits a further simplified representation. By exploiting the nilpotent structure, the effective input vector can be expressed in a more explicit form, reducing the complexity of the offline controller design while preserving the finite-dimensional feedback structure. Numerical simulations are conducted to illustrate the effectiveness of the proposed controller and the exponential decay of the closed-loop states.
 \end{enumerate}
 
 The remainder of this paper is organized as follows. Section~\ref{sec:prob} presents the problem formulation and preliminary results. Section~\ref{sec:stab} develops the proposed controllers and establishes exponential stability. Numerical examples are provided in Section~\ref{sec:num}, followed by conclusions in Section~\ref{sec:concl}.
 
 \textbf{Notations:}
-The notation $\abs{\cdot}$ denotes the absolute value, complex modulus, Euclidean norm, or induced matrix 2-norm, as appropriate. The notation $\norm{\cdot}_2$ denotes the $L^2(0,D)$ norm, and $\dint{\cdot}$ abbreviates $\int_0^D$. The symbols $I$ and $0$ denote identity and zero matrices of compatible dimensions, respectively. For symmetric matrices $P$ and $Q$, $P\preceq Q$ means that $Q-P$ is positive semidefinite.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+The notation $\abs{\cdot}$ denotes the absolute value of a real number, the modulus of a complex number, the Euclidean norm of a vector, or the induced 2-norm of a matrix, as appropriate. The notation $\norm{\cdot}_2$ denotes the $L^2(0,D)$ norm, and $\dint{\cdot}$ abbreviates $\int_0^D$. For a positive definite matrix $P$, $P^{1/2}$ denotes its unique positive definite square root. The symbols $I$ and $0$ denote identity and zero matrices of compatible dimensions, respectively. For symmetric matrices $P$ and $Q$, $P\preceq Q$ means that $Q-P$ is positive semidefinite. For a sufficiently differentiable function $u(x,t)$, $u_x$, $u_{xx}$, and $u_t$ denote its first- and second-order spatial partial derivatives and first-order temporal partial derivative, respectively.
 
 
 \section{Preliminaries}
 \label{sec:prob}
-
 \subsection{Problem Formulation}
-Consider $x \in [0, D]$ and $t \geq 0$, and the system
+In this article, we consider the following PDE--ODE cascade system:
 \begin{equation}
 \begin{aligned}
-\dot{X}(t)={}&AX(t)+\dint{B_1(x)u(x,t)\,\mathrm{d}x}\\
-&+\dint{B_2(x)u_t(x,t)\,\mathrm{d}x},
+\dot{X}(t)={}&AX(t)
++\dint{B_1(x)u(x,t)\,\mathrm{d}x}
++\dint{B_2(x)u_t(x,t)\,\mathrm{d}x}
 \end{aligned}
 \label{eq:ode}
 \end{equation}
 \begin{equation}
-u_{tt}(x,t) = u_{xx}(x,t),
+u_{tt}(x,t)=u_{xx}(x,t),
 \label{eq:wave}
 \end{equation}
+with boundary conditions given as follows:
 \begin{equation}
 u_x(0,t)=0,
 \label{eq:left_boundary}
@@ -127,21 +107,23 @@ u_x(0,t)=0,
 u_x(D,t)=U(t),
 \label{eq:right_boundary}
 \end{equation}
-where $X(t) \in \mathbb{R}^n$ is the plant state, $A \in
-\mathbb{R}^{n \times n}$, $U(t) \in \mathbb{R}$ is the boundary control applied
-at $x = D$, and $u \colon [0,D]\times[0,\infty) \to \mathbb{R}$ is the wave
-state. The coupling kernels satisfy
-$B_1,B_2\in L^2(0,D;\mathbb{R}^n)$, and the initial data are
+where $X(t)\in\mathbb{R}^n$ is the plant state,
+$U(t)\in\mathbb{R}$ is the control signal,
+$u(x,t):[0,D]\times[0,+\infty)\to\mathbb{R}$
+is the actuator state, and
+$B_1(x),B_2(x):[0,D]\to\mathbb{R}^n$
+are distributed coupling functions satisfying
 \begin{equation}
-X(0)=X_0,\qquad u(\cdot,0)=u_0,\qquad u_t(\cdot,0)=u_1,
-\label{eq:initial}
+\int_0^D |B_i(x)|^2\,\mathrm{d}x<+\infty,
+\quad i=1,2.
+\label{eq:kernel_condition}
 \end{equation}
-with $X_0\in\mathbb{R}^n$, $u_0\in H^1(0,D)$, and $u_1\in L^2(0,D)$ for energy
-solutions; classical solutions require higher regularity and the corresponding
-boundary compatibility conditions. Equation~\eqref{eq:ode} is an
-$n$-dimensional linear ODE driven by the distributed effects of the wave
-displacement and velocity, while \eqref{eq:wave}--\eqref{eq:right_boundary}
-models the actuator dynamics.
+The ODE subsystem is affected by the distributed
+displacement and velocity of the wave, while the
+wave equation describes the actuator dynamics.
+The boundary conditions are of Neumann type,
+with the control signal applied at $x=D$.
+
 
 The control objective is to design $U(t)$ using only $X(t)$, $u(D,t)$, and
 $u_t(D,t)$ so that the closed-loop energy
@@ -152,9 +134,13 @@ $u_t(D,t)$ so that the closed-loop energy
 \end{equation}
 decays exponentially.
 
+
 \subsection{Technical Lemmas}
-We use the standard parametric Riccati properties and a Poincar\'e-type
-estimate.
+
+The following lemmas provide useful Riccati properties
+\cite{lin_low-gain_1999,xu_stabilization_2018,xu_semi-global_2019}
+and Poincar\'e-type inequalities
+\cite{krstic_smyshlyaev_boundary_2008}.
 
 \begin{lemma}
 \label{lem:riccati}
@@ -178,9 +164,6 @@ A^{\top}P_\varepsilon A
 \preceq 3n^2\varepsilon^2 P_\varepsilon.
 \label{eq:riccati_nilp}
 \end{equation}
-These standard properties are stated without proof; see
-\cite{lin_low-gain_1999,xu_stabilization_2018}, and, for the nilpotent
-estimate, \cite{xu_semi-global_2019}.
 \end{lemma}
 
 \begin{lemma}
@@ -192,10 +175,10 @@ For every $y\in H^1(0,D)$,
 \label{eq:poincare}
 \end{equation}
 and
-$\norm{y}_{L^\infty}^2 \leq 2y^2(D)+2D\norm{y_x}_2^2$.
-These classical estimates are stated without proof; see, e.g.,
-\cite{krstic_smyshlyaev_boundary_2008}.
+$\norm{y}_{L^\infty}^2
+\leq 2y^2(D)+2D\norm{y_x}_2^2$.
 \end{lemma}
+
 
 \subsection{Offline Kernel Construction}
 
