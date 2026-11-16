@@ -52,16 +52,16 @@ Boundary control, wave equation, distributed parameter systems, finite-dimension
 \section{Introduction}
 
 
-Interconnections between ordinary differential equations (ODEs) and partial differential equations (PDEs) arise in various engineering systems involving flexible structures and mechanical vibrations \cite{krstic_compensating_2009,susto_control_2010,bekiaris-liberis_compensating_2010}. In particular, when the vibrations of a flexible structure are described by a wave equation and its distributed displacement and velocity affect a finite-dimensional subsystem, the resulting dynamics can be modeled as a wave PDE--ODE cascade with distributed coupling. In such systems, the control input may be applied at the boundary of the wave equation, whereas the ODE is driven by the wave state distributed over the spatial domain. In this context, we are concerned with the boundary stabilization of wave PDE--ODE cascades with distributed coupling.
+Interconnections between ordinary differential equations (ODEs) and partial differential equations (PDEs) arise in various engineering systems involving flexible structures and mechanical vibrations \cite{krstic_compensating_2009,susto_control_2010,bekiaris-liberis_compensating_2010,artstein_linear-systems_1982}. In particular, when the vibrations of a flexible structure are described by a wave equation and its distributed displacement and velocity affect a finite-dimensional subsystem, the resulting dynamics can be modeled as a wave PDE--ODE cascade with distributed coupling. In such systems, the control input may be applied at the boundary of the wave equation, whereas the ODE is driven by the wave state distributed over the spatial domain. In this context, we are concerned with the boundary stabilization of wave PDE--ODE cascades with distributed coupling.
 
 
 
 
-Various approaches have been developed for the stabilization of PDE--ODE cascades. Backstepping has been widely employed to stabilize coupled PDE--ODE systems through infinite-dimensional transformations and boundary feedback design \cite{krstic_backstepping_2008,krstic_compensating_2009,susto_control_2010,bekiaris-liberis_compensating_2010}. More recently, Tsubakino and Krstic \cite{tsubakino_forwarding-based_2024} developed a forwarding-based controller for general linear ODE--wave cascades with distributed interconnections, allowing unstable ODE dynamics. However, these designs may require distributed PDE-state measurements and spatial integral terms in the feedback law. To overcome limitations in state availability, output-feedback controllers have also been developed using state observers and disturbance estimators \cite{than_output-feedback_2021,mei_infinite-dimensional_2023,feng_output-feedback_2024}. Although these methods reduce direct state-measurement requirements, the additional observer dynamics, particularly for infinite-dimensional systems, may increase the complexity of real-time implementation. These considerations motivate the development of stabilizing controllers with simpler online feedback structures.
+Various approaches have been developed for the stabilization of PDE--ODE cascades, including distributed forwarding designs \cite{xu_backstepping-forwarding_2024}. Backstepping has been widely employed to stabilize coupled PDE--ODE systems through infinite-dimensional transformations and boundary feedback design \cite{krstic_backstepping_2008,krstic_compensating_2009,susto_control_2010,bekiaris-liberis_compensating_2010,bekiaris-liberis_compensating_2011,krstic_lyapunov_2010}. More recently, Tsubakino and Krstic \cite{tsubakino_forwarding-based_2024} developed a forwarding-based controller for general linear ODE--wave cascades with distributed interconnections, allowing unstable ODE dynamics. However, these designs may require distributed PDE-state measurements and spatial integral terms in the feedback law. To overcome limitations in state availability, output-feedback controllers have also been developed using state observers and disturbance estimators \cite{than_output-feedback_2021,mei_infinite-dimensional_2023,feng_output-feedback_2024}. Although these methods reduce direct state-measurement requirements, the additional observer dynamics, particularly for infinite-dimensional systems, may increase the complexity of real-time implementation. These considerations motivate the development of stabilizing controllers with simpler online feedback structures.
 
 
 
-To simplify the feedback implementation, Xu et al. \cite{xu_low-gain_2023} proposed a finite-dimensional feedback design for PDE--ODE cascades with distributed diffusion and counter convection. Their approach achieves exponential stabilization without requiring the full PDE state in the feedback law, at the expense of additional spectral restrictions on the ODE subsystem. This result motivates us to investigate whether a similar finite-dimensional control structure can be developed for wave PDE--ODE cascades. However, unlike diffusion equations, wave equations generally lack intrinsic energy dissipation and may possess nondecaying modes under certain boundary conditions. As a result, the stability analysis developed for diffusion PDE--ODE cascades cannot be directly applied to wave PDE--ODE cascades, since the dissipative properties underlying the original analysis are no longer available.
+Finite-dimensional low-gain feedback has also been applied to delayed linear systems \cite{lin_semiglobal_1993,zhou_stabilization_2012,xu_stability_2020}. To simplify the feedback implementation, Xu et al. \cite{xu_low-gain_2023} proposed a finite-dimensional feedback design for PDE--ODE cascades with distributed diffusion and counter convection. Their approach achieves exponential stabilization without requiring the full PDE state in the feedback law, at the expense of additional spectral restrictions on the ODE subsystem. This result motivates us to investigate whether a similar finite-dimensional control structure can be developed for wave PDE--ODE cascades. However, unlike diffusion equations, wave equations generally lack intrinsic energy dissipation and may possess nondecaying modes under certain boundary conditions. As a result, the stability analysis developed for diffusion PDE--ODE cascades cannot be directly applied to wave PDE--ODE cascades, since the dissipative properties underlying the original analysis are no longer available.
 
 
 
@@ -118,7 +118,8 @@ $u(x,t):[0,D]\times[0,+\infty)\to\mathbb{R}$
 is the actuator state, and
 $B_1(x),B_2(x):[0,D]\to\mathbb{R}^n$
 are distributed coupling functions satisfying
-$\int_0^D |B_i(x)|^2\,\mathrm{d}x<+\infty$ for $i=1,2$.
+$B_1\in L^1(0,D;\mathbb R^n)$ and
+$B_2\in L^2(0,D;\mathbb R^n)$.
 The ODE subsystem is affected by the distributed
 displacement and velocity of the wave, while the
 wave equation describes the actuator dynamics.
@@ -132,9 +133,9 @@ ODE state $X(t)$ and the boundary measurements $u(D,t)$ and $u_t(D,t)$.
 \subsection{Technical Lemmas}
 
 The following lemmas provide useful Riccati properties
-\cite{lin_low-gain_1999,xu_stabilization_2018,xu_semi-global_2019}
+\cite{lin_low-gain_1999,zhou_analytical_2009,xu_stabilization_2018,xu_semi-global_2019}
 and Poincar\'e-type inequalities
-\cite{krstic_smyshlyaev_boundary_2008}.
+\cite{krstic_smyshlyaev_boundary_2008,evans_pde_2010}.
 
 \begin{lemma}
 \label{lem:riccati}
@@ -262,7 +263,7 @@ then the corresponding solution is classical.
 \end{theorem}
 
 \begin{proof}
-Let $g\in H^2(0,D;\mathbb R^n)$ be the solution of the boundary-value
+Let $g\in L^2(0,D;\mathbb R^n)$ be the solution, with $W^{2,1}$ regularity, of the boundary-value
 problem
 \begin{equation}
  g''(x)=A^2g(x)-AB_2(x)-B_1(x),
@@ -618,10 +619,11 @@ Consequently,
  e^{-\beta t}\Omega(0),\qquad t\geq0.
 \label{eq:stab_proof}
 \end{equation}
-The well-posedness argument is given in
-Appendix~\ref{app:wellposed}. The calculations above first apply to
-compatible classical solutions and extend to all energy solutions by
-density. This completes the proof.
+Standard semigroup well-posedness for the boundary-damped wave equation
+and bounded perturbations on $H^1(0,D)\times L^2(0,D)$
+\cite{curtain_zwart_introduction_1995,tsubakino_forwarding-based_2024}
+permits extension from compatible classical data to energy solutions
+by density. This completes the proof.
 \end{proof}
 
 Next, we consider the case where all eigenvalues of $A$ are at the
@@ -672,7 +674,7 @@ the solution is classical.
 \end{theorem}
 
 \begin{proof}
-Let $g\in H^2(0,D;\mathbb R^n)$ satisfy
+Let $g\in L^2(0,D;\mathbb R^n)$, with $W^{2,1}$ regularity, satisfy
 \begin{equation}
  g''(x)=-B_1(x),
 \label{eq:nilpKernelODE}
@@ -781,56 +783,45 @@ where
  \beta_n=\min\Bigl\{\frac\varepsilon4,\frac c3\Bigr\}>0.
 \label{eq:betaN}
 \end{equation}
-The equivalence of $V(t)$ and $\Omega(t)$ and the well-posedness
-argument follow as in Theorem~\ref{thm1}.
+The equivalence of $V(t)$ and $\Omega(t)$ and the extension to
+energy solutions follow as in Theorem~\ref{thm1}.
 \end{proof}
 
 \begin{remark}
-\label{rem:online}
-The functions $g$ and $Z$ are used only in the stability proof.
-The controllers \eqref{eq:controller} and \eqref{eq:nilpCtrl} require
-only $X(t)$, $u(D,t)$, and $u_t(D,t)$ for online implementation.
-\end{remark}
-
-\begin{remark}
-\label{rem:lowgain}
-The low-gain property in Lemma~\ref{lem:riccati} implies
-$\|P_\varepsilon\|=O(\varepsilon)$.
-The estimate \eqref{eq:Vdecay} shows that small values of
-$\varepsilon$ may lead to slow convergence. The theoretical bound
-$\varepsilon^*$ is sufficient and can be conservative.
-\end{remark}
-
-\begin{remark}
-\label{rem:scope}
-Assumption~\ref{ass:marginal} does not require $A$ to be
-diagonalizable. Thus it includes ODEs with integrator chains as well as
-oscillators. The restriction on the eigenvalues is needed for the
-present low-gain design, while full-state forwarding and backstepping
-methods can handle broader ODE dynamics at the cost of more complicated
-online feedback \cite{tsubakino_forwarding-based_2024}.
-\end{remark}
-
-\begin{remark}
-\label{rem:offline}
-The matrix functions in \eqref{eq:effectiveB} and
-\eqref{eq:effectiveE} are defined by their usual power series, so
-neither $A^{-1}$ nor a diagonalization of $A$ is needed.
-In fact, under Assumption~\ref{ass:marginal} and
-\eqref{eq:parameterChoice}, $E$ is invertible.
-For each eigenvalue $\lambda=i\omega$ of $A$, where
-$\omega\in\mathbb R$,
+\label{rem:pbh}
+The controllability conditions are directly testable using the PBH
+criterion. Since $E$ is a matrix function of $A$, $(A,\mathfrak B)$
+is controllable if and only if, for each $\lambda\in\sigma(A)$ and each
+nonzero complex left eigenvector $w^*A=\lambda w^*$,
 \begin{equation}
-\begin{aligned}
- &(b\lambda+q)\cosh(\lambda D)+\lambda\sinh(\lambda D)\\
- &\quad=(q+ib\omega)\cos(\omega D)-\omega\sin(\omega D)\neq0.
-\end{aligned}
-\label{eq:Enonsingular}
+ w^*\!\int_0^D\!\cosh(\lambda x)
+ \bigl(\lambda B_2(x)+B_1(x)\bigr)\,\mathrm dx\neq0.
+\label{eq:explicitPBH}
 \end{equation}
-Indeed, for $\omega=0$ the value is $q>0$, while for
-$\omega\neq0$ its real and imaginary parts cannot both be zero.
-Thus the matrix $E$ is nonsingular for all matrices satisfying
-Assumption~\ref{ass:marginal}.
+For the nilpotent case this reduces to
+$w^*\int_0^D B_1(x)\,\mathrm dx\neq0$ for every nonzero
+left eigenvector at $\lambda=0$.
+Moreover, $E$ is nonsingular when all eigenvalues of $A$ lie on
+the imaginary axis: for $\lambda=i\omega$ its scalar factor equals
+$(q+ib\omega)\cos(\omega D)-\omega\sin(\omega D)$, which never vanishes
+for $b,q>0$. The feedback requires only $X(t)$, $u(D,t)$, and
+$u_t(D,t)$ online \cite{tsubakino_forwarding-based_2024}.
+\end{remark}
+
+\begin{remark}
+\label{rem:dirac}
+The displacement coupling $B_1\in L^1$ can also be extended to a
+finite $\mathbb R^n$-valued measure $\mu_1$ on $(0,D)$. For example,
+$\mathrm d\mu_1=c\,\delta_\xi$ with $\xi\in(0,D)$ produces the
+pointwise term $c\,u(\xi,t)$ in \eqref{eq:ode}.
+The map $u\mapsto u(\xi)$ is bounded on $H^1(0,D)$.
+The integral involving $B_1$ in \eqref{eq:effectiveB} is then
+understood as a measure integral, and the auxiliary kernel satisfies
+its equation distributionally (with a jump in $g'$ at $\xi$).
+The same energy estimates use only $g\in L^2$, so the stability
+argument applies with this interpretation.
+The velocity kernel remains $B_2\in L^2$; an interior Dirac velocity
+measurement is not defined for general $u_t\in L^2$ energy states.
 \end{remark}
 
 \section{Numerical Simulation}
@@ -881,9 +872,7 @@ $u(x,0)=0.08\cos(\pi x/(2D))$. Figure~\ref{fig:ex1} shows the ODE
 trajectories and wave displacement converging toward zero.
 \begin{figure*}[!t]
  \centering
- \IfFileExists{fig2.png}{\includegraphics[width=.70\textwidth]{fig2.png}}
- {\fbox{\parbox[c][18mm][c]{.68\textwidth}{\centering
-  Figure file \texttt{fig2.png} not supplied.}}}
+ \includegraphics[width=.70\textwidth]{fig2.png}
  \caption{Example~\ref{ex1}: (a) ODE state trajectories and
  (b) wave displacement $u(x,t)$ under \eqref{eq:ex1Ctrl}.}
  \label{fig:ex1}
@@ -928,9 +917,7 @@ unforced nilpotent ODE with a persistent component; the low-gain term
 also drives the ODE state toward zero.
 \begin{figure*}[!t]
  \centering
- \IfFileExists{fig3.png}{\includegraphics[width=.70\textwidth]{fig3.png}}
- {\fbox{\parbox[c][18mm][c]{.68\textwidth}{\centering
-  Figure file \texttt{fig3.png} not supplied.}}}
+ \includegraphics[width=.70\textwidth]{fig3.png}
  \caption{Example~\ref{ex2}: ODE and wave responses under boundary-only
  feedback (a)--(b) and finite-dimensional compensation (c)--(d).}
  \label{fig:ex2}
@@ -938,22 +925,25 @@ also drives the ODE state toward zero.
 
 \subsection{Example 3: Influence of the Low-Gain Parameter}
 \label{ex3}
-For the plant in Example~\ref{ex1}, keep the same initial conditions,
-boundary parameters, and distributed kernels. Recompute $P_\varepsilon$ for
-$\varepsilon\in\{0.02,0.05,0.08,0.12,0.20,0.30\}$.
-Figure~\ref{fig:ex3}(a) compares closed-loop state norms, while
-Fig.~\ref{fig:ex3}(b) presents the terminal value $\|X(50)\|$ across the
-sweep. The displayed numerical results illustrate slower transient decay
-for smaller gains and diminishing improvement at the largest gain. These
-observations are empirical for this discretized example, not a claim that
-the analytic stability threshold has been determined.
+Consider the same plant, boundary parameters, and initial data as in
+Example~\ref{ex1}. Recomputing the Riccati gain for
+$\varepsilon\in\{0.05,0.20,0.40\}$ produces the three responses
+in Fig.~\ref{fig:ex3}. For $\varepsilon=0.05$ and $0.20$, both the
+ODE states and the wave displacement converge toward zero; the larger
+of these two gains yields faster convergence. At $\varepsilon=0.40$,
+the states instead diverge. For this last gain, the closed-loop
+characteristic equation admits a positive real root near $0.09375$,
+confirming instability independently of the time-domain simulation.
+These results illustrate the tradeoff between convergence speed and
+the admissible low-gain range.
 \begin{figure*}[!t]
  \centering
- \IfFileExists{fig4.png}{\includegraphics[width=.70\textwidth]{fig4.png}}
- {\fbox{\parbox[c][18mm][c]{.68\textwidth}{\centering
-  Figure file \texttt{fig4.png} not supplied.}}}
- \caption{Example~\ref{ex3}: (a) state-norm evolution for representative
- $\varepsilon$; (b) terminal norm $\|X(50)\|$ versus $\varepsilon$.}
+ \includegraphics[width=.73\textwidth]{fig4.png}
+ \caption{Example~\ref{ex3}: ODE state responses (left) and
+ three-dimensional wave displacements $u(x,t)$ (right) for
+ $\varepsilon=0.05$, $0.20$, and $0.40$, respectively, from top to
+ bottom. The first two gains yield convergence and the third
+ produces divergence.}
  \label{fig:ex3}
 \end{figure*}
 
@@ -971,57 +961,7 @@ boundary measurements online, avoiding spatial wave-state integration at
 the cost of a spectral restriction on the ODE dynamics. Future work will
 consider broader ODE spectra and output-feedback implementations.
 
-\appendices
-\section{Well-Posedness of the Closed Loop}
-\label{app:wellposed}
-Here we justify the semigroup step used in Theorems~\ref{thm1} and
-\ref{thm2}. Write $v=u_t$ and $K=\mathfrak B^\top P_\varepsilon$ or
-$K=\bar B^\top P_\varepsilon$, respectively. Equip
-$\mathcal H=\mathbb R^n\times H^1(0,D)\times L^2(0,D)$ with the equivalent
-Hilbert norm
-\begin{equation}
- \|(X,f,v)\|_{\mathcal H}^2
- =|X|^2+\|f'\|_2^2+\|v\|_2^2+qf^2(D).
-\label{eq:semigroupNorm}
-\end{equation}
-The closed-loop operator is
-\begin{equation}
-\begin{aligned}
- \mathcal G_K(X,f,v)=\bigl(&AX+\textstyle\int_0^D B_1f\,\mathrm dx
-                  +\int_0^D B_2v\,\mathrm dx,\\
- &v,\ f''\bigr)
-\end{aligned}
-\label{eq:generator}
-\end{equation}
-on the domain
-\begin{equation}
-\begin{aligned}
- D(\mathcal G_K)=\bigl\{(X,f,v):\;&X\in\mathbb R^n,\;f\in H^2(0,D),\\
- &v\in H^1(0,D),\;f'(0)=0,\\
- &f'(D)+bv(D)+qf(D)=-KX\bigr\}.
-\end{aligned}
-\label{eq:generatorDomain}
-\end{equation}
-To reduce this domain to a homogeneous boundary condition, take
-$\chi(x)=-x^2/[D(2+qD)]$, which satisfies $\chi'(0)=0$ and
-$\chi'(D)+q\chi(D)=-1$. The bounded invertible change of coordinates
-$(X,f,v)\mapsto(X,w,v)$, $w=f-\chi KX$, converts the boundary condition
-into $w'(0)=0$ and $w'(D)+bv(D)+qw(D)=0$.
-In these coordinates, the operator differs by bounded maps on
-$\mathcal H$ from the direct sum of the finite-dimensional generator $A$
-and the standard wave generator with positive boundary damping $b$
-and stiffness $q$. Indeed, the distributed maps from $H^1\times L^2$
-to $\mathbb R^n$ are bounded, while $\chi$, $\chi''$ and the fixed row
-vector $K$ yield bounded additional state-space terms.
-The homogeneous wave generator is maximal dissipative in the wave-energy
-inner product: dissipativity follows by integration by parts, and
-surjectivity of its positive resolvent follows from the coercive
-Robin variational problem. The bounded perturbation theorem and similarity
-then show that $\mathcal G_K$ generates a $C_0$-semigroup on $\mathcal H$.
-Classical compatible initial data form a dense subset of $\mathcal H$;
-therefore the Lyapunov estimates extend to all energy solutions.
-
-\bibliographystyle{ieeetr}
+\bibliographystyle{IEEEtran}
 \bibliography{wave-ode}
 
 \end{document}
