@@ -61,7 +61,7 @@ Various approaches have been developed for the stabilization of PDE--ODE cascade
 
 
 
-Finite-dimensional low-gain feedback has also been applied to delayed linear systems \cite{lin_semiglobal_1993,zhou_stabilization_2012,xu_stability_2020}. To simplify the feedback implementation, Xu et al. \cite{xu_low-gain_2023} proposed a finite-dimensional feedback design for PDE--ODE cascades with distributed diffusion and counter convection. Their approach achieves exponential stabilization without requiring the full PDE state in the feedback law, at the expense of additional spectral restrictions on the ODE subsystem. This result motivates us to investigate whether a similar finite-dimensional control structure can be developed for wave PDE--ODE cascades. However, unlike diffusion equations, wave equations generally lack intrinsic energy dissipation and may possess nondecaying modes under certain boundary conditions. As a result, the stability analysis developed for diffusion PDE--ODE cascades cannot be directly applied to wave PDE--ODE cascades, since the dissipative properties underlying the original analysis are no longer available.
+Finite-dimensional low-gain feedback has also been used for delayed systems \cite{lin_semiglobal_1993,zhou_stabilization_2012,xu_stability_2020}. To simplify the feedback implementation, Xu et al. \cite{xu_low-gain_2023} proposed a finite-dimensional feedback design for PDE--ODE cascades with distributed diffusion and counter convection. Their approach achieves exponential stabilization without requiring the full PDE state in the feedback law, at the expense of additional spectral restrictions on the ODE subsystem. This result motivates us to investigate whether a similar finite-dimensional control structure can be developed for wave PDE--ODE cascades. However, unlike diffusion equations, wave equations generally lack intrinsic energy dissipation and may possess nondecaying modes under certain boundary conditions. As a result, the stability analysis developed for diffusion PDE--ODE cascades cannot be directly applied to wave PDE--ODE cascades, since the dissipative properties underlying the original analysis are no longer available.
 
 
 
@@ -118,8 +118,7 @@ $u(x,t):[0,D]\times[0,+\infty)\to\mathbb{R}$
 is the actuator state, and
 $B_1(x),B_2(x):[0,D]\to\mathbb{R}^n$
 are distributed coupling functions satisfying
-$B_1\in L^1(0,D;\mathbb R^n)$ and
-$B_2\in L^2(0,D;\mathbb R^n)$.
+$B_1\in L^1(0,D;\mathbb R^n)$ and $B_2\in L^2(0,D;\mathbb R^n)$.
 The ODE subsystem is affected by the distributed
 displacement and velocity of the wave, while the
 wave equation describes the actuator dynamics.
@@ -201,7 +200,8 @@ where
  E=(bA+qI)\cosh(AD)+A\sinh(AD).
 \label{eq:effectiveE}
 \end{equation}
-The matrix $E$ is assumed to be invertible.
+The matrix $E$ is nonsingular whenever all eigenvalues of $A$
+lie on the imaginary axis, as shown in Remark~\ref{rem:E_nonsingular}.
 
 \begin{assumption}
 \label{ass:marginal}
@@ -263,7 +263,7 @@ then the corresponding solution is classical.
 \end{theorem}
 
 \begin{proof}
-Let $g\in L^2(0,D;\mathbb R^n)$ be the solution, with $W^{2,1}$ regularity, of the boundary-value
+Let $g\in L^2(0,D;\mathbb R^n)$, with $W^{2,1}$ regularity, be the solution of the boundary-value
 problem
 \begin{equation}
  g''(x)=A^2g(x)-AB_2(x)-B_1(x),
@@ -619,11 +619,11 @@ Consequently,
  e^{-\beta t}\Omega(0),\qquad t\geq0.
 \label{eq:stab_proof}
 \end{equation}
-Standard semigroup well-posedness for the boundary-damped wave equation
-and bounded perturbations on $H^1(0,D)\times L^2(0,D)$
+Standard semigroup results for boundary-damped wave equations and
+bounded perturbations on $H^1(0,D)\times L^2(0,D)$
 \cite{curtain_zwart_introduction_1995,tsubakino_forwarding-based_2024}
-permits extension from compatible classical data to energy solutions
-by density. This completes the proof.
+allow the estimates for compatible classical solutions to extend to
+energy solutions by density. This completes the proof.
 \end{proof}
 
 Next, we consider the case where all eigenvalues of $A$ are at the
@@ -788,40 +788,62 @@ energy solutions follow as in Theorem~\ref{thm1}.
 \end{proof}
 
 \begin{remark}
-\label{rem:pbh}
-The controllability conditions are directly testable using the PBH
-criterion. Since $E$ is a matrix function of $A$, $(A,\mathfrak B)$
-is controllable if and only if, for each $\lambda\in\sigma(A)$ and each
-nonzero complex left eigenvector $w^*A=\lambda w^*$,
+\label{rem:E_nonsingular}
+In this article, the invertibility of $E$ in
+\eqref{eq:effectiveE} follows from the spectral condition on $A$.
+Indeed, the eigenvalues of $E$ are
+$d(\lambda)=(b\lambda+q)\cosh(\lambda D)
++\lambda\sinh(\lambda D)$, $\lambda\in\sigma(A)$.
+For $\lambda=i\omega$, $\omega\in\mathbb R$, we have
 \begin{equation}
- w^*\!\int_0^D\!\cosh(\lambda x)
- \bigl(\lambda B_2(x)+B_1(x)\bigr)\,\mathrm dx\neq0.
-\label{eq:explicitPBH}
+\begin{aligned}
+ d(i\omega)={}&q\cos(\omega D)-\omega\sin(\omega D)\\
+ &+ib\omega\cos(\omega D).
+\end{aligned}
+\label{eq:E_spectrum}
 \end{equation}
-For the nilpotent case this reduces to
-$w^*\int_0^D B_1(x)\,\mathrm dx\neq0$ for every nonzero
-left eigenvector at $\lambda=0$.
-Moreover, $E$ is nonsingular when all eigenvalues of $A$ lie on
-the imaginary axis: for $\lambda=i\omega$ its scalar factor equals
-$(q+ib\omega)\cos(\omega D)-\omega\sin(\omega D)$, which never vanishes
-for $b,q>0$. The feedback requires only $X(t)$, $u(D,t)$, and
-$u_t(D,t)$ online \cite{tsubakino_forwarding-based_2024}.
+If $\omega=0$, then $d(0)=q>0$. For $\omega\ne0$, a zero
+imaginary part would require $\cos(\omega D)=0$, in which
+case the real part is $-\omega\sin(\omega D)\ne0$.
+Thus, $E$ is nonsingular under Assumption~\ref{ass:marginal}
+for every $b>0$ and $q>0$.
 \end{remark}
 
 \begin{remark}
 \label{rem:dirac}
-The displacement coupling $B_1\in L^1$ can also be extended to a
-finite $\mathbb R^n$-valued measure $\mu_1$ on $(0,D)$. For example,
-$\mathrm d\mu_1=c\,\delta_\xi$ with $\xi\in(0,D)$ produces the
-pointwise term $c\,u(\xi,t)$ in \eqref{eq:ode}.
-The map $u\mapsto u(\xi)$ is bounded on $H^1(0,D)$.
-The integral involving $B_1$ in \eqref{eq:effectiveB} is then
-understood as a measure integral, and the auxiliary kernel satisfies
-its equation distributionally (with a jump in $g'$ at $\xi$).
-The same energy estimates use only $g\in L^2$, so the stability
-argument applies with this interpretation.
-The velocity kernel remains $B_2\in L^2$; an interior Dirac velocity
-measurement is not defined for general $u_t\in L^2$ energy states.
+In the proof, we must avoid $\int_0^D|B_1(x)|^2\,\mathrm dx$,
+which is not defined for a Dirac coupling, e.g.,
+$B_1(x)=c\,\delta(x-\xi)$ with $c\in\mathbb R^n$ and
+$\xi\in(0,D)$. To address this, we use the wave-energy bound
+$\|u(\cdot,t)\|_\infty^2\leq4(D+q^{-1})E_u(t)$
+and estimate the coupling term directly as
+\begin{equation}
+\begin{aligned}
+ &\left|\int_0^D B_1(x)u(x,t)\,\mathrm dx\right|\\
+ &\quad\leq\|u(\cdot,t)\|_\infty
+       \int_0^D|B_1(x)|\,\mathrm dx\\
+ &\quad\leq2\sqrt{D+q^{-1}}\,\|B_1\|_1\sqrt{E_u(t)}.
+\end{aligned}
+\label{eq:dirac_bound}
+\end{equation}
+For $B_1=c\,\delta_\xi$, the integral equals
+$c\,u(\xi,t)$ and the bound holds with $\|B_1\|_1$
+replaced by $|c|$. The kernel equation is then interpreted
+distributionally; the estimates continue to use $g\in L^2$.
+The velocity kernel remains $B_2\in L^2$, since a general
+$u_t\in L^2$ has no point trace.
+\end{remark}
+
+\begin{remark}
+\label{rem:epsilon_range}
+In this article, the upper bound $\varepsilon^*$ in
+Theorem~\ref{thm1} is obtained from the sufficient
+small-gain inequalities in \eqref{eq:Vdot}. Such a bound can
+be conservative, and the actual allowable range of
+$\varepsilon$ may be larger. It can be explored by examining
+the closed-loop spectrum numerically, as illustrated in
+Example~\ref{ex3}, where increasing $\varepsilon$ first
+accelerates convergence and eventually causes instability.
 \end{remark}
 
 \section{Numerical Simulation}
@@ -872,7 +894,9 @@ $u(x,0)=0.08\cos(\pi x/(2D))$. Figure~\ref{fig:ex1} shows the ODE
 trajectories and wave displacement converging toward zero.
 \begin{figure*}[!t]
  \centering
- \includegraphics[width=.70\textwidth]{fig2.png}
+ \IfFileExists{fig2.png}{\includegraphics[width=.70\textwidth]{fig2.png}}
+ {\fbox{\parbox[c][18mm][c]{.68\textwidth}{\centering
+  Figure file \texttt{fig2.png} not supplied.}}}
  \caption{Example~\ref{ex1}: (a) ODE state trajectories and
  (b) wave displacement $u(x,t)$ under \eqref{eq:ex1Ctrl}.}
  \label{fig:ex1}
@@ -908,16 +932,25 @@ and hence
  U=-(0.0200,\ 0.2000)X-u_t(D)-0.5u(D).
 \label{eq:ex2Ctrl}
 \end{equation}
-Take $X(0)=(0.30,-0.20)^\top$ and
-$u(x,0)=0.04\cos(\pi x/(2D))$.
-Figure~\ref{fig:ex2} compares the response under boundary damping and
-stiffness alone ($U=-u_t(D)-0.5u(D)$) with the response under
-\eqref{eq:ex2Ctrl}. The baseline damps the wave but leaves the
-unforced nilpotent ODE with a persistent component; the low-gain term
-also drives the ODE state toward zero.
+The initial conditions are given by
+\begin{equation}
+\begin{aligned}
+ X(0)&=(0.30,-0.20)^\top,\\
+ u(x,0)&=0.04\cos\!\left(\frac{\pi x}{2D}\right),
+ \quad x\in[0,D].
+\end{aligned}
+\label{eq:ex2Init}
+\end{equation}
+Figure~\ref{fig:ex2} compares the boundary damping and stiffness
+feedback $U=-u_t(D)-0.5u(D)$ with \eqref{eq:ex2Ctrl}.
+The baseline damps the wave, but the nilpotent ODE retains
+a persistent component. The proposed low-gain term also
+drives the ODE state toward zero.
 \begin{figure*}[!t]
  \centering
- \includegraphics[width=.70\textwidth]{fig3.png}
+ \IfFileExists{fig3.png}{\includegraphics[width=.57\textwidth]{fig3.png}}
+ {\fbox{\parbox[c][18mm][c]{.68\textwidth}{\centering
+  Figure file \texttt{fig3.png} not supplied.}}}
  \caption{Example~\ref{ex2}: ODE and wave responses under boundary-only
  feedback (a)--(b) and finite-dimensional compensation (c)--(d).}
  \label{fig:ex2}
@@ -929,21 +962,19 @@ Consider the same plant, boundary parameters, and initial data as in
 Example~\ref{ex1}. Recomputing the Riccati gain for
 $\varepsilon\in\{0.05,0.20,0.40\}$ produces the three responses
 in Fig.~\ref{fig:ex3}. For $\varepsilon=0.05$ and $0.20$, both the
-ODE states and the wave displacement converge toward zero; the larger
+ODE states and wave displacement converge toward zero; the larger
 of these two gains yields faster convergence. At $\varepsilon=0.40$,
-the states instead diverge. For this last gain, the closed-loop
-characteristic equation admits a positive real root near $0.09375$,
-confirming instability independently of the time-domain simulation.
-These results illustrate the tradeoff between convergence speed and
-the admissible low-gain range.
+the states instead diverge. The continuous closed-loop characteristic
+equation admits a positive real root near $0.09375$ for the last gain,
+confirming its instability. These results illustrate the tradeoff
+between convergence speed and the admissible low-gain range.
 \begin{figure*}[!t]
  \centering
- \includegraphics[width=.73\textwidth]{fig4.png}
- \caption{Example~\ref{ex3}: ODE state responses (left) and
- three-dimensional wave displacements $u(x,t)$ (right) for
- $\varepsilon=0.05$, $0.20$, and $0.40$, respectively, from top to
- bottom. The first two gains yield convergence and the third
- produces divergence.}
+ \includegraphics[width=.7\textwidth]{fig4.png}
+ \caption{Example~\ref{ex3}: ODE responses (left) and three-dimensional
+ wave displacements $u(x,t)$ (right) for $\varepsilon=0.05$, $0.20$,
+ and $0.40$, respectively, from top to bottom. The first two gains
+ yield convergence and the third produces divergence.}
  \label{fig:ex3}
 \end{figure*}
 
